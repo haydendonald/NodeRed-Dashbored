@@ -1,0 +1,28 @@
+{
+  "name": "node-red-contrib-dashbored",
+  "version": "0.0.1",
+  "description": "A more customizable dashboard for NodeRed",
+  "main": "",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:haydendonald/nodeRed-dashbored.git"
+  },
+  "license": "Apache-2.0",
+  "keywords": [
+    "node-red"
+  ],
+  "node-red": {
+    "nodes": {
+      "dashbored-dashbored": "./nodes/dashbored.js",
+      "dashbored-widget": "./nodes/widget.js",
+
+      "dashbored-widget_basicText": "./widgets/basicText.js"
+    }
+  },
+  "author": "Hayden Donald",
+  "bugs": {
+    "url": "https://github.com/haydendonald/nodeRed-dashbored/issues"
+  },
+  "homepage": "https://github.com/haydendonald/nodeRed-dashbored#readme",
+  "dependencies": {}
+}

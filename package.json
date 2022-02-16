@@ -13,10 +13,11 @@
   ],
   "node-red": {
     "nodes": {
+      "dashbored-server": "./nodes/server.js",
       "dashbored-dashbored": "./nodes/dashbored.js",
       "dashbored-widget": "./nodes/widget.js",
-
-      "dashbored-widget_basicText": "./widgets/basicText.js"
+      "dashbored-node": "./nodes/dashboredNode.js",
+      "dashbored-widget-node": "./nodes/widgetNode.js"
     }
   },
   "author": "Hayden Donald",
@@ -24,5 +25,9 @@
     "url": "https://github.com/haydendonald/nodeRed-dashbored/issues"
   },
   "homepage": "https://github.com/haydendonald/nodeRed-dashbored#readme",
-  "dependencies": {}
+  "dependencies": {
+    "path": "^0.12.7",
+    "ws": "^8.5.0",
+    "node-html-parser": "^5.2.0"
+  }
 }

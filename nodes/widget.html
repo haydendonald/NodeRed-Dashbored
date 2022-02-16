@@ -4,8 +4,8 @@
         <input type="text" id="node-config-input-name" placeholder="Name">
     </div>
     <div class="form-row">
-        <label for="node-config-input-ipAddress"><i class="icon-bookmark"></i>IP Address</label>
-        <input type="text" id="node-config-input-ipAddress">
+        <label for="node-config-input-server"><i class="icon-bookmark"></i> Server</label>
+        <input type="text" id="node-config-input-server">
     </div>
 </script>
 
@@ -14,7 +14,7 @@
         category: "config",
         defaults: {
             name: {value: ""},
-            ipAddress: {required: true, validate: RED.validators.regex(/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/)},
+            server: {value: "", required: true, type: "dashbored-server"},
         },
         label: function() {
             return (this.name || "Widget" );

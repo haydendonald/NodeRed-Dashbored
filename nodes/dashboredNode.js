@@ -4,7 +4,7 @@
 
 module.exports = function(RED)
 {
-    function widget(config)
+    function node(config)
     {
         RED.nodes.createNode(this, config);
         var node = this;
@@ -14,5 +14,5 @@ module.exports = function(RED)
     
     }
 
-    RED.nodes.registerType("dashbored-widget-basicText", widget);
+    RED.nodes.registerType("dashbored-node", node);
 }

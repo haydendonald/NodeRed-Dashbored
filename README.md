@@ -24,5 +24,18 @@ If you know how to install it feel free to give it a shot!
 
 # Configuration
 
+# Limitations
+* There is probably no or very little security. Data will probably be sent in plain text so don't expect any encryption.
+
 ----
 It's a good start??
+
+# Dev stuff
+Websocket message format
+```
+{
+    id,
+    data: {}
+}
+```
+

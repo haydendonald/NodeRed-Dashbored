@@ -3,13 +3,18 @@
         <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-config-input-name" placeholder="Name">
     </div>
+    <div class="form-row">
+        <label for="node-config-input-server"><i class="icon-bookmark"></i> Server</label>
+        <input type="text" id="node-config-input-server">
+    </div>
 </script>
 
 <script type="text/javascript">
     RED.nodes.registerType("dashbored-dashbored", {
         category: "config",
         defaults: {
-            name: {value: ""}
+            name: {value: ""},
+            server: {value: "", required: true, type: "dashbored-server"},
         },
         label: function() {
             return (this.name || "Dashbored" );

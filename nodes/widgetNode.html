@@ -1,29 +1,29 @@
-<script type="text/x-red" data-template-name="dashbored-widget-basicText">
+<script type="text/x-red" data-template-name="dashbored-widget-node">
     <div class="form-row">
         <label for="node-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
     <div class="form-row">
-        <label for="node-input-dashbored"><i class="icon-bookmark"></i> Dashbored</label>
-        <input type="text" id="node-input-dashbored">
+        <label for="node-input-widget"><i class="icon-bookmark"></i> Widget</label>
+        <input type="text" id="node-input-widget">
     </div>
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType("dashbored-widget-basicText", {
+    RED.nodes.registerType("dashbored-widget-node", {
         category: "Dashbored",
         color: "#F5F5DC",
         defaults: {
             name: {value: ""},
-            dashbored: {value: "", required: true, type: "dashbored-dashbored"},
+            widget: {value: "", required: true, type: "dashbored-widget"},
         },
         inputs: 1,
         outputs: 1,
         align: "right",
-        paletteLabel: "Text",
+        paletteLabel: "Widget",
         icon: "debug.svg",
         label: function() {
-            return (this.name || "Basic Text" );
+            return (this.name || "Widget" );
         }
     });
 </script>

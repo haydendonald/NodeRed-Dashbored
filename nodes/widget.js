@@ -26,11 +26,11 @@ module.exports = function (RED) {
 
         var name = config.name || "dashbored";
         var server = RED.nodes.getNode(config.server);
-        var text = "Test Button";
-        var onValue = "true";
-        var offValue = "false";
-        var onColor = "green";
-        var offColor = "red";
+        var text = config.text || "Toggle Button";
+        var onValue = config.onValue || "on";
+        var offValue = config.offValue || "off";
+        var onColor = config.onColor || "green";
+        var offColor = config.offColor || "red";
         var currentState = offValue;
         var nodeMsgFunctions = [];
 

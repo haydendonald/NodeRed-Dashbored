@@ -5,14 +5,13 @@ module.exports = function (RED) {
         const fs = require("fs");
         const WebSocket = require("ws");
         const htmlParse = require("node-html-parser").parse;
-        const debug = true;
 
         RED.nodes.createNode(this, config);
         var node = this;
         var rootFolder = path.join(__dirname, "..");
         var webFolder = path.join(rootFolder, "web");
         var dashboards = [];
-        var widgets = [];
+        var widgets = {};
 
         RED.log.info("-------- Dashbored Let's Start! --------");
         RED.log.info(`Root Folder: ${rootFolder}`);
@@ -28,10 +27,10 @@ module.exports = function (RED) {
 
                 //Send the message to the dashboards
                 for (var i = 0; i < dashboards.length; i++) {
-                    dashboards[i].onMessage(data);
+                    dashboards[i].onMessage(JSON.parse(data));
                 }
-                for (var i = 0; i < widgets.length; i++) {
-                    widgets[i].onMessage(data);
+                for(var i in widgets) {
+                    widgets[i].onMessage(JSON.parse(data));
                 }
             });
         });
@@ -46,6 +45,11 @@ module.exports = function (RED) {
         }
 
         ////////////////////
+
+        //Send a message to all dashboreds
+        node.sendMsg = (msg) => {
+            broadcastMessage(JSON.stringify(msg));
+        }
 
         node.addDashbored = (dashbored) => {
             RED.log.info(`- Created Dashbored [${dashbored.name}] at /${dashbored.endpoint}`);
@@ -72,13 +76,43 @@ module.exports = function (RED) {
                         }
 
                         var html = htmlParse(data);
-                        var wid = html.querySelector("#widgets");
-                        
-                        for(var i = 0; i < widgets.length; i++) {
-                            wid.innerHTML += widgets[i].generateHTML();
+                        var widgetDiv = html.querySelector("#widgets");
+
+                        var onloadScript = `<script id="onloadScripts">`;
+
+                        //For each widget in this dashbored add it to the HTML
+                        for (var i = 0; i < dashbored.widgetIds.length; i++) {
+                            var widget = widgets[dashbored.widgetIds[i]];
+                            if (!widget) { RED.log.warn(`Widget ${dashbored.widgetIds[i]} was not found for dashbored ${dashbored.name}`); break; }
+
+                            //Insert the onload script
+                            onloadScript += `
+                            addOnLoadFunction(() => {
+                                print("debug", "onload triggered - ${widget.name} (${widget.id})");
+                                ${widget.generateOnload()}
+                            });
+
+                            addOnMsgFunction((data) => {
+                                //Check if the id is equal to this widget, if so execute the actions
+                                var msg = JSON.parse(data.data);
+                                if(msg.id == "${widget.id}") {
+                                    print("debug", "onmsg triggered - ${widget.name} (${widget.id})");
+                                    ${widget.generateOnMsg()}
+                                }
+                            })
+                            `
+
+                            //Add any extra scripts/css for the widget
+                            if (widget.generateCSS) { html.querySelector("head").innerHTML += `<style id="${widget.id}">${widget.generateCSS()}</style>`; }
+                            if (widget.generateScript) { html.querySelector("head").innerHTML += `<script id="${widget.id}">${widget.generateScript()}</script>`; }
+
+                            //Insert the HTML for the widget
+                            widgetDiv.innerHTML += widget.generateHTML();
                         }
 
-                        
+                        //Add the onload scripts and delete the element
+                        html.querySelector("head").innerHTML += `${onloadScript}document.getElementById("onloadScripts").remove()</script>`;
+
 
                         console.log(html.innerHTML);
                         res.send(html.innerHTML);
@@ -96,8 +130,8 @@ module.exports = function (RED) {
         }
 
         node.addWidget = (widget) => {
-            RED.log.info(`- Added widget ${widget.name}`);
-            widgets.push(widget);
+            RED.log.info(`- Added widget ${widget.name} (${widget.id})`);
+            widgets[widget.id] = widget;
         }
 
         //On redeploy

@@ -31,13 +31,15 @@ module.exports = function (RED) {
         var offValue = "false";
         var onColor = "green";
         var offColor = "red";
+        var currentState = offValue;
         var nodeMsgFunctions = [];
 
         //When a message is received from the dashbored
-        var onMessage = (data) => {
-            if (data.id == node.id) {
+        var onMessage = (msg) => {
+            if (msg.id == node.id) {
                 for (var i = 0; i < nodeMsgFunctions.length; i++) {
-                    nodeMsgFunctions[i](data.msg);
+                    nodeMsgFunctions[i](msg.payload);
+                    currentState = msg.payload;
                 }
             }
         }
@@ -47,17 +49,35 @@ module.exports = function (RED) {
             return `
             ${util.generateCSS(node, "#", "button", `
             {
-                width: 50%
+                border-radius: 6px;
+                border-width: 0;
+                cursor: pointer;
+                font-size: 100%;
+                height: 44px;
+                overflow: hidden;
+                width: 100%;
+            }
+            `)}
+            ${util.generateCSS(node, "#", "button:disabled", `
+            {
+                cursor: default;
+            }
+            `)}
+            ${util.generateCSS(node, "#", "button:hover", `
+            {
+                font-weight: bold;
             }
             `)}
             ${util.generateCSS(node, ".", "onColor", `
             {
                 background-color: ${onColor};
+                color: #fff;
             }
             `)}
             ${util.generateCSS(node, ".", "offColor", `
             {
                 background-color: ${offColor};
+                color: #fff;
             }
             `)}
             `;
@@ -66,14 +86,13 @@ module.exports = function (RED) {
         //Generate the HTML for the widget to be inserted into the dashbored
         var generateHTML = () => {
             return `
-            ${util.generateTag(node, "button", "button", text, `class="${util.generateCSSClass(node, "offColor")}"`)}
+            ${util.generateTag(node, "button", "button", text, `class="${util.generateCSSClass(node, (currentState == offValue ? "offColor" : "onColor"))}" state="${currentState}"`)}
             `;
         }
 
         //Generate the script to be executed in the dashbored when the page loads
         var generateOnload = () => {
             return `
-            ${util.getElement(node, "button")}.setAttribute("state", "${offValue}");
             ${util.getElement(node, "button")}.onclick = function(event) {
                 if(event.target.getAttribute("state") == "${onValue}") {
                     sendNodeMsg("${node.id}", "${offValue}");
@@ -118,8 +137,11 @@ module.exports = function (RED) {
 
         //When an input is passed to the node in the flow
         node.input = (msg) => {
-            msg.id = node.id;
-            server.sendMsg(msg);
+            if(msg.payload) {
+                msg.id = node.id;
+                currentState = msg.payload;
+                server.sendMsg(msg);
+            }
         }
 
         //Functions to be called when a msg comes from the dashbored

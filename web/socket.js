@@ -25,10 +25,10 @@ socket.addEventListener("close", function () {
 });
 
 //Send a message to the socket
-sendNodeMsg = function(id, msg) {
-    print("debug", "Sending msg for " + id + ": " + msg);
+sendNodeMsg = function(id, payload) {
+    print("debug", "Sending msg for " + id + ": " + payload);
     socket.send(JSON.stringify({
         id: id,
-        msg: msg
+        payload: payload
     }));
 }

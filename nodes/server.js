@@ -57,7 +57,6 @@ module.exports = function (RED) {
 
             //Handle the incoming HTTP request
             var handleHTTP = (req, res) => {
-                console.log(req.url);
                 if (req.method != "GET") {
                     res.type("text/plain");
                     res.status(500);
@@ -115,7 +114,7 @@ module.exports = function (RED) {
                         html.querySelector("head").innerHTML += `${onloadScript}var temp = document.getElementById("onloadScripts"); temp.parentNode.removeChild(temp)</script>`;
 
 
-                        console.log(html.innerHTML);
+                        //console.log(html.innerHTML);
                         res.send(html.innerHTML);
                     });
                 }

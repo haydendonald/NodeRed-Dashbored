@@ -74,7 +74,7 @@ module.exports = function (RED) {
         var generateOnload = () => {
             return `
             ${util.getElement(node, "button")}.setAttribute("state", "${offValue}");
-            ${util.getElement(node, "button")}.onclick = (event) => {
+            ${util.getElement(node, "button")}.onclick = function(event) {
                 if(event.target.getAttribute("state") == "${onValue}") {
                     sendNodeMsg("${node.id}", "${offValue}");
                 }

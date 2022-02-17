@@ -9,7 +9,7 @@ socket.addEventListener('open', function (event) {
 });
 
 socket.addEventListener("message", function (data) {
-    print("debug", `Socket message received: ${data}`);
+    print("debug", "Socket message received: " + data);
     for(var i = 0; i < onMsgFunctions.length; i++) {
         onMsgFunctions[i](data);
     }
@@ -25,10 +25,10 @@ socket.addEventListener("close", function () {
 });
 
 //Send a message to the socket
-sendNodeMsg = (id, msg) => {
-    print("debug", `Sending msg for ${id}: ${msg}`);
+sendNodeMsg = function(id, msg) {
+    print("debug", "Sending msg for " + id + ": " + msg);
     socket.send(JSON.stringify({
-        id,
-        msg
+        id: id,
+        msg: msg
     }));
 }

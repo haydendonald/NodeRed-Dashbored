@@ -29,7 +29,7 @@ module.exports = function (RED) {
                 for (var i = 0; i < dashboards.length; i++) {
                     dashboards[i].onMessage(JSON.parse(data));
                 }
-                for(var i in widgets) {
+                for (var i in widgets) {
                     widgets[i].onMessage(JSON.parse(data));
                 }
             });
@@ -57,6 +57,7 @@ module.exports = function (RED) {
 
             //Handle the incoming HTTP request
             var handleHTTP = (req, res) => {
+                console.log(req.url);
                 if (req.method != "GET") {
                     res.type("text/plain");
                     res.status(500);
@@ -78,7 +79,7 @@ module.exports = function (RED) {
                         var html = htmlParse(data);
                         var widgetDiv = html.querySelector("#widgets");
 
-                        var onloadScript = `<script id="onloadScripts">`;
+                        var onloadScript = `<script id="onloadScripts" type="text/javascript">`;
 
                         //For each widget in this dashbored add it to the HTML
                         for (var i = 0; i < dashbored.widgetIds.length; i++) {
@@ -87,12 +88,12 @@ module.exports = function (RED) {
 
                             //Insert the onload script
                             onloadScript += `
-                            addOnLoadFunction(() => {
+                            addOnLoadFunction(function() {
                                 print("debug", "onload triggered - ${widget.name} (${widget.id})");
                                 ${widget.generateOnload()}
                             });
 
-                            addOnMsgFunction((data) => {
+                            addOnMsgFunction(function(data) {
                                 //Check if the id is equal to this widget, if so execute the actions
                                 var msg = JSON.parse(data.data);
                                 if(msg.id == "${widget.id}") {
@@ -104,14 +105,14 @@ module.exports = function (RED) {
 
                             //Add any extra scripts/css for the widget
                             if (widget.generateCSS) { html.querySelector("head").innerHTML += `<style id="${widget.id}">${widget.generateCSS()}</style>`; }
-                            if (widget.generateScript) { html.querySelector("head").innerHTML += `<script id="${widget.id}">${widget.generateScript()}</script>`; }
+                            if (widget.generateScript) { html.querySelector("html").innerHTML += `<script id="${widget.id}" type="text/javascript">${widget.generateScript()}</script>`; }
 
                             //Insert the HTML for the widget
                             widgetDiv.innerHTML += widget.generateHTML();
                         }
 
                         //Add the onload scripts and delete the element
-                        html.querySelector("head").innerHTML += `${onloadScript}document.getElementById("onloadScripts").remove()</script>`;
+                        html.querySelector("head").innerHTML += `${onloadScript}var temp = document.getElementById("onloadScripts"); temp.parentNode.removeChild(temp)</script>`;
 
 
                         console.log(html.innerHTML);
@@ -127,6 +128,10 @@ module.exports = function (RED) {
             //Set our HTTP listeners
             RED.httpNode.get(`/${dashbored.endpoint}`, handleHTTP);
             RED.httpNode.get(`/${dashbored.endpoint}/*`, handleHTTP);
+
+            //Because IE is poo send the files if it asks for them
+            RED.httpNode.get(`/socket.js`, (req, res) => {res.sendFile("socket.js", { root: webFolder });});
+            RED.httpNode.get(`/util.js`, (req, res) => {res.sendFile("util.js", { root: webFolder });});
         }
 
         node.addWidget = (widget) => {

@@ -22,7 +22,7 @@ function addOnMsgFunction(fn) {
 //Print to the console
 function print(type, message) {
     if(type.toUpperCase() == "debug" && !debug){return;}
-    console.log(`[${type.toUpperCase()}] - ${message}`);
+    console.log("[" + type.toUpperCase() + "] - " + message);
 }
 
 ///////////////////////////////////////////////////////////

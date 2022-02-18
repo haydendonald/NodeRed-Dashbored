@@ -4,6 +4,7 @@ module.exports = function (RED) {
     const fs = require("fs");
     const WebSocket = require("ws");
     const htmlParse = require("node-html-parser").parse;
+    const util = require("../util.js");
     var rootFolder = path.join(__dirname, "..");
     var webFolder = path.join(rootFolder, "web");
     var dashboards = {};
@@ -96,7 +97,9 @@ module.exports = function (RED) {
                         //For each page generate
                         for (var i = 0; i < dashboredPages.length; i++) {
                             var page = dashboredPages[i];
-                            var currentPageHTML = `<div>`;
+                            var pageId = util.randString();
+                            if(!page.getAttribute("name")){page.setAttribute("name", "Page");}
+                            var currentPageHTML = `<div id="page_${pageId}">`;
                             var elements = page.querySelectorAll("*");
                             for (var j = 0; j < elements.length; j++) {
                                 if (elements[j].rawTagName == "widget") {

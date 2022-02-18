@@ -43,6 +43,11 @@ module.exports = {
         return `document.getElementById("${node.id.split(".")[0]}_${elementName}")`;
     },
 
+    //Generate a random string
+    randString: () => {
+        return (Math.random() + 1).toString(36).substring(2);
+    }
+
     // /**
     //  * 
     //  * @param {The node element} node 

@@ -88,8 +88,12 @@ module.exports = function (RED) {
                         }
 
                         var html = htmlParse(data);
+                        var head = html.querySelector("head");
                         var pagesDiv = html.querySelector("#pages");
                         var onloadScript = `<script id="onloadScripts" type="text/javascript">`;
+
+                        //Set the CSS from the dashbored
+                        head.innerHTML += `<style>${dashbored.CSS}</style>`;
 
                         var dashboredHTML = htmlParse(dashbored.HTML);
                         var dashboredPages = dashboredHTML.querySelectorAll("page");

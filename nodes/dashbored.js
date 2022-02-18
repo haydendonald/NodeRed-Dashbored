@@ -9,6 +9,7 @@ module.exports = function (RED) {
         var endpoint = config.endpoint || name.toLowerCase();
         var server = RED.nodes.getNode(config.server);
         var HTML = config.HTML || "";
+        var CSS = config.CSS || "";
         //var widgetIds = [];
 
         //When a message is received from the dashbored
@@ -27,7 +28,8 @@ module.exports = function (RED) {
             name,
             endpoint,
             onMessage,
-            HTML
+            HTML,
+            CSS
         });
 
         //On redeploy

@@ -1,3 +1,5 @@
+<!-- NodeRed Documentation https://nodered.org/docs/creating-nodes/edit-dialog -->
+
 <script type="text/x-red" data-template-name="dashbored-widget">
     <div class="form-row">
         <label for="node-config-input-name">Name</label>
@@ -7,28 +9,23 @@
         <label for="node-config-input-server">Server</label>
         <input type="text" id="node-config-input-server">
     </div>
-    <hr>
     <div class="form-row">
-        <label for="node-config-input-option-text">Button Text</label>
+        <label for="node-config-input-option-text">Text</label>
         <input type="text" id="node-config-input-text">
     </div>
-    <hr>
     <div class="form-row">
         <label for="node-config-input-option-onValue">On Value</label>
         <input type="text" id="node-config-input-onValue">
     </div>
     <div class="form-row">
-        <label for="node-config-input-onColor">On Color</label>
-        <input type="text" id="node-config-input-onColor">
-    </div>
-    <hr>
-    <div class="form-row">
         <label for="node-config-input-option-offValue">Off Value</label>
         <input type="text" id="node-config-input-offValue">
     </div>
+
+    <!-- CSS Editor -->
     <div class="form-row">
-        <label for="node-config-input-option-offColor">Off Color</label>
-        <input type="text" id="node-config-input-offColor">
+        <label for="node-config-input-option-offColor">CSS</label>
+        <div style="height: 250px; min-height:150px;" class="node-text-editor" id="node-input-css-editor"></div>
     </div>
 </script>
 
@@ -36,18 +33,59 @@
     RED.nodes.registerType("dashbored-widget", {
         category: "config",
         defaults: {
-            name: {value: ""},
-            server: {value: "", required: true, type: "dashbored-server"},
-            text: {value: "Toggle Button", required: true},
-            onValue: {value: "on", required: true},
-            offValue: {value: "off", required: true},
-            onColor: {value: "#99ff99", required: true},
-            offColor: {value: "#99ff99", required: true}
+            name: { value: "Toggle Button", required: true},
+            server: { value: "", required: true, type: "dashbored-server" },
+            text: { value: "Toggle Button", required: true },
+            onValue: { value: "on", required: true },
+            offValue: { value: "off", required: true },
+
+            //The default CSS for the button
+            CSS: {
+                value: `
+                    #button {
+                        border-radius: 6px;
+                        border-width: 0;
+                        cursor: pointer;
+                        font-size: 100%;
+                        height: 44px;
+                        overflow: hidden;
+                        width: 100%;
+                    }
+                    #button:disabled {
+                        cursor: default;
+                    }
+                    #button:hover {
+                        font-weight: bold;
+                    }
+                    .on {
+                        background-color: green;
+                        color: black;
+                    }
+                    .off {
+                        background-color: red;
+                        color: black;
+                    }
+                `.replace(/^\s+|\s+$/gm, ''), required: true
+            }
         },
-        label: function() {
-            return (this.name || "Toggle Button" );
+        label: function () {
+            return (this.name || "Toggle Button");
         },
         oneditprepare: function () {
-        }
+            this.cssEditor = RED.editor.createEditor({
+                id: "node-input-css-editor",
+                mode: "ace/mode/css",
+                value: this.CSS
+            });
+        },
+        oneditsave: function () {
+            this.CSS = this.cssEditor.getValue();
+            this.cssEditor.destroy();
+            delete this.cssEditor;
+        },
+        oneditcancel: function () {
+            this.cssEditor.destroy();
+            delete this.cssEditor;
+        },
     });
 </script>

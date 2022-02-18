@@ -14,10 +14,10 @@
   "node-red": {
     "nodes": {
       "dashbored-server": "./nodes/server.js",
-      "dashbored-dashbored": "./nodes/dashbored.js",
       "dashbored-widget": "./nodes/widget.js",
-      "dashbored-node": "./nodes/dashboredNode.js",
-      "dashbored-widget-node": "./nodes/widgetNode.js"
+      "dashbored-dashbored": "./nodes/dashbored.js",
+      "dashbored-widget-node": "./nodes/widgetNode.js",
+      "dashbored-node": "./nodes/dashboredNode.js"
     }
   },
   "author": "Hayden Donald",

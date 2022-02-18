@@ -1,6 +1,6 @@
 
 module.exports = function (RED) {
-
+    //const htmlParse = require("node-html-parser").parse;
     function dashbored(config) {
         RED.nodes.createNode(this, config);
         var node = this;
@@ -8,17 +8,18 @@ module.exports = function (RED) {
         var name = config.name || "dashbored";
         var endpoint = config.endpoint || name.toLowerCase();
         var server = RED.nodes.getNode(config.server);
-        var widgetIds = [];
+        var HTML = config.HTML || "";
+        //var widgetIds = [];
 
         //When a message is received from the dashbored
         var onMessage = (data) => {
             //console.log(`${data}`);
         }
 
-        //Add a widget to this dashbored
-        var addWidget = (widgetId) => {
-            widgetIds.push(widgetId);
-        }
+        // //Add a widget to this dashbored
+        // var addWidget = (widgetId) => {
+        //     widgetIds.push(widgetId);
+        // }
 
         //Add this dashboard to the server
         server.addDashbored({
@@ -26,10 +27,8 @@ module.exports = function (RED) {
             name,
             endpoint,
             onMessage,
-            widgetIds
+            HTML
         });
-
-        addWidget("a8256a77.949728"); //TESTING
 
         //On redeploy
         node.on("close", () => { });

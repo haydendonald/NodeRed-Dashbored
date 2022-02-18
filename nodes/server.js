@@ -1,17 +1,19 @@
 
 module.exports = function (RED) {
-    function server(config) {
-        const path = require("path");
-        const fs = require("fs");
-        const WebSocket = require("ws");
-        const htmlParse = require("node-html-parser").parse;
+    const path = require("path");
+    const fs = require("fs");
+    const WebSocket = require("ws");
+    const htmlParse = require("node-html-parser").parse;
+    var rootFolder = path.join(__dirname, "..");
+    var webFolder = path.join(rootFolder, "web");
+    var dashboards = {};
+    var widgets = {};
 
+    function server(config) {
         RED.nodes.createNode(this, config);
         var node = this;
-        var rootFolder = path.join(__dirname, "..");
-        var webFolder = path.join(rootFolder, "web");
-        var dashboards = [];
-        var widgets = {};
+        dashboards = {};
+        widgets = {};
 
         RED.log.info("-------- Dashbored Let's Start! --------");
         RED.log.info(`Root Folder: ${rootFolder}`);
@@ -26,7 +28,7 @@ module.exports = function (RED) {
                 RED.log.debug(`Got websocket message [${data}]`);
 
                 //Send the message to the dashboards
-                for (var i = 0; i < dashboards.length; i++) {
+                for (var i in dashboards) {
                     dashboards[i].onMessage(JSON.parse(data));
                 }
                 for (var i in widgets) {
@@ -51,12 +53,21 @@ module.exports = function (RED) {
             broadcastMessage(JSON.stringify(msg));
         }
 
+        //Return the widgets
+        node.getWidgets = () => {
+            return widgets;
+        }
+
+        //Return the dashboreds
+        node.getDashboreds = () => {
+            return dashboards;
+        }
+
         node.addDashbored = (dashbored) => {
             RED.log.info(`- Created Dashbored [${dashbored.name}] at /${dashbored.endpoint}`);
-            dashboards.push(dashbored);
 
             //Handle the incoming HTTP request
-            var handleHTTP = (req, res) => {
+            dashbored.handleHTTP = (req, res) => {
                 if (req.method != "GET") {
                     res.type("text/plain");
                     res.status(500);
@@ -76,45 +87,57 @@ module.exports = function (RED) {
                         }
 
                         var html = htmlParse(data);
-                        var widgetDiv = html.querySelector("#widgets");
-
+                        var pagesDiv = html.querySelector("#pages");
                         var onloadScript = `<script id="onloadScripts" type="text/javascript">`;
 
-                        //For each widget in this dashbored add it to the HTML
-                        for (var i = 0; i < dashbored.widgetIds.length; i++) {
-                            var widget = widgets[dashbored.widgetIds[i]];
-                            if (!widget) { RED.log.warn(`Widget ${dashbored.widgetIds[i]} was not found for dashbored ${dashbored.name}`); break; }
+                        var dashboredHTML = htmlParse(dashbored.HTML);
+                        var dashboredPages = dashboredHTML.querySelectorAll("page");
 
-                            //Insert the onload script
-                            onloadScript += `
-                            addOnLoadFunction(function() {
-                                print("debug", "onload triggered - ${widget.name} (${widget.id})");
-                                ${widget.generateOnload()}
-                            });
+                        //For each page generate
+                        for (var i = 0; i < dashboredPages.length; i++) {
+                            var page = dashboredPages[i];
+                            var currentPageHTML = `<div>`;
+                            var elements = page.querySelectorAll("*");
+                            for (var j = 0; j < elements.length; j++) {
+                                if (elements[j].rawTagName == "widget") {
+                                    //Handle the widget creation
+                                    var widget = widgets[elements[j].id];
+                                    console.log(widget.generateHTML());
+                                    if (!widget) { RED.log.warn(`Widget ${elements[j].id} was not found for dashbored ${dashbored.name}`); break; }
 
-                            addOnMsgFunction(function(data) {
-                                //Check if the id is equal to this widget, if so execute the actions
-                                var msg = JSON.parse(data.data);
-                                if(msg.id == "${widget.id}") {
-                                    print("debug", "onmsg triggered - ${widget.name} (${widget.id})");
-                                    ${widget.generateOnMsg()}
+                                    //Insert the onload script
+                                    onloadScript += `
+                                        addOnLoadFunction(function() {
+                                            print("debug", "onload triggered - ${widget.name} (${widget.id})");
+                                            ${widget.generateOnload()}
+                                        });
+
+                                        addOnMsgFunction(function(data) {
+                                            //Check if the id is equal to this widget, if so execute the actions
+                                            var msg = JSON.parse(data.data);
+                                            if(msg.id == "${widget.id}") {
+                                                print("debug", "onmsg triggered - ${widget.name} (${widget.id})");
+                                                ${widget.generateOnMsg()}
+                                            }
+                                        })
+                                    `;
+
+                                    //Add any extra scripts/css for the widget
+                                    if (widget.generateCSS) { html.querySelector("head").innerHTML += `<style id="${widget.id}">${widget.generateCSS()}</style>`; }
+                                    if (widget.generateScript) { html.querySelector("html").innerHTML += `<script id="${widget.id}" type="text/javascript">${widget.generateScript()}</script>`; }
+
+                                    currentPageHTML += `<div id=${widget.id}>${widget.generateHTML()}</div>`;
                                 }
-                            })
-                            `
-
-                            //Add any extra scripts/css for the widget
-                            if (widget.generateCSS) { html.querySelector("head").innerHTML += `<style id="${widget.id}">${widget.generateCSS()}</style>`; }
-                            if (widget.generateScript) { html.querySelector("html").innerHTML += `<script id="${widget.id}" type="text/javascript">${widget.generateScript()}</script>`; }
-
-                            //Insert the HTML for the widget
-                            widgetDiv.innerHTML += widget.generateHTML();
+                                else {
+                                    currentPageHTML += elements[j].outerHTML;
+                                }
+                            }
+                            pagesDiv.innerHTML += currentPageHTML + "</div>";
+                           console.log(pagesDiv.innerHTML);
                         }
 
                         //Add the onload scripts and delete the element
                         html.querySelector("head").innerHTML += `${onloadScript}var temp = document.getElementById("onloadScripts"); temp.parentNode.removeChild(temp)</script>`;
-
-
-                        //console.log(html.innerHTML);
                         res.send(html.innerHTML);
                     });
                 }
@@ -124,13 +147,8 @@ module.exports = function (RED) {
                 }
             }
 
-            //Set our HTTP listeners
-            RED.httpNode.get(`/${dashbored.endpoint}`, handleHTTP);
-            RED.httpNode.get(`/${dashbored.endpoint}/*`, handleHTTP);
-
-            //Because IE is poo send the files if it asks for them
-            RED.httpNode.get(`/socket.js`, (req, res) => {res.sendFile("socket.js", { root: webFolder });});
-            RED.httpNode.get(`/util.js`, (req, res) => {res.sendFile("util.js", { root: webFolder });});
+            //Add the dashbored
+            dashboards[dashbored.id] = dashbored;
         }
 
         node.addWidget = (widget) => {
@@ -143,6 +161,19 @@ module.exports = function (RED) {
             wss.close();
         });
     }
+
+    //Setup the HTTP server
+    RED.httpNode.get(`/socket.js`, (req, res) => { res.sendFile("socket.js", { root: webFolder }); });
+    RED.httpNode.get(`/util.js`, (req, res) => { res.sendFile("util.js", { root: webFolder }); });
+    RED.httpNode.get("/*", (req, res) => {
+        for (var i in dashboards) {
+            if ("/" + dashboards[i].endpoint == req.url) {
+                RED.log.debug("Got request for dashbored " + dashboards[i].name);
+                dashboards[i].handleHTTP(req, res);
+                break;
+            }
+        }
+    });
 
     RED.nodes.registerType("dashbored-server", server);
 }

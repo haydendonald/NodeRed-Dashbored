@@ -5,8 +5,6 @@
  * 
  * onValue = The value when the switch is "on"
  * offValue = The value when the switch is "off"
- * onColor = The color when the switch is "on"
- * offColor = The color when the switch is "off"
  * 
  * Input/output is a payload of the on/off value.
  * {
@@ -24,13 +22,12 @@ module.exports = function (RED) {
         var node = this;
         const util = require("../util.js");
 
-        var name = config.name || "dashbored";
+        var name = config.name || "Toggle Button";
         var server = RED.nodes.getNode(config.server);
         var text = config.text || "Toggle Button";
         var onValue = config.onValue || "on";
         var offValue = config.offValue || "off";
-        var onColor = config.onColor || "green";
-        var offColor = config.offColor || "red";
+        var CSS = config.CSS || "";
         var currentState = offValue;
         var nodeMsgFunctions = [];
 
@@ -46,47 +43,23 @@ module.exports = function (RED) {
 
         //Generate the CSS for the widget to be inserted into the dashbored
         var generateCSS = () => {
-            return `
-            ${util.generateCSS(node, "#", "button", `
-            {
-                border-radius: 6px;
-                border-width: 0;
-                cursor: pointer;
-                font-size: 100%;
-                height: 44px;
-                overflow: hidden;
-                width: 100%;
+            //Go through the CSS and add the ids
+            var rebuild = "";
+            var classes = CSS.split("}");
+            for(var i = 0; i < classes.length - 1; i++) {
+                var selectors = classes[i].split(" {");
+                selectors[0] = selectors[0].replace(/^\s+|\s+$/gm, '');
+                var output = `${selectors[0][0]}${node.id.split(".")[0]}_${selectors[0].substring(1)} {${selectors[1]}}\n`;
+                rebuild += output;
             }
-            `)}
-            ${util.generateCSS(node, "#", "button:disabled", `
-            {
-                cursor: default;
-            }
-            `)}
-            ${util.generateCSS(node, "#", "button:hover", `
-            {
-                font-weight: bold;
-            }
-            `)}
-            ${util.generateCSS(node, ".", "onColor", `
-            {
-                background-color: ${onColor};
-                color: #fff;
-            }
-            `)}
-            ${util.generateCSS(node, ".", "offColor", `
-            {
-                background-color: ${offColor};
-                color: #fff;
-            }
-            `)}
-            `;
+
+            return rebuild;
         }
 
         //Generate the HTML for the widget to be inserted into the dashbored
         var generateHTML = () => {
             return `
-            ${util.generateTag(node, "button", "button", text, `class="${util.generateCSSClass(node, (currentState == offValue ? "offColor" : "onColor"))}" state="${currentState}"`)}
+            ${util.generateTag(node, "button", "button", text, `class="${util.generateCSSClass(node, (currentState == offValue ? "off" : "on"))}" state="${currentState}"`)}
             `;
         }
 
@@ -110,12 +83,12 @@ module.exports = function (RED) {
             return `
             ${util.getElement(node, "button")}.setAttribute("state", msg.payload);
             if(msg.payload == "${onValue}") {
-                ${util.getElement(node, "button")}.classList.add("${util.generateCSSClass(node, "onColor")}");
-                ${util.getElement(node, "button")}.classList.remove("${util.generateCSSClass(node, "offColor")}");
+                ${util.getElement(node, "button")}.classList.add("${util.generateCSSClass(node, "on")}");
+                ${util.getElement(node, "button")}.classList.remove("${util.generateCSSClass(node, "off")}");
             }
             else {
-                ${util.getElement(node, "button")}.classList.add("${util.generateCSSClass(node, "offColor")}");
-                ${util.getElement(node, "button")}.classList.remove("${util.generateCSSClass(node, "onColor")}");
+                ${util.getElement(node, "button")}.classList.add("${util.generateCSSClass(node, "off")}");
+                ${util.getElement(node, "button")}.classList.remove("${util.generateCSSClass(node, "on")}");
             }
             `;
         }

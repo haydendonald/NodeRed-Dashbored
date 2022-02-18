@@ -9,7 +9,7 @@ module.exports = {
      * @param {Any extra attributes to add} attributes 
      */
     generateTag: (node, tag, elementName, inner, attributes = "") => {
-        return `<${tag} id="${node.id.split(".")[0]}_${elementName}" ${attributes}>${inner}</${tag}`;
+        return `<${tag} id="${node.id.split(".")[0]}_${elementName}" ${attributes}>${inner}</${tag}>`;
     },
 
     /**

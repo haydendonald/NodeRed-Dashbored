@@ -7,17 +7,51 @@
         <label for="node-config-input-server"><i class="icon-bookmark"></i> Server</label>
         <input type="text" id="node-config-input-server">
     </div>
+
+    <!-- HTML Editor -->
+    <div class="form-row">
+        <label for="node-config-input-option-offColor">HTML</label>
+        <div style="height: 250px; min-height:150px;" class="node-text-editor" id="node-input-html-editor"></div>
+    </div>
 </script>
 
 <script type="text/javascript">
     RED.nodes.registerType("dashbored-dashbored", {
         category: "config",
         defaults: {
-            name: {value: ""},
-            server: {value: "", required: true, type: "dashbored-server"},
+            name: { value: "" },
+            server: { value: "", required: true, type: "dashbored-server" },
+            
+            //The default HTML for the dashbored
+            HTML: {
+                value: `
+                <html>
+                    <page>
+                        <h1>Hello World!</h1>
+                        <widget id="85731b03.01a9c8"></widget>
+                        <widget id="3f0529c5.4b7bb6"></widget>
+                    </page>
+                </html>`.replace(/^\s+|\s+$/gm, ''), required: true
+            }
         },
-        label: function() {
-            return (this.name || "Dashbored" );
-        }
+        label: function () {
+            return (this.name || "Dashbored");
+        },
+        oneditprepare: function () {
+            this.htmlEditor = RED.editor.createEditor({
+                id: "node-input-html-editor",
+                mode: "ace/mode/html",
+                value: this.HTML
+            });
+        },
+        oneditsave: function () {
+            this.HTML = this.htmlEditor.getValue();
+            this.htmlEditor.destroy();
+            delete this.htmlEditor;
+        },
+        oneditcancel: function () {
+            this.htmlEditor.destroy();
+            delete this.htmlEditor;
+        },
     });
 </script>

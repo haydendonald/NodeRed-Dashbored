@@ -165,6 +165,12 @@ module.exports = function (RED) {
     //Setup the HTTP server
     RED.httpNode.get(`/socket.js`, (req, res) => { res.sendFile("socket.js", { root: webFolder }); });
     RED.httpNode.get(`/util.js`, (req, res) => { res.sendFile("util.js", { root: webFolder }); });
+    //Send the widget ids for the node red editor to populate (if theres a better way i'd like to know...)
+    RED.httpNode.get(`/dashboredgetallnodeids`, (req, res) => {
+        var send = [];
+        for(var i in widgets){send.push(`{"value":"${i}", "label":"${widgets[i].name}"}`);}
+        res.send(send);
+    })
     RED.httpNode.get("/*", (req, res) => {
         for (var i in dashboards) {
             if ("/" + dashboards[i].endpoint == req.url) {

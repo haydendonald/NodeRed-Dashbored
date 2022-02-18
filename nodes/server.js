@@ -95,24 +95,25 @@ module.exports = function (RED) {
                         var dashboredPages = dashboredHTML.querySelectorAll("page");
 
                         //For each page generate
+                        var widgetIdsCSSDone = {};
                         for (var i = 0; i < dashboredPages.length; i++) {
                             var page = dashboredPages[i];
-                            var pageId = util.randString();
                             if(!page.getAttribute("name")){page.setAttribute("name", "Page");}
-                            var currentPageHTML = `<div id="page_${pageId}">`;
+                            page.setAttribute("id", "page_" + util.randString());
                             var elements = page.querySelectorAll("*");
                             for (var j = 0; j < elements.length; j++) {
                                 if (elements[j].rawTagName == "widget") {
+                                    var randomId = util.randString();
+
                                     //Handle the widget creation
                                     var widget = widgets[elements[j].id];
-                                    console.log(widget.generateHTML());
                                     if (!widget) { RED.log.warn(`Widget ${elements[j].id} was not found for dashbored ${dashbored.name}`); break; }
 
                                     //Insert the onload script
                                     onloadScript += `
                                         addOnLoadFunction(function() {
                                             print("debug", "onload triggered - ${widget.name} (${widget.id})");
-                                            ${widget.generateOnload()}
+                                            ${widget.generateOnload(randomId)}
                                         });
 
                                         addOnMsgFunction(function(data) {
@@ -120,23 +121,19 @@ module.exports = function (RED) {
                                             var msg = JSON.parse(data.data);
                                             if(msg.id == "${widget.id}") {
                                                 print("debug", "onmsg triggered - ${widget.name} (${widget.id})");
-                                                ${widget.generateOnMsg()}
+                                                ${widget.generateOnMsg(randomId)}
                                             }
                                         })
                                     `;
 
                                     //Add any extra scripts/css for the widget
-                                    if (widget.generateCSS) { html.querySelector("head").innerHTML += `<style id="${widget.id}">${widget.generateCSS()}</style>`; }
-                                    if (widget.generateScript) { html.querySelector("html").innerHTML += `<script id="${widget.id}" type="text/javascript">${widget.generateScript()}</script>`; }
+                                    if (widget.generateCSS && !widgetIdsCSSDone[widget.id]) { html.querySelector("head").innerHTML += `<style id="${widget.id}">${widget.generateCSS()}</style>`; widgetIdsCSSDone[widget.id] = {};}
+                                    if (widget.generateScript) { html.querySelector("html").innerHTML += `<script id="${widget.id}" type="text/javascript">${widget.generateScript(randomId)}</script>`; }
 
-                                    currentPageHTML += `<div id=${widget.id}>${widget.generateHTML()}</div>`;
-                                }
-                                else {
-                                    currentPageHTML += elements[j].outerHTML;
+                                    elements[j].innerHTML = widget.generateHTML(randomId);
                                 }
                             }
-                            pagesDiv.innerHTML += currentPageHTML + "</div>";
-                           console.log(pagesDiv.innerHTML);
+                            pagesDiv.innerHTML = dashboredHTML.outerHTML;
                         }
 
                         //Add the onload scripts and delete the element

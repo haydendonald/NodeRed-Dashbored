@@ -49,7 +49,7 @@ module.exports = function (RED) {
             for(var i = 0; i < classes.length - 1; i++) {
                 var selectors = classes[i].split(" {");
                 selectors[0] = selectors[0].replace(/^\s+|\s+$/gm, '');
-                var output = `${selectors[0][0]}${node.id.split(".")[0]}_${selectors[0].substring(1)} {${selectors[1]}}\n`;
+                var output = `${selectors[0][0]}n${node.id.split(".")[0]}_${selectors[0].substring(1)} {${selectors[1]}}\n`;
                 rebuild += output;
             }
 
@@ -57,16 +57,16 @@ module.exports = function (RED) {
         }
 
         //Generate the HTML for the widget to be inserted into the dashbored
-        var generateHTML = () => {
+        var generateHTML = (id) => {
             return `
-            ${util.generateTag(node, "button", "button", text, `class="${util.generateCSSClass(node, (currentState == offValue ? "off" : "on"))}" state="${currentState}"`)}
+            ${util.generateTag(id, "button", "button", text, `class="${util.generateCSSClass(node, "button")} ${util.generateCSSClass(node, (currentState == offValue ? "off" : "on"))}" state="${currentState}"`)}
             `;
         }
 
         //Generate the script to be executed in the dashbored when the page loads
-        var generateOnload = () => {
+        var generateOnload = (id) => {
             return `
-            ${util.getElement(node, "button")}.onclick = function(event) {
+            ${util.getElement(id, "button")}.onclick = function(event) {
                 if(event.target.getAttribute("state") == "${onValue}") {
                     sendNodeMsg("${node.id}", "${offValue}");
                 }
@@ -79,16 +79,16 @@ module.exports = function (RED) {
 
         //Generate the script to be executed in the dashboard when a msg comes in to the widget
         //msg can be used to get the msg object
-        var generateOnMsg = () => {
+        var generateOnMsg = (id) => {
             return `
-            ${util.getElement(node, "button")}.setAttribute("state", msg.payload);
+            ${util.getElement(id, "button")}.setAttribute("state", msg.payload);
             if(msg.payload == "${onValue}") {
-                ${util.getElement(node, "button")}.classList.add("${util.generateCSSClass(node, "on")}");
-                ${util.getElement(node, "button")}.classList.remove("${util.generateCSSClass(node, "off")}");
+                ${util.getElement(id, "button")}.classList.add("${util.generateCSSClass(node, "on")}");
+                ${util.getElement(id, "button")}.classList.remove("${util.generateCSSClass(node, "off")}");
             }
             else {
-                ${util.getElement(node, "button")}.classList.add("${util.generateCSSClass(node, "off")}");
-                ${util.getElement(node, "button")}.classList.remove("${util.generateCSSClass(node, "on")}");
+                ${util.getElement(id, "button")}.classList.add("${util.generateCSSClass(node, "off")}");
+                ${util.getElement(id, "button")}.classList.remove("${util.generateCSSClass(node, "on")}");
             }
             `;
         }

@@ -2,14 +2,14 @@ module.exports = {
     /**
      * Create a tag with id
      * <[TAG] id=[ID] [ATTRIBUTES]>[INNER]</[TAG]>
-     * @param {The node element} node 
+     * @param {The node element random id} id 
      * @param {The tag to create} tag 
      * @param {The element name} elementName
      * @param {The content inside the tag} inner 
      * @param {Any extra attributes to add} attributes 
      */
-    generateTag: (node, tag, elementName, inner, attributes = "") => {
-        return `<${tag} id="${node.id.split(".")[0]}_${elementName}" ${attributes}>${inner}</${tag}>`;
+    generateTag: (id, tag, elementName, inner, attributes = "") => {
+        return `<${tag} id="${id}_${elementName}" ${attributes}>${inner}</${tag}>`;
     },
 
     /**
@@ -22,7 +22,7 @@ module.exports = {
      * @returns 
      */
     generateCSS: (node, selector, name, inner) => {
-        return `${selector}${node.id.split(".")[0]}_${name} ${inner}`;
+        return `${selector}n${node.id.split(".")[0]}_${name} ${inner}`;
     },
 
     /**
@@ -31,36 +31,20 @@ module.exports = {
      * @param {The name of the class to use} name 
      */
     generateCSSClass: (node, name) => {
-        return `${node.id.split(".")[0]}_${name}`;
+        return `n${node.id.split(".")[0]}_${name}`;
     },
 
     /**
      * 
-     * @param {The node element} node 
+     * @param {The node element random id} id 
      * @param {The name of the element} elementName 
      */
-    getElement: (node, elementName) => {
-        return `document.getElementById("${node.id.split(".")[0]}_${elementName}")`;
+    getElement: (id, elementName) => {
+        return `document.getElementById("${id}_${elementName}")`;
     },
 
     //Generate a random string
     randString: () => {
-        return (Math.random() + 1).toString(36).substring(2);
+        return "r" + (Math.random() + 1).toString(36).substring(2);
     }
-
-    // /**
-    //  * 
-    //  * @param {The node element} node 
-    //  * @param {The message object to send} msg 
-    //  */
-    // sendMsg: (node, msg) => {
-    //     return `sendNodeMsg("${node.id}", ${msg})`;
-    // }
-
-    // generateOnLoadScript: (node, fn) => {
-    //     return `addOnLoadFunction(() => {
-    //         print("debug", "onload triggered - ${node.name} (${node.id})");
-    //         ${fn}
-    //     });`;
-    // }
 }

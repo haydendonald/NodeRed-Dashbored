@@ -9,10 +9,14 @@ module.exports = function(RED) {
         var server = RED.nodes.getNode(config.server);
         var locked = false;
         var password = "";
-        var headerImage = ""; //https://images.fastcompany.net/image/upload/w_1280,f_auto,q_auto,fl_lossy/w_596,c_limit,q_auto:best,f_auto/fc/3034007-inline-i-applelogo.jpg
+        var headerImage = "red/images/node-red.svg";
         var headerText = "Dashbored";
         var showClock = true;
         var showWeather = true;
+
+        var navMode = "right"; //Top, Left, Bottom
+
+
         var HTML = config.HTML || "";
         var CSS = config.CSS || "";
 
@@ -35,7 +39,8 @@ module.exports = function(RED) {
             headerImage,
             headerText,
             showClock,
-            showWeather
+            showWeather,
+            navMode
         });
 
         //On redeploy

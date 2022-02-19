@@ -47,6 +47,19 @@ function sendNodeMsg(id, payload) {
     }));
 }
 
+//Hide or show an element
+function hideShowElement(id, show) {
+    try {
+        if (show) {
+            document.getElementById(id).classList.remove("hidden");
+            document.getElementById(id).style.opacity = 1;
+        } else {
+            document.getElementById(id).style.opacity = 0;
+            document.getElementById(id).classList.add("hidden");
+        }
+    } catch (e) {}
+}
+
 ///////////////////////////////////////////////////////////
 
 window.onload = function() {

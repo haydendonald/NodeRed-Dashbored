@@ -1,5 +1,5 @@
 /**
- * Setup some utility functions that are used throughout the dashbored project
+ * The main script file for the website of the dashbored project
  * 
  * https://github.com/haydendonald/NodeRed-Dashbored
  * 
@@ -8,6 +8,7 @@
 var debug = true;
 var onLoadFunctions = [];
 var onMsgFunctions = [];
+var socket = new WebSocket("ws://" + location.host.split(":")[0] + ":4235");
 
 //Add a function to action when the window loads in
 function addOnLoadFunction(fn) {
@@ -37,11 +38,42 @@ function formatAMPM(date) {
     return strTime;
 }
 
+//Send a message to the socket
+function sendNodeMsg(id, payload) {
+    print("debug", "Sending msg for " + id + ": " + payload);
+    socket.send(JSON.stringify({
+        id: id,
+        payload: payload
+    }));
+}
+
 ///////////////////////////////////////////////////////////
 
 window.onload = function() {
     print("info", "Dashbored project by Hayden Donald\nhttps://github.com/haydendonald/NodeRed-Dashbored\nLet's Go!");
     print("debug", "Triggering onload functions");
+
+    socket.addEventListener('open', function(event) {
+        print("debug", "Socket open");
+    });
+
+    socket.addEventListener("message", function(data) {
+        var msg = JSON.parse(data.data);
+        print("debug", "Socket message received");
+        if (debug) { console.log(msg); }
+        for (var i = 0; i < onMsgFunctions.length; i++) {
+            onMsgFunctions[i](msg);
+        }
+    });
+
+    socket.addEventListener("error", function(error) {
+        print("error", "Socket error");
+        console.log(error);
+    });
+
+    socket.addEventListener("close", function() {
+        print("debug", "Socket closed");
+    });
 
     //Execute all the onload functions
     for (var i = 0; i < onLoadFunctions.length; i++) {

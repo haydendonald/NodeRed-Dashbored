@@ -15,50 +15,50 @@
  * 
  */
 
-module.exports = function (RED) {
+module.exports = function(RED) {
 
-    function widget(config) {
-        RED.nodes.createNode(this, config);
-        var node = this;
-        const util = require("../util.js");
+        function widget(config) {
+            RED.nodes.createNode(this, config);
+            var node = this;
+            const util = require("../util.js");
 
-        var name = config.name || "Toggle Button";
-        var server = RED.nodes.getNode(config.server);
-        var text = config.text || "Toggle Button";
-        var onValue = config.onValue || "on";
-        var offValue = config.offValue || "off";
-        var CSS = config.CSS || "";
-        var currentState = offValue;
-        var nodeMsgFunctions = [];
+            var name = config.name || "Toggle Button";
+            var server = RED.nodes.getNode(config.server);
+            var text = config.text || "Toggle Button";
+            var onValue = config.onValue || "on";
+            var offValue = config.offValue || "off";
+            var CSS = config.CSS || "";
+            var currentState = offValue;
+            var nodeMsgFunctions = [];
 
-        //When a message is received from the dashbored
-        var onMessage = (msg) => {
-            if (msg.id == node.id) {
-                for (var i = 0; i < nodeMsgFunctions.length; i++) {
-                    nodeMsgFunctions[i](msg.payload);
-                    currentState = msg.payload;
+            //When a message is received from the dashbored
+            var onMessage = (msg) => {
+                if (msg.id == node.id) {
+                    for (var i = 0; i < nodeMsgFunctions.length; i++) {
+                        nodeMsgFunctions[i](msg.payload);
+                        currentState = msg.payload;
+                    }
                 }
             }
-        }
 
-        //Generate the CSS for the widget to be inserted into the dashbored
-        var generateCSS = () => {
-            //Go through the CSS and add the ids
-            var rebuild = "";
-            var classes = CSS.split("}");
-            for(var i = 0; i < classes.length - 1; i++) {
-                var selectors = classes[i].split(" {");
-                selectors[0] = selectors[0].replace(/^\s+|\s+$/gm, '');
-                var output = `${selectors[0][0]}n${node.id.split(".")[0]}_${selectors[0].substring(1)} {${selectors[1]}}\n`;
-                rebuild += output;
+            //Generate the CSS for the widget to be inserted into the dashbored
+            var generateCSS = () => {
+                //Go through the CSS and add the ids
+                var rebuild = "";
+                var classes = CSS.split("}");
+                for (var i = 0; i < classes.length - 1; i++) {
+                    var selectors = classes[i].split(" {");
+                    selectors[0] = selectors[0].replace(/^\s+|\s+$/gm, '');
+                    var output = `${selectors[0][0]}n${node.id.split(".")[0]}_${selectors[0].substring(1)} {${selectors[1]}}\n`;
+                    rebuild += output;
+                }
+
+                return rebuild;
             }
 
-            return rebuild;
-        }
-
-        //Generate the HTML for the widget to be inserted into the dashbored
-        var generateHTML = (id) => {
-            return `
+            //Generate the HTML for the widget to be inserted into the dashbored
+            var generateHTML = (id) => {
+                    return `
             ${util.generateTag(id, "button", "button", text, `class="${util.generateCSSClass(node, "button")} ${util.generateCSSClass(node, (currentState == offValue ? "off" : "on"))}" state="${currentState}"`)}
             `;
         }

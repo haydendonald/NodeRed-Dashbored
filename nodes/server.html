@@ -3,16 +3,53 @@
         <label for="node-config-input-name"><i class="icon-tag"></i> Name</label>
         <input type="text" id="node-config-input-name" placeholder="Name">
     </div>
+
+    <p>Weather</p>
+    <div class="form-row">
+        <label for="node-config-input-option-weatherLat">Latitude</label>
+        <input type="text" id="node-config-input-weatherLat">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-option-weatherLong">Longitude</label>
+        <input type="text" id="node-config-input-weatherLong">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-option-weatherUnit">Unit</label>
+        <input type="text" id="node-config-input-weatherUnit">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-option-apiKey">API Key</label>
+        <input type="password" id="node-config-input-apiKey">
+    </div>
 </script>
 
 <script type="text/javascript">
     RED.nodes.registerType("dashbored-server", {
         category: "config",
         defaults: {
-            name: {value: ""}
+            name: {
+                value: ""
+            },
+            weatherLat: {
+                value: "-37.8136",
+                required: true
+            },
+            weatherLong: {
+                value: "144.9631",
+                required: true
+            },
+            weatherUnit: {
+                value: "metric",
+                required: true
+            },
+            apiKey: {
+                value: "",
+                required: true,
+                type: "password"
+            }
         },
         label: function() {
-            return (this.name || "Dashbored Server" );
+            return (this.name || "Dashbored Server");
         }
     });
 </script>

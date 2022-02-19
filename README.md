@@ -29,13 +29,3 @@ If you know how to install it feel free to give it a shot!
 
 ----
 It's a good start??
-
-# Dev stuff
-Websocket message format
-```
-{
-    id,
-    data: {}
-}
-```
-

@@ -33,29 +33,33 @@
     RED.nodes.registerType("dashbored-widget", {
         category: "config",
         defaults: {
-            name: { value: "Toggle Button", required: true},
-            server: { value: "", required: true, type: "dashbored-server" },
-            text: { value: "Toggle Button", required: true },
-            onValue: { value: "on", required: true },
-            offValue: { value: "off", required: true },
+            name: {
+                value: "Toggle Button",
+                required: true
+            },
+            server: {
+                value: "",
+                required: true,
+                type: "dashbored-server"
+            },
+            text: {
+                value: "Toggle Button",
+                required: true
+            },
+            onValue: {
+                value: "on",
+                required: true
+            },
+            offValue: {
+                value: "off",
+                required: true
+            },
 
             //The default CSS for the button
             CSS: {
                 value: `
                     .button {
-                        border-radius: 6px;
-                        border-width: 0;
-                        cursor: pointer;
-                        font-size: 100%;
-                        height: 44px;
-                        overflow: hidden;
-                        width: 100%;
-                    }
-                    .button:disabled {
-                        cursor: default;
-                    }
-                    .button:hover {
-                        font-weight: bold;
+                        border: 3px solid black;
                     }
                     .on {
                         background-color: green;
@@ -65,25 +69,26 @@
                         background-color: red;
                         color: black;
                     }
-                `.replace(/^\s+|\s+$/gm, ''), required: true
+                `.replace(/^\s+|\s+$/gm, ''),
+                required: true
             }
         },
-        label: function () {
+        label: function() {
             return (this.name || "Toggle Button");
         },
-        oneditprepare: function () {
+        oneditprepare: function() {
             this.cssEditor = RED.editor.createEditor({
                 id: "node-input-css-editor",
                 mode: "ace/mode/css",
                 value: this.CSS
             });
         },
-        oneditsave: function () {
+        oneditsave: function() {
             this.CSS = this.cssEditor.getValue();
             this.cssEditor.destroy();
             delete this.cssEditor;
         },
-        oneditcancel: function () {
+        oneditcancel: function() {
             this.cssEditor.destroy();
             delete this.cssEditor;
         },

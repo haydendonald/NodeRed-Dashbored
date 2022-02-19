@@ -46,5 +46,17 @@ module.exports = {
     //Generate a random string
     randString: () => {
         return "r" + (Math.random() + 1).toString(36).substring(2);
+    },
+
+    //Generate a string for the time with AM PM
+    formatAMPM: (date) => {
+        var hours = date.getHours();
+        var minutes = date.getMinutes();
+        var ampm = hours >= 12 ? 'pm' : 'am';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        var strTime = hours + ':' + minutes + ' ' + ampm;
+        return strTime;
     }
 }

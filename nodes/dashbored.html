@@ -9,21 +9,31 @@
     </div>
 
     <!-- Page Adder -->
-    <h1>Add Page</h1>
     <div class="form-row">
-        <label for="node-input-pageName">Name</label>
-        <input type="text" id="node-input-pageName">
-        <label for="node-input-pageIcon">Icon</label>
-        <input type="text" id="node-input-pageIcon">
-        <button type="button" class="red-ui-button" id="node-input-page-add">Add</button>
+        <label for="node-input-pageName">Page</label>
+
+        <div style="width: 30%; margin-left: 1%">
+            <i class="fa fa-tag" aria-hidden="true"></i>
+            <input type="text" id="node-input-pageName" value="Home" />
+        </div>
+
+        <div style="width: 20%; margin-left: 1%">
+            <i class="fa fa-font-awesome" aria-hidden="true"></i>
+            <input type="text" id="node-input-pageIcon" value="fa-home" />
+        </div>
+
+        <button type="button" class="red-ui-button" id="node-input-page-add"><i class="fa fa-clipboard" aria-hidden="true"></i></button>
     </div>
+
 
     <!-- Widget Adder -->
     <div class="form-row">
-        <label for="node-input-widget">Add Widget</label>
+        <label for="node-input-widget">Widget</label>
         <input type="text" id="node-input-widgets">
-        <button type="button" class="red-ui-button" id="node-input-widgets-add">Add</button>
+        <button type="button" class="red-ui-button" id="node-input-widgets-add"><i class="fa fa-clipboard" aria-hidden="true"></i></button>
     </div>
+
+    <p><a href="https://github.com/haydendonald/NodeRed-Dashbored/wiki/Dashbored-Node" target="_blank">See the wiki for more options</a></p>
 
     <!-- HTML Editor -->
     <div class="form-row">
@@ -41,8 +51,14 @@
     RED.nodes.registerType("dashbored-dashbored", {
         category: "config",
         defaults: {
-            name: { value: "Dashbored" },
-            server: { value: "", required: true, type: "dashbored-server" },
+            name: {
+                value: "Dashbored"
+            },
+            server: {
+                value: "",
+                required: true,
+                type: "dashbored-server"
+            },
 
             //The default HTML for the dashbored
             HTML: {
@@ -58,7 +74,8 @@
                 <page name="Example Page 2">
                     <h1>This is another example page!</h1>
                 </page>
-                `.replace(/^\s+|\s+$/gm, ''), required: true
+                `.replace(/^\s+|\s+$/gm, ''),
+                required: true
             },
 
             //The default CSS for the dashbored
@@ -66,15 +83,16 @@
                 value: `
                 /* You can add any CSS here to have it effect the entire dashbored! */
                 html {
-                    text-align: center;
+                    text-align: none;
                 }
-                `.replace(/^\s+|\s+$/gm, ''), required: true
+                `.replace(/^\s+|\s+$/gm, ''),
+                required: true
             }
         },
-        label: function () {
+        label: function() {
             return (this.name || "Dashbored");
         },
-        oneditprepare: async function () {
+        oneditprepare: async function() {
             //Do a call to the server and request the widgets in memory
             var widgetIds = await $.ajax({
                 type: "GET",
@@ -85,29 +103,27 @@
             }
 
             $("#node-input-widgets").typedInput({
-                types: [
-                    {
-                        value: "widIds",
-                        multiple: "true",
-                        options: widgetIds
-                    }
-                ]
+                types: [{
+                    value: "widIds",
+                    multiple: "true",
+                    options: widgetIds
+                }]
             });
 
-            //Add the page to the HTML
+            //Copy the page to the clipboard
             $("#node-input-page-add").click(() => {
                 var name = $("#node-input-pageName").val();
                 var icon = $("#node-input-pageIcon").val();
-                this.htmlEditor.insert(`<!-- ${name} -->\n<page name="${name}" icon="${icon}">\n</page>`)
+                navigator.clipboard.writeText(`<page name="${name}" icon="${icon}"></page>`);
             });
 
-            //Add the selected widgets to the HTML
+            //Copy the selected widgets to the clipboard
             $("#node-input-widgets-add").click(() => {
                 var widgets = $("#node-input-widgets").val().split(",");
                 for (var i = 0; i < widgets.length; i++) {
                     for (var j = 0; j < widgetIds.length; j++) {
                         if (widgetIds[j].value == widgets[i]) {
-                            this.htmlEditor.insert(`<!-- ${widgetIds[j].label} -->\n<widget name="${widgetIds[j].label}" id="${widgetIds[j].value}"></widget>\n`)
+                            navigator.clipboard.writeText(`<widget name="${widgetIds[j].label}" id="${widgetIds[j].value}"></widget>`);
                             break;
                         }
                     }
@@ -126,7 +142,7 @@
                 value: this.CSS
             });
         },
-        oneditsave: function () {
+        oneditsave: function() {
             this.HTML = this.htmlEditor.getValue();
             this.htmlEditor.destroy();
             delete this.htmlEditor;
@@ -134,7 +150,7 @@
             this.cssEditor.destroy();
             delete this.cssEditor;
         },
-        oneditcancel: function () {
+        oneditcancel: function() {
             this.htmlEditor.destroy();
             delete this.htmlEditor;
             this.cssEditor.destroy();

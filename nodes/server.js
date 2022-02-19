@@ -80,7 +80,7 @@ module.exports = function(RED) {
         weatherInterval = setInterval(getWeather, 500000);
 
         //Add the widgets to a page
-        var addWidgetsToPage = (page, head, widgetIdsCSSDone, onloadScript) => {
+        var addWidgetsToPage = (document, page, widgetIdsCSSDone) => {
             var elements = page.querySelectorAll("*");
             for (var i = 0; i < elements.length; i++) {
                 if (elements[i].rawTagName == "widget") {
@@ -93,7 +93,7 @@ module.exports = function(RED) {
                     var randomId = util.randString();
 
                     //Insert the onload script
-                    onloadScript(`
+                    document.addScript(`
                         addOnLoadFunction(function() {
                             print("debug", "onload triggered for widget - ${widget.name} (${widget.id})");
                             ${widget.generateOnload(randomId)}
@@ -110,7 +110,7 @@ module.exports = function(RED) {
 
                     //Add any extra scripts/css for the widget
                     if (widget.generateCSS && !widgetIdsCSSDone[widget.id]) {
-                        head.innerHTML += `<style id="${widget.id}">${widget.generateCSS()}</style>`;
+                        document.head.innerHTML += `<style id="${widget.id}">${widget.generateCSS()}</style>`;
                         widgetIdsCSSDone[widget.id] = {};
                     }
                     if (widget.generateScript) { html.querySelector("html").innerHTML += `<script id="${widget.id}" type="text/javascript">${widget.generateScript(randomId)}</script>`; }
@@ -121,11 +121,13 @@ module.exports = function(RED) {
         }
 
         //Add a set of pages to a dashbored
-        var addPagesToDashbored = (toAdd, nav, pages, head, onloadScript) => {
+        var addPagesToDashbored = (document, dashbored) => {
             var widgetIdsCSSDone = {};
             var firstPage = true;
-            for (var i = 0; i < toAdd.length; i++) {
-                var page = toAdd[i];
+            var html = htmlParse(dashbored.HTML);
+            var pages = html.querySelectorAll("page");
+            for (var i = 0; i < pages.length; i++) {
+                var page = pages[i];
                 var name = page.getAttribute("name") || "";
                 var icon = page.getAttribute("icon") || "";
                 var navigationVisibility = page.getAttribute("navigation-visibility") || "yes";
@@ -136,9 +138,9 @@ module.exports = function(RED) {
 
                 //Add page to navigation
                 if (navigationVisibility != "no") {
-                    nav.innerHTML += `<button id="trigger_${id}">${icon != "" ? "<i class='fa " + icon + "'></i> " : ""}<p class="mobile-hidden">${name}</p></button>`;
+                    document.nav.innerHTML += `<button id="trigger_${id}">${icon != "" ? "<i class='fa " + icon + "'></i> " : ""}<p class="mobile-hidden">${name}</p></button>`;
                     //When the button is clicked make this page visible and all others not
-                    onloadScript(`
+                    document.addScript(`
                         addOnLoadFunction(function() {
                             var others =  document.getElementsByTagName("page");
                             function hideAllPages() {
@@ -160,10 +162,10 @@ module.exports = function(RED) {
                 }
 
                 //Generate the widgets
-                addWidgetsToPage(page, head, widgetIdsCSSDone, onloadScript);
+                addWidgetsToPage(document, page, widgetIdsCSSDone);
 
                 //Add our page
-                pages.innerHTML += page.outerHTML;
+                document.pages.innerHTML += page.outerHTML;
                 firstPage = false;
             }
         }
@@ -208,48 +210,52 @@ module.exports = function(RED) {
                             res.send("Internal Server Error");
                         }
 
-                        var html = htmlParse(data);
-                        var head = html.querySelector("head");
-                        var pages = html.querySelector("#pages");
-                        var header = html.querySelector("#header");
-                        var nav = html.querySelector("#nav");
-                        var onloadScript = `<script id="onloadScripts" type="text/javascript">`;
-                        var addOnLoadScript = (script) => { onloadScript += script; }
+                        //Grab the elements from the document
+                        var document = {};
+                        document.html = htmlParse(data);
+                        document.head = document.html.querySelector("head");
+                        document.pages = document.html.querySelector("#pages");
+                        document.header = document.html.querySelector("#header");
+                        document.nav = document.html.querySelector("#nav");
+                        document.onloadScripts = "";
+                        document.addScript = (script) => {
+                            document.onloadScripts += script;
+                        }
 
-                        //Set the CSS from the dashbored
-                        head.innerHTML += `<style>${dashbored.CSS}</style>`;
+                        //Add the CSS from the dashbored
+                        document.head.innerHTML += `<style>${dashbored.CSS}</style>`;
 
                         //Set the header
-                        header.innerHTML += `
+                        document.header.innerHTML += `
                             ${dashbored.headerText ? "" : "<h1>" + dashbored.headerText + "</h1>"}
                             ${dashbored.headerImage ? "<img src='" + dashbored.headerImage + "' alt='dashbored logo'>" : ""}
                         `;
-                        html.querySelector("#clockWeather").innerHTML = `
+                        document.html.querySelector("#clockWeather").innerHTML = `
                             ${dashbored.showClock ? "<h2 id='clock'>" + util.formatAMPM(new Date) + "</h2>" : ""}
                             ${dashbored.showWeather ? "<div id='weather'><img id='weatherImg'></img><h2 id='weatherTemp'></h2></div>" : ""}
                         `;
 
                         //Set the listener for the clock updates
                         if (dashbored.showClock) {
-                            onloadScript += `
+                            document.addScript(`
                                 addOnLoadFunction(function(msg) {
                                     setInterval(function() {
-                                        document.getElementById("clock").innerHTML = formatAMPM(new Date());
-                                    }, 1000);
-                                });
-                            `;
+                                            document.getElementById("clock").innerHTML = formatAMPM(new Date());
+                                        }, 1000);
+                                    });
+                                `);
                         }
 
                         //Set the listener for the weather updates
                         if (dashbored.showWeather) {
-                            onloadScript += `
+                            document.addScript(`
                                 addOnMsgFunction(function(msg) {
                                     if(msg.id == "weather") {
                                         document.getElementById("weatherTemp").innerHTML = Math.round(msg.temp) + "°";
                                         document.getElementById("weatherImg").setAttribute("src", msg.iconUrl);
                                     }
                                 });
-                            `;
+                            `);
                         }
 
                         //Set the nav bar position
@@ -258,103 +264,34 @@ module.exports = function(RED) {
                                 { break; }
                             case "top":
                                 {
-                                    header.classList.add("navTop");
-                                    pagesDiv.classList.add("navTop");
-                                    nav.classList.add("top");
+                                    document.header.classList.add("navTop");
+                                    document.pages.classList.add("navTop");
+                                    document.nav.classList.add("top");
                                     break;
                                 }
                             case "left":
                                 {
-                                    header.classList.add("navSide");
-                                    pagesDiv.classList.add("navSide");
-                                    nav.classList.add("left");
+                                    document.header.classList.add("navSide");
+                                    document.pages.classList.add("navSide");
+                                    document.nav.classList.add("left");
                                     break;
                                 }
                         }
 
-                        var currDashbored = htmlParse(dashbored.HTML);
-                        addPagesToDashbored(currDashbored.querySelectorAll("page"), nav, pages, head, addOnLoadScript);
-
-                        //For each page generate
-                        // var widgetIdsCSSDone = {};
-                        // var dashboredHTML = htmlParse(dashbored.HTML);
-                        // var dashboredPages = dashboredHTML.querySelectorAll("page");
-                        // for (var i = 0; i < dashboredPages.length; i++) {
-                        // var page = dashboredPages[i];
-                        // addPagesToDashbored(pages, nav, page);
-
-
-
-
-                        // if (!page.getAttribute("name")) { page.setAttribute("name", "Page"); }
-                        // page.setAttribute("id", "page_" + util.randString());
-                        // var name = page.getAttribute("name");
-                        // var id = page.getAttribute("id");
-
-
-
-
-
-
-
-                        // //Set the page scripts
-                        // onloadScript += `
-                        //     addOnLoadFunction(function() {
-                        //         print("debug", "onload triggered for page - ${name} (${id})");
-                        //     });
-                        // `;
-
-                        // //Handle the widgets
-                        // var elements = page.querySelectorAll("*");
-                        // for (var j = 0; j < elements.length; j++) {
-                        //     if (elements[j].rawTagName == "widget") {
-                        //         var randomId = util.randString();
-
-                        //         //Handle the widget creation
-                        //         var widget = widgets[elements[j].id];
-                        //         if (!widget) {
-                        //             RED.log.warn(`Widget ${elements[j].id} was not found for dashbored ${dashbored.name}`);
-                        //             elements[j].innerHTML = `<p style="background-color: red">Failed to generate widget</p>`;
-                        //             break;
-                        //         }
-
-                        //         //Insert the onload script
-                        //         onloadScript += `
-                        //             addOnLoadFunction(function() {
-                        //                 print("debug", "onload triggered for widget - ${widget.name} (${widget.id})");
-                        //                 ${widget.generateOnload(randomId)}
-                        //             });
-
-                        //             addOnMsgFunction(function(msg) {
-                        //                 //Check if the id is equal to this widget, if so execute the actions
-                        //                 if(msg.id == "${widget.id}") {
-                        //                     print("debug", "onmsg triggered - ${widget.name} (${widget.id})");
-                        //                     ${widget.generateOnMsg(randomId)}
-                        //                 }
-                        //             })
-                        //         `;
-
-                        //         //Add any extra scripts/css for the widget
-                        //         if (widget.generateCSS && !widgetIdsCSSDone[widget.id]) {
-                        //             html.querySelector("head").innerHTML += `<style id="${widget.id}">${widget.generateCSS()}</style>`;
-                        //             widgetIdsCSSDone[widget.id] = {};
-                        //         }
-                        //         if (widget.generateScript) { html.querySelector("html").innerHTML += `<script id="${widget.id}" type="text/javascript">${widget.generateScript(randomId)}</script>`; }
-
-                        //         elements[j].innerHTML = widget.generateHTML(randomId);
-                        //     }
-                        // }
-                        // pagesDiv.innerHTML = dashboredHTML.outerHTML;
-                        //}
+                        //Generate the pages 
+                        addPagesToDashbored(document, dashbored);
 
                         //Add the onload scripts and delete the element
-                        onloadScript += `
+                        document.addScript(`
                             addOnLoadFunction(function() {
                                 hideShowElement("loader", false);
                             });
-                        `;
-                        html.querySelector("head").innerHTML += `${onloadScript}var temp = document.getElementById("onloadScripts"); temp.parentNode.removeChild(temp);</script>`;
-                        res.send(html.innerHTML);
+                            var temp = document.getElementById("onLoadScripts");
+                            temp.parentNode.removeChild(temp);
+                        `);
+
+                        document.head.innerHTML += `<script id="onLoadScripts" type="text/javascript">${document.onloadScripts}</script>`;
+                        res.send(document.html.innerHTML);
 
                         //And then get the weather information to send to the client via the websocket
                         getWeather();

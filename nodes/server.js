@@ -57,7 +57,7 @@ module.exports = function(RED) {
         var getWeather = () => {
             if (weatherLat != "" && weatherLong != "" && weatherUnit != "" && weatherAppId != "") {
                 try {
-                    RED.log.info("Attempt to get weather information");
+                    RED.log.debug("Attempt to get weather information");
                     var weather = require("openweathermap");
                     weather.now({ lat: weatherLat, lon: weatherLong, units: weatherUnit, appid: weatherAppId }, (error, out) => {
                         if (error || out.cod != 200) {
@@ -79,8 +79,49 @@ module.exports = function(RED) {
         //Get weather updates every couple minutes
         weatherInterval = setInterval(getWeather, 500000);
 
+        //Add the widgets to a page
+        var addWidgetsToPage = (page, head, widgetIdsCSSDone, onloadScript) => {
+            var elements = page.querySelectorAll("*");
+            for (var i = 0; i < elements.length; i++) {
+                if (elements[i].rawTagName == "widget") {
+                    var widget = widgets[elements[i].id];
+                    if (!widget) {
+                        RED.log.warn(`Widget ${elements[i].id} was not found`);
+                        elements[i].innerHTML = `<p style="background-color: red">Failed to generate widget</p>`;
+                        break;
+                    }
+                    var randomId = util.randString();
+
+                    //Insert the onload script
+                    onloadScript(`
+                        addOnLoadFunction(function() {
+                            print("debug", "onload triggered for widget - ${widget.name} (${widget.id})");
+                            ${widget.generateOnload(randomId)}
+                        });
+
+                        addOnMsgFunction(function(msg) {
+                            //Check if the id is equal to this widget, if so execute the actions
+                            if(msg.id == "${widget.id}") {
+                                print("debug", "onmsg triggered - ${widget.name} (${widget.id})");
+                                ${widget.generateOnMsg(randomId)}
+                            }
+                        })
+                    `);
+
+                    //Add any extra scripts/css for the widget
+                    if (widget.generateCSS && !widgetIdsCSSDone[widget.id]) {
+                        head.innerHTML += `<style id="${widget.id}">${widget.generateCSS()}</style>`;
+                        widgetIdsCSSDone[widget.id] = {};
+                    }
+                    if (widget.generateScript) { html.querySelector("html").innerHTML += `<script id="${widget.id}" type="text/javascript">${widget.generateScript(randomId)}</script>`; }
+
+                    elements[i].innerHTML = widget.generateHTML(randomId);
+                }
+            }
+        }
+
         //Add a set of pages to a dashbored
-        var addPagesToDashbored = (toAdd, nav, pages, onloadScript) => {
+        var addPagesToDashbored = (toAdd, nav, pages, head, onloadScript) => {
             var widgetIdsCSSDone = {};
             var firstPage = true;
             for (var i = 0; i < toAdd.length; i++) {
@@ -118,21 +159,8 @@ module.exports = function(RED) {
                     `);
                 }
 
-
-                // onloadScript += `
-                //     addOnMsgFunction(function(msg) {
-                //         if(msg.id == "weather") {
-                //             document.getElementById("weatherTemp").innerHTML = Math.round(msg.temp) + "°";
-                //             document.getElementById("weatherImg").setAttribute("src", msg.iconUrl);
-                //         }
-                //     });
-                // `;
-
-
-                //GO TO ANOTHER FUNCTION TO DO THE WIDGET GENERATION
-                //
-                //
-                //
+                //Generate the widgets
+                addWidgetsToPage(page, head, widgetIdsCSSDone, onloadScript);
 
                 //Add our page
                 pages.innerHTML += page.outerHTML;
@@ -186,6 +214,7 @@ module.exports = function(RED) {
                         var header = html.querySelector("#header");
                         var nav = html.querySelector("#nav");
                         var onloadScript = `<script id="onloadScripts" type="text/javascript">`;
+                        var addOnLoadScript = (script) => { onloadScript += script; }
 
                         //Set the CSS from the dashbored
                         head.innerHTML += `<style>${dashbored.CSS}</style>`;
@@ -244,9 +273,7 @@ module.exports = function(RED) {
                         }
 
                         var currDashbored = htmlParse(dashbored.HTML);
-                        addPagesToDashbored(currDashbored.querySelectorAll("page"), nav, pages, (script) => {
-                            onloadScript += script;
-                        });
+                        addPagesToDashbored(currDashbored.querySelectorAll("page"), nav, pages, head, addOnLoadScript);
 
                         //For each page generate
                         // var widgetIdsCSSDone = {};

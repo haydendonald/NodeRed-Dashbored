@@ -15,51 +15,51 @@
  * 
  */
 
-module.exports = function(RED) {
+module.exports = function (RED) {
 
-        function widget(config) {
-            RED.nodes.createNode(this, config);
-            var node = this;
-            const util = require("../util.js");
+    function widget(config) {
+        RED.nodes.createNode(this, config);
+        var node = this;
+        const util = require("../util.js");
 
-            var name = config.name || "Toggle Button";
-            var server = RED.nodes.getNode(config.server);
-            var text = config.text || "Toggle Button";
-            var onValue = config.onValue || "on";
-            var offValue = config.offValue || "off";
-            var CSS = config.CSS || "";
-            var currentState = offValue;
-            var nodeMsgFunctions = [];
-            var id = node.id;
+        var name = config.name || "Toggle Button";
+        var server = RED.nodes.getNode(config.server);
+        var text = config.text || "Toggle Button";
+        var onValue = config.onValue || "on";
+        var offValue = config.offValue || "off";
+        var CSS = config.CSS || "";
+        var currentState = offValue;
+        var nodeMsgFunctions = [];
+        var id = node.id;
 
-            //When a message is received from the dashbored
-            var onMessage = (msg) => {
-                if (msg.id == id) {
-                    for (var i = 0; i < nodeMsgFunctions.length; i++) {
-                        nodeMsgFunctions[i](msg.payload);
-                        currentState = msg.payload;
-                    }
+        //When a message is received from the dashbored
+        var onMessage = (msg) => {
+            if (msg.id == id) {
+                for (var i = 0; i < nodeMsgFunctions.length; i++) {
+                    nodeMsgFunctions[i](msg.payload);
+                    currentState = msg.payload;
                 }
             }
+        }
 
-            //Generate the CSS for the widget to be inserted into the dashbored
-            var generateCSS = () => {
-                //Go through the CSS and add the ids
-                var rebuild = "";
-                var classes = CSS.split("}");
-                for (var i = 0; i < classes.length - 1; i++) {
-                    var selectors = classes[i].split(" {");
-                    selectors[0] = selectors[0].replace(/^\s+|\s+$/gm, '');
-                    var output = `${selectors[0][0]}n${id.split(".")[0]}_${selectors[0].substring(1)} {${selectors[1]}}\n`;
-                    rebuild += output;
-                }
-
-                return rebuild;
+        //Generate the CSS for the widget to be inserted into the dashbored
+        var generateCSS = () => {
+            //Go through the CSS and add the ids
+            var rebuild = "";
+            var classes = CSS.split("}");
+            for (var i = 0; i < classes.length - 1; i++) {
+                var selectors = classes[i].split(" {");
+                selectors[0] = selectors[0].replace(/^\s+|\s+$/gm, '');
+                var output = `${selectors[0][0]}n${id.split(".")[0]}_${selectors[0].substring(1)} {${selectors[1]}}\n`;
+                rebuild += output;
             }
 
-            //Generate the HTML for the widget to be inserted into the dashbored
-            var generateHTML = (id) => {
-                    return `
+            return rebuild;
+        }
+
+        //Generate the HTML for the widget to be inserted into the dashbored
+        var generateHTML = (id) => {
+            return `
             ${util.generateTag(id, "button", "button", text, `class="${util.generateCSSClass(node, "button")} ${util.generateCSSClass(node, (currentState == offValue ? "off" : "on"))}" state="${currentState}"`)}
             `;
         }
@@ -68,23 +68,13 @@ module.exports = function(RED) {
         var generateOnload = (htmlId, lockedAccess, alwaysPassword, ask, askText) => {
             return `
             ${util.getElement(htmlId, "button")}.onclick = function(event) {
-                //Send the message
-                var send = function() {
+                var yesAction = function() {
                     sendMsg("${id}", event.target.getAttribute("state") == "${onValue}" ? "${offValue}" : "${onValue}");
                 }
+                var noAction = function(){console.log("no");}
 
-                //Check if the user is sure
-                var checkAreYouSure = function() {
-                    ${ask == "yes" ? "askAreYouSure(send, undefined, '" + askText + "');" : "send();"}
-                }
-
-                //Check for a password depending on what the options are
-                ${lockedAccess == "password" ? "if(locked){askPassword(checkAreYouSure);}" : ""}
-                ${lockedAccess == "yes" ? "if(locked){askPassword(checkAreYouSure, undefined, true);}" : ""}
-                if(!locked) {
-                    ${alwaysPassword == "yes" ? "askPassword(checkAreYouSure);" : "checkAreYouSure()"}
-                }
-            }
+                ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
+            } 
             `;
         }
 
@@ -121,7 +111,7 @@ module.exports = function(RED) {
 
         //When an input is passed to the node in the flow
         node.input = (msg) => {
-            if(msg.payload) {
+            if (msg.payload) {
                 currentState = msg.payload;
                 server.sendMsg(id, currentState);
             }

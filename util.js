@@ -63,5 +63,22 @@ module.exports = {
         minutes = minutes < 10 ? '0' + minutes : minutes;
         var strTime = hours + ':' + minutes + ' ' + ampm;
         return strTime;
+    },
+
+    //Generate the widget action with locked, areYouSure functionality
+    generateWidgetAction: (lockedAccess, alwaysPassword, ask, askText, actionYes, actionNo) => {
+        return `
+        //Check if the user is sure
+        var checkAreYouSure = function () {
+            ${ask == "yes" ? "askAreYouSure(" + actionYes + ", " + actionNo + ", '" + askText + "');" : actionYes + "();"}
+        }
+
+        //Check for a password depending on what the options are
+        ${lockedAccess == "password" ? "if(locked){askPassword(checkAreYouSure);}" : ""}
+        ${lockedAccess == "yes" ? "if(locked){askPassword(checkAreYouSure, undefined, true);}" : ""}
+        if (!locked) {
+            ${alwaysPassword == "yes" ? "askPassword(checkAreYouSure);" : "checkAreYouSure()"}
+        }
+        `;
     }
 }

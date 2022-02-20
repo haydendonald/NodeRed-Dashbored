@@ -66,11 +66,10 @@ module.exports = function (RED) {
                         }
 
                         //Broadcast to all sessions
-                        broadcastMessage(JSON.stringify({
-                            id: "weather",
+                        this.sendMsg("weather", {
                             temp: out.main.temp,
                             iconUrl: out.weather[0].iconUrl
-                        }));
+                        });
                     });
                 } catch (e) { }
             }
@@ -137,27 +136,53 @@ module.exports = function (RED) {
 
                 //Add page to navigation
                 if (navigationVisibility != "no") {
+                    console.log(lockedAccess);
                     document.nav.innerHTML += `<button id="trigger_${id}">${icon != "" ? "<i class='fa " + icon + "'></i> " : ""}<p class="mobile-hidden">${name}</p></button>`;
                     //When the button is clicked make this page visible and all others not
                     document.addScript(`
                         addOnLoadFunction(function() {
                             var others =  document.getElementsByTagName("page");
                             function hideAllPages() {
-                                    for(var i = 0; i < others.length; i++) {
-                                    others[i].style.display = "none";
+                                for(var i = 0; i < others.length; i++) {
+                                    others[i].classList.add("hidden");
                                 }
                             }
 
                             //Change the page
                             document.getElementById("trigger_${id}").onclick = function() {
-                                hideAllPages();
-                                document.getElementById("${id}").style.display = "block";
+                                askPassword(function() {
+                                    hideAllPages();
+                                    currentPage = document.getElementById("${id}");
+                                    currentPage.classList.remove("hidden");
+                                }, undefined, ${lockedAccess == "yes"});
                             }
 
                             //Set the first page to visible
-                            if(${firstPage}){hideAllPages(); document.getElementById("${id}").style.display = "block";}
+                            if(${firstPage}){hideAllPages(); currentPage = document.getElementById("${id}"); currentPage.classList.remove("hidden");}
                         });
                     `);
+                }
+
+                //Add the disabling of the page when locked
+                if (lockedAccess != "yes") {
+                    //Add the callbacks for lock changes
+                    document.addScript(`
+                        addOnUnlockFunction(function() {
+                            currentPage.classList.remove("hidden");
+                        });
+                        addOnLockFunction(function() {
+                            document.getElementById("${id}").classList.add("hidden");
+                        });
+                    `);
+
+                    //Hide the page if locked
+                    if (dashbored.locked == true) {
+                        document.addScript(`
+                        addOnLoadFunction(function() {
+                            document.getElementById("${id}").classList.add("hidden");
+                        });
+                    `);
+                    }
                 }
 
                 //Add the widgets
@@ -172,8 +197,11 @@ module.exports = function (RED) {
         ////////////////////
 
         //Send a message to all dashboreds
-        node.sendMsg = (msg) => {
-            broadcastMessage(JSON.stringify(msg));
+        node.sendMsg = (id, payload) => {
+            broadcastMessage(JSON.stringify({
+                id,
+                payload
+            }));
         }
 
         //Return the widgets
@@ -250,8 +278,8 @@ module.exports = function (RED) {
                             document.addScript(`
                                 addOnMsgFunction(function(msg) {
                                     if(msg.id == "weather") {
-                                        document.getElementById("weatherTemp").innerHTML = Math.round(msg.temp) + "°";
-                                        document.getElementById("weatherImg").setAttribute("src", msg.iconUrl);
+                                        document.getElementById("weatherTemp").innerHTML = Math.round(msg.payload.temp) + "°";
+                                        document.getElementById("weatherImg").setAttribute("src", msg.payload.iconUrl);
                                     }
                                 });
                             `);
@@ -282,6 +310,11 @@ module.exports = function (RED) {
 
                         //Add the onload scripts and delete the element
                         document.addScript(`
+                            //Global variables
+                            var dashboredId = "${dashbored.id}";
+                            var locked = ${dashbored.locked};
+
+
                             addOnLoadFunction(function() {
                                 hideShowElement("loader", false);
                             });

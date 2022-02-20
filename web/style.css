@@ -1,9 +1,25 @@
+/* Main colours */
+#header, #nav {
+    background-color: #252525;
+}
+html, #pages, page, #password {
+    background-color: #121212;
+    color: white;
+}
+button {
+    background-color: #3700B3;
+    color: white;
+}
+button:hover {
+    background-color: #FFFFFF;
+    color: black;
+}
+
 /* Pages section */
 
 #pages {
     position: absolute;
     top: 80px;
-    background-color: pink;
     width: 100%;
     height: calc(100% - 180px);
 }
@@ -18,6 +34,18 @@
 #pages.navTop {
     top: 100px;
 }
+page {
+    position: absolute;
+    top: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+}
+#locked {
+    text-align: center;
+    padding: 50px;
+    font-size: 1.2em;
+}
 
 
 /* Header */
@@ -27,7 +55,6 @@
     position: absolute;
     width: 100%;
     height: 80px;
-    background-color: red;
 }
 
 #header.navSide {
@@ -73,6 +100,8 @@
 #weatherImg {
     height: 60px !important;
     margin: -13px !important;
+    -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+    filter: grayscale(100%);
 }
 
 
@@ -84,7 +113,6 @@
     left: 0;
     width: 100%;
     height: 100px;
-    background-color: yellow;
 }
 
 #nav p {
@@ -125,10 +153,8 @@
 }
 
 button {
-    background-color: #111827;
     border: 1px solid transparent;
     border-radius: .75rem;
-    color: #FFFFFF;
     cursor: pointer;
     font-size: 1.125rem;
     font-weight: 600;
@@ -144,9 +170,6 @@ button {
     width: auto;
 }
 
-button:hover {
-    background-color: #374151;
-}
 
 button:focus {
     box-shadow: none;
@@ -158,6 +181,50 @@ button:focus {
     display: none;
 }
 
+/** Password **/
+#password {
+    padding-top: 5vh;
+    position: absolute;
+    width: 100%;
+    height: calc(100% - 5vh);
+    z-index: 20;
+    text-align: center;
+}
+#buttonPad {
+    margin-left: calc(50% - 108px);
+    margin-top: 3vh;
+}
+#buttonPad button {
+    width: 70px;
+    height: 70px;
+    margin: 2px;
+    padding: 0;
+}
+#checkPassword, #closePassword {
+    margin: 10px;
+    margin-top: 3vh;
+    width: 100px;
+    height: 70px;
+    padding: 0;
+}
+#currentPassword {
+    font-size: 2em;
+    height: 15px;
+}
+#passwordCorrect, #passwordIncorrect {
+    position: absolute;
+    top: 20px;
+    left: calc(25%);
+    width: 50%;
+    padding-bottom: 10px;
+}
+
+.bgRed {
+    background-color: #DC143C;
+}
+.bgGreen {
+    background-color: #228B22;
+}
 
 /** Mobile **/
 
@@ -176,8 +243,6 @@ button:focus {
 #loader {
     position: absolute;
     z-index: 30;
-    background-color: black;
-    color: white;
     width: 100%;
     height: 100%;
     text-align: center;

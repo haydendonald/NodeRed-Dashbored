@@ -11,13 +11,56 @@
 </head>
 
 <body>
-    <div id="loader"><div class="lds-facebook"><div></div><div></div><div></div></div></div>
+    <div id="loader">
+        <div class="lds-facebook">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+    <div id="password" class="hidden">
+        <h1>Please enter the password</h1>
+        <p>The action requires you to enter the password</p>
+        <p id="currentPassword"> </p>
+        <div id="passwordIncorrect" class="hidden bgRed"><h1><i class="fa fa-times"></i></h1><h1>Sorry, Please Try Again</h1></div>
+        <div id="passwordCorrect" class="hidden bgGreen"><h1><i class="fa fa-check"></i></h1><h1>Correct!</h1></div>
+        <table id="buttonPad">
+            <tr>
+                <td><button>1</button></td>
+                <td><button>2</button></td>
+                <td><button>3</button></td>
+            </tr>
+            <tr>
+                <td><button>4</button></td>
+                <td><button>5</button></td>
+                <td><button>6</button></td>
+            </tr>
+            <tr>
+                <td><button>7</button></td>
+                <td><button>8</button></td>
+                <td><button>9</button></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><button>0</button></td>
+                <td><button><i class="fa fa-undo"></i></button></td>
+            </tr>
+        </table>
+        <button id="checkPassword">OK</button>
+        <button id="closePassword">BACK</button>
+    </div>
     <div id="header">
         <div id="clockWeather"></div>
     </div>
     <div id="nav">
     </div>
-    <div id="pages"></div>
+    <div id="pages">
+        <div id="locked">
+            <h1 style="color: #FFA500; font-size: 4em"><i class="fa fa-lock"></i></h1>
+            <h1>Locked</h1>
+            <p>Your actions have been limited</p>
+        </div>
+    </div>
 </body>
 
 </html>

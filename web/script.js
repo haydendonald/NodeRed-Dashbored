@@ -8,6 +8,10 @@
 var debug = true;
 var onLoadFunctions = [];
 var onMsgFunctions = [];
+var onLockFunctions = [];
+var onUnlockFunctions = [];
+var socketCallbacks = [];
+var currentPage;
 var socket = new WebSocket("ws://" + location.host.split(":")[0] + ":4235");
 
 //Add a function to action when the window loads in
@@ -38,25 +42,48 @@ function formatAMPM(date) {
     return strTime;
 }
 
-//Send a message to the socket
-function sendNodeMsg(id, payload) {
+/**
+ * Send a message to NodeRed over the websocket
+ * @param {string} id The node or event id 
+ * @param {object} payload The payload to send
+ * @param {function} callback When a message is received on the socket this callback will be called with callback(id, success, msg) this MUST return true if successful otherwise the timeout will be called
+ */
+function sendMsg(id, payload, callback) {
     print("debug", "Sending msg for " + id + ": " + payload);
+    if (callback) {
+        var index = socketCallbacks.length;
+        socketCallbacks.push(
+            {
+                timeout: setTimeout(function () {
+                    socketCallbacks = socketCallbacks.splice(index + 1, 1);
+                    callback(id, false);
+                }, 1000),
+                id: id,
+                fn: callback
+            });
+    }
     socket.send(JSON.stringify({
         id: id,
         payload: payload
     }));
 }
 
-//Hide or show an element
+
+/**
+ * Show or show an element
+ * @param {string} id The HTML element id
+ * @param {boolean} show Should it be shown
+ * @param {number} sec How long should it take to fade in seconds
+ */
 function hideShowElement(id, show, sec = 0.2) {
     try {
         document.getElementById(id).style.transition = `opacity ${sec}s linear`;
         if (show) {
             document.getElementById(id).classList.remove("hidden");
-            setTimeout(() => { document.getElementById(id).style.opacity = 1; }, sec * 1000);
+            setTimeout(function () { document.getElementById(id).style.opacity = 1; }, sec * 1000);
         } else {
             document.getElementById(id).style.opacity = 0;
-            setTimeout(() => { document.getElementById(id).classList.add("hidden"); }, sec * 1000);
+            setTimeout(function () { document.getElementById(id).classList.add("hidden"); }, sec * 1000);
         }
     } catch (e) { }
 }
@@ -66,15 +93,132 @@ function hideShowElement(id, show, sec = 0.2) {
 ///TO DOCUMENT
 
 /**
+ * Show a message popup
+ * @param {string} type The type of message. (info, warn, error) 
+ * @param {string} title The title of the message
+ * @param {string} description The description of the message
+ * @param {number} closeAfterSec How long until it's closed. False will not close the message, True will close the message
+ */
+function message(type, title, description, closeAfterSec = 3) {
+    console.log(description);
+    //TODO
+}
+
+/**
  * Add a function to be called when the dashbored becomes locked
- * @param {function} fn hi
+ * @param {function} fn The function to execute
  */
 function addOnLockFunction(fn) {
-
+    onLockFunctions.push(fn);
 }
-addOnLoadFunction()
+/**
+ * Add a function to be called when the dashbored becomes unlocked
+ * @param {function} fn The function to execute
+ */
+function addOnUnlockFunction(fn) {
+    onUnlockFunctions.push(fn);
+}
+/**
+ * Lock the dashbored
+ */
+function lockDashbored() {
+    print("info", "Locking the dashbored");
+    sendMsg(dashboredId, { type: "lock" });
+}
+/**
+ * Attempt to unlock the dashbored using a password
+ */
+function unlockDashbored() {
+    askPassword(function (password) {
+        sendMsg(dashboredId, {
+            type: "unlock",
+            password: password
+        }, function (id, success, msg) {
+            return true;
+        });
+    });
+}
 
+/**
+ * Ask for a password before performing the callback
+ */
+function askPassword(correctCallback, incorrectCallback, bypassPassword = false) {
+    if (bypassPassword == true) { correctCallback(); return; }
+    hideShowElement("password", true);
+    var password = "";
 
+    //Convert the password to dots
+    var convertStringToDots = function (string) {
+        var ret = "";
+        for(var i = 0; i < string.length; i++){ret += "&bull;";}
+        return ret;
+    }
+
+    //Set the button numbers
+    var elms = document.getElementById("buttonPad").getElementsByTagName("button");
+    for(var i = 0; i < elms.length; i++) {
+        //Backspace button
+        if(i == 10) {
+            elms[i].onclick = function() {
+                password = "";
+                document.getElementById("currentPassword").innerHTML = convertStringToDots(password);
+            }
+            break;
+        }
+
+        //Num buttons
+        elms[i].setAttribute("num", i != 9 ? i + 1 : 0);
+        elms[i].onclick = function(event) {
+            password += event.target.getAttribute("num");
+            document.getElementById("currentPassword").innerHTML = convertStringToDots(password);
+        }
+    }
+
+    //When the user clicks the OK button check the password and execute actions
+    document.getElementById("checkPassword").onclick = function () {
+        //Check if the password is correct
+        sendMsg(dashboredId, {
+            type: "password",
+            password: password
+        }, function (id, success, msg) {
+            if (id != dashboredId) { return; }
+            if (success) {
+                if (msg.payload.type == "password") {
+                    if (msg.payload.correct == true) {
+                        print("debug", "Password correct");
+                        if (correctCallback) { correctCallback(password); }
+                        hideShowElement("passwordCorrect", true);
+                        setTimeout(function () {
+                            hideShowElement("password", false);
+                            hideShowElement("passwordCorrect", false);
+                        }, 1000);
+                    }
+                    else {
+                        print("debug", "Password incorrect");
+                        document.getElementById("currentPassword").innerHTML = "";
+                        password = "";
+                        if (incorrectCallback) { incorrectCallback(); }
+                        hideShowElement("passwordIncorrect", true);
+                        setTimeout(function () {
+                            hideShowElement("passwordIncorrect", false);
+                        }, 1000);
+                    }
+                }
+                else { return; }
+            }
+            else {
+                message("error", "Something went wrong", "Couldn't check your password, please try again");
+            }
+
+            return true;
+        });
+    }
+
+    document.getElementById("closePassword").onclick = function() {
+        hideShowElement("password", false);
+        if (incorrectCallback) { incorrectCallback(); }
+    }
+}
 
 ///////////////////////////////////////////////////////////
 
@@ -90,8 +234,45 @@ window.onload = function () {
         var msg = JSON.parse(data.data);
         print("debug", "Socket message received");
         if (debug) { console.log(msg); }
+
+        //Send to onMsgCallbacks
         for (var i = 0; i < onMsgFunctions.length; i++) {
             onMsgFunctions[i](msg);
+        }
+
+        //Send to socket callbacks
+        var del = [];
+        for (var i = 0; i < socketCallbacks.length; i++) {
+            if (socketCallbacks[i].fn(socketCallbacks[i].id, true, msg) === true) {
+                clearTimeout(socketCallbacks[i].timeout);
+                del.push(i);
+            }
+        }
+        //Delete all the completed callbacks
+        for (var i = 0; i < del.length; i++) { socketCallbacks = socketCallbacks.splice(del[i], 1); }
+
+        //If the message is for this dashbored handle it
+        if (msg.id == dashboredId) {
+            switch (msg.payload.type) {
+                case "lock": {
+                    print("info", "Request to lock dashbored");
+                    for (var i = 0; i < onLockFunctions.length; i++) {
+                        onLockFunctions[i]();
+                    }
+                    locked = true;
+                    break;
+                }
+                case "unlock": {
+                    if (msg.payload.unlock == true) {
+                        print("info", "Request to unlock dashbored");
+                        for (var i = 0; i < onUnlockFunctions.length; i++) {
+                            onUnlockFunctions[i]();
+                        }
+                        locked = false;
+                    }
+                    break;
+                }
+            }
         }
     });
 

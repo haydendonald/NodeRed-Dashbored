@@ -30,10 +30,11 @@ module.exports = function(RED) {
             var CSS = config.CSS || "";
             var currentState = offValue;
             var nodeMsgFunctions = [];
+            var id = node.id;
 
             //When a message is received from the dashbored
             var onMessage = (msg) => {
-                if (msg.id == node.id) {
+                if (msg.id == id) {
                     for (var i = 0; i < nodeMsgFunctions.length; i++) {
                         nodeMsgFunctions[i](msg.payload);
                         currentState = msg.payload;
@@ -49,7 +50,7 @@ module.exports = function(RED) {
                 for (var i = 0; i < classes.length - 1; i++) {
                     var selectors = classes[i].split(" {");
                     selectors[0] = selectors[0].replace(/^\s+|\s+$/gm, '');
-                    var output = `${selectors[0][0]}n${node.id.split(".")[0]}_${selectors[0].substring(1)} {${selectors[1]}}\n`;
+                    var output = `${selectors[0][0]}n${id.split(".")[0]}_${selectors[0].substring(1)} {${selectors[1]}}\n`;
                     rebuild += output;
                 }
 
@@ -64,14 +65,14 @@ module.exports = function(RED) {
         }
 
         //Generate the script to be executed in the dashbored when the page loads
-        var generateOnload = (id) => {
+        var generateOnload = (htmlId) => {
             return `
-            ${util.getElement(id, "button")}.onclick = function(event) {
+            ${util.getElement(htmlId, "button")}.onclick = function(event) {
                 if(event.target.getAttribute("state") == "${onValue}") {
-                    sendNodeMsg("${node.id}", "${offValue}");
+                    sendMsg("${id}", "${offValue}");
                 }
                 else {
-                    sendNodeMsg("${node.id}", "${onValue}");
+                    sendMsg("${id}", "${onValue}");
                 }
             }
             `;
@@ -79,16 +80,16 @@ module.exports = function(RED) {
 
         //Generate the script to be executed in the dashboard when a msg comes in to the widget
         //msg can be used to get the msg object
-        var generateOnMsg = (id) => {
+        var generateOnMsg = (htmlId) => {
             return `
-            ${util.getElement(id, "button")}.setAttribute("state", msg.payload);
+            ${util.getElement(htmlId, "button")}.setAttribute("state", msg.payload);
             if(msg.payload == "${onValue}") {
-                ${util.getElement(id, "button")}.classList.add("${util.generateCSSClass(node, "on")}");
-                ${util.getElement(id, "button")}.classList.remove("${util.generateCSSClass(node, "off")}");
+                ${util.getElement(htmlId, "button")}.classList.add("${util.generateCSSClass(node, "on")}");
+                ${util.getElement(htmlId, "button")}.classList.remove("${util.generateCSSClass(node, "off")}");
             }
             else {
-                ${util.getElement(id, "button")}.classList.add("${util.generateCSSClass(node, "off")}");
-                ${util.getElement(id, "button")}.classList.remove("${util.generateCSSClass(node, "on")}");
+                ${util.getElement(htmlId, "button")}.classList.add("${util.generateCSSClass(node, "off")}");
+                ${util.getElement(htmlId, "button")}.classList.remove("${util.generateCSSClass(node, "on")}");
             }
             `;
         }
@@ -98,7 +99,7 @@ module.exports = function(RED) {
 
         //Add this dashboard to the server
         server.addWidget({
-            id: node.id,
+            id,
             name,
             onMessage,
             generateCSS,
@@ -111,9 +112,8 @@ module.exports = function(RED) {
         //When an input is passed to the node in the flow
         node.input = (msg) => {
             if(msg.payload) {
-                msg.id = node.id;
                 currentState = msg.payload;
-                server.sendMsg(msg);
+                server.sendMsg(id, currentState);
             }
         }
 

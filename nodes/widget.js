@@ -65,14 +65,18 @@ module.exports = function(RED) {
         }
 
         //Generate the script to be executed in the dashbored when the page loads
-        var generateOnload = (htmlId) => {
+        var generateOnload = (htmlId, lockedAccess, alwaysPassword) => {
             return `
             ${util.getElement(htmlId, "button")}.onclick = function(event) {
-                if(event.target.getAttribute("state") == "${onValue}") {
-                    sendMsg("${id}", "${offValue}");
+                var action = function() {
+                    sendMsg("${id}", event.target.getAttribute("state") == "${onValue}" ? "${offValue}" : "${onValue}");
                 }
-                else {
-                    sendMsg("${id}", "${onValue}");
+
+                //Check for a password depending on what the options are
+                ${lockedAccess == "password" ? "if(locked){askPassword(action);}" : ""}
+                ${lockedAccess == "yes" ? "if(locked){askPassword(action, undefined, true);}" : ""}
+                if(!locked) {
+                    ${alwaysPassword == "yes" ? "askPassword(action);" : "action()"}
                 }
             }
             `;

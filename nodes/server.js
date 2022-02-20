@@ -84,24 +84,34 @@ module.exports = function (RED) {
             for (var i = 0; i < elements.length; i++) {
                 if (elements[i].rawTagName == "widget") {
                     var widget = widgets[elements[i].id];
+                    var widgetElement = elements[i];
                     if (!widget) {
                         RED.log.warn(`Widget ${elements[i].id} was not found`);
                         elements[i].innerHTML = `<p style="background-color: red">Failed to generate widget</p>`;
                         break;
                     }
                     var randomId = util.randString();
+                    widgetElement.setAttribute("id", randomId);
+                    var lockedAccess = widgetElement.getAttribute("locked-access") || "no";
+                    var alwaysPassword = widgetElement.getAttribute("always-password") || "no";
+
+                    //Hide the widget when locked
+                    if (lockedAccess == "no") {
+                        document.addScript(`
+                            addElementHiddenWhileLocked("${randomId}");
+                        `);
+                    }
+
 
                     //Insert the onload script
                     document.addScript(`
                         addOnLoadFunction(function() {
-
-                            ${widget.generateOnload(randomId)}
+                            ${widget.generateOnload(randomId, lockedAccess, alwaysPassword)}
                         });
 
                         addOnMsgFunction(function(msg) {
                             //Check if the id is equal to this widget, if so execute the actions
                             if(msg.id == "${widget.id}") {
-                                print("debug", "onmsg triggered - ${widget.name} (${widget.id})");
                                 ${widget.generateOnMsg(randomId)}
                             }
                         })

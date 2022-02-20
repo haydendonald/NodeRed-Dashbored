@@ -48,29 +48,30 @@ function sendNodeMsg(id, payload) {
 }
 
 //Hide or show an element
-function hideShowElement(id, show) {
+function hideShowElement(id, show, sec = 0.2) {
     try {
+        document.getElementById(id).style.transition = `opacity ${sec}s linear`;
         if (show) {
             document.getElementById(id).classList.remove("hidden");
-            document.getElementById(id).style.opacity = 1;
+            setTimeout(() => { document.getElementById(id).style.opacity = 1; }, sec * 1000);
         } else {
             document.getElementById(id).style.opacity = 0;
-            document.getElementById(id).classList.add("hidden");
+            setTimeout(() => { document.getElementById(id).classList.add("hidden"); }, sec * 1000);
         }
-    } catch (e) {}
+    } catch (e) { }
 }
 
 ///////////////////////////////////////////////////////////
 
-window.onload = function() {
+window.onload = function () {
     print("info", "Dashbored project by Hayden Donald\nhttps://github.com/haydendonald/NodeRed-Dashbored\nLet's Go!");
     print("debug", "Triggering onload functions");
 
-    socket.addEventListener('open', function(event) {
+    socket.addEventListener('open', function (event) {
         print("debug", "Socket open");
     });
 
-    socket.addEventListener("message", function(data) {
+    socket.addEventListener("message", function (data) {
         var msg = JSON.parse(data.data);
         print("debug", "Socket message received");
         if (debug) { console.log(msg); }
@@ -79,12 +80,12 @@ window.onload = function() {
         }
     });
 
-    socket.addEventListener("error", function(error) {
+    socket.addEventListener("error", function (error) {
         print("error", "Socket error");
         console.log(error);
     });
 
-    socket.addEventListener("close", function() {
+    socket.addEventListener("close", function () {
         print("debug", "Socket closed");
     });
 

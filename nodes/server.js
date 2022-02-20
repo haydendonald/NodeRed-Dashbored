@@ -95,7 +95,7 @@ module.exports = function(RED) {
                     //Insert the onload script
                     document.addScript(`
                         addOnLoadFunction(function() {
-                            print("debug", "onload triggered for widget - ${widget.name} (${widget.id})");
+
                             ${widget.generateOnload(randomId)}
                         });
 
@@ -161,8 +161,13 @@ module.exports = function(RED) {
                     `);
                 }
 
-                //Generate the widgets
-                addWidgetsToPage(document, page, widgetIdsCSSDone);
+                //If a url is specified load the url into the entire page
+                if (url != "") {
+                    page.innerHTML += `<iframe src="http://www.google.com/">Google</iframe><object type="text/html" data="${url}" width="100px" height="100px"></object>`;
+                } else {
+                    //Otherwise generate the widgets
+                    addWidgetsToPage(document, page, widgetIdsCSSDone);
+                }
 
                 //Add our page
                 document.pages.innerHTML += page.outerHTML;

@@ -36,7 +36,7 @@ module.exports = function (RED) {
 
                 //Send the message to the dashboards
                 for (var i in dashboards) {
-                    dashboards[i].onMessage(JSON.parse(data));
+                    dashboards[i].onMessage(dashboards[i], JSON.parse(data));
                 }
                 for (var i in widgets) {
                     widgets[i].onMessage(JSON.parse(data));
@@ -49,6 +49,15 @@ module.exports = function (RED) {
             wss.clients.forEach((client) => {
                 if (client.readyState === WebSocket.WebSocket.OPEN) {
                     client.send(data);
+                }
+            });
+        }
+
+        //Kick all the web socket clients
+        var kickClients = () => {
+            wss.clients.forEach((client) => {
+                if (client.readyState === WebSocket.WebSocket.OPEN) {
+                    client.terminate();
                 }
             });
         }
@@ -339,6 +348,7 @@ module.exports = function (RED) {
 
         //On redeploy
         node.on("close", () => {
+            kickClients();
             wss.close();
             clearInterval(weatherInterval);
         });

@@ -4,76 +4,57 @@ module.exports = function (RED) {
         RED.nodes.createNode(this, config);
         var node = this;
 
-        var name = config.name || "dashbored";
-        var endpoint = config.endpoint || name.toLowerCase();
         var server = RED.nodes.getNode(config.server);
-        var locked = false;
-        var password = "";
-        var headerImage = "red/images/node-red.svg";
-        var headerText = "Dashbored";
-        var showClock = true;
-        var showWeather = true;
-        var id = node.id;
+        server.addDashbored({
+            id: node.id,
+            name: config.name || "dashbored",
+            endpoint: config.endpoint || this.name.toLowerCase(),
+            HTML: config.HTML || "",
+            CSS: config.CSS || "",
+            locked: false,
+            headerImage: "red/images/node-red.svg",
+            headerText: "Dashbored",
+            showClock: true,
+            showWeather: false,
+            navMode: "right",
+            password: "",
 
-        var navMode = "right"; //Top, Left, Bottom
-
-
-        var HTML = config.HTML || "";
-        var CSS = config.CSS || "";
-
-        //When a message is received from the dashbored
-        var onMessage = (data) => {
-            if (data.id == id) {
-                switch (data.payload.type) {
-                    case "password": {
-                        var correct = false;
-                        if (data.payload.password !== undefined) {
-                            if (data.payload.password == password) { correct = true; }
+            //When a message is received from the dashbored
+            onMessage: (dashbored, data) => {
+                if (data.id == dashbored.id) {
+                    switch (data.payload.type) {
+                        case "password": {
+                            var correct = false;
+                            if (data.payload.password !== undefined) {
+                                if (data.payload.password == dashbored.password) { correct = true; }
+                            }
+                            server.sendMsg(this.id, {
+                                type: "password",
+                                correct
+                            });
+                            break;
                         }
-                        server.sendMsg(id, {
-                            type: "password",
-                            correct
-                        });
-                        break;
-                    }
-                    case "unlock": {
-                        var correct = false;
-                        if (data.payload.password !== undefined) {
-                            if (data.payload.password == password) { correct = true; }
+                        case "unlock": {
+                            var correct = false;
+                            if (data.payload.password !== undefined) {
+                                if (data.payload.password == dashbored.password) { correct = true; }
+                            }
+                            server.sendMsg(dashbored.id, {
+                                type: "unlock",
+                                unlock: correct
+                            });
+                            break;
                         }
-                        server.sendMsg(id, {
-                            type: "unlock",
-                            unlock: correct
-                        });
-                        break;
-                    }
-                    case "lock": {
-                        locked = true;
-                        server.sendMsg(id, {
-                            type: "lock"
-                        });
-                        break;
+                        case "lock": {
+                            locked = true;
+                            server.sendMsg(dashbored.id, {
+                                type: "lock"
+                            });
+                            break;
+                        }
                     }
                 }
-            }
-        }
-
-        //TODO handle locked ad unlocking of the dashboard
-
-        //Add this dashboard to the server
-        server.addDashbored({
-            id,
-            name,
-            endpoint,
-            onMessage,
-            HTML,
-            CSS,
-            locked,
-            headerImage,
-            headerText,
-            showClock,
-            showWeather,
-            navMode
+            },
         });
 
         //On redeploy

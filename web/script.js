@@ -13,7 +13,8 @@ var onUnlockFunctions = [];
 var socketCallbacks = [];
 var elementsHiddenWhileLocked = [];
 var currentPage;
-var socket = new WebSocket("ws://" + location.host.split(":")[0] + ":4235");
+var socketWasClosed = false;
+var socket;
 
 //Add a function to action when the window loads in
 function addOnLoadFunction(fn) {
@@ -77,7 +78,7 @@ function sendMsg(id, payload, callback) {
  * @param {number} sec How long should it take to fade in seconds
  */
 function hideShowElement(id, show, sec) {
-    if(sec === undefined){sec = 0.2;}
+    if (sec === undefined) { sec = 0.2; }
     try {
         document.getElementById(id).style.transition = "opacity " + sec + "s linear";
         if (show) {
@@ -102,7 +103,7 @@ function hideShowElement(id, show, sec) {
  * @param {number} closeAfterSec How long until it's closed. False will not close the message, True will close the message
  */
 function message(type, title, description, closeAfterSec) {
-    if(closeAfterSec === undefined){closeAfterSec = 3;}
+    if (closeAfterSec === undefined) { closeAfterSec = 3; }
     console.log(description);
     //TODO
 }
@@ -150,7 +151,7 @@ function addElementHiddenWhileLocked(id) {
  * Ask for a password before performing the callback
  */
 function askPassword(correctCallback, incorrectCallback, bypassPassword) {
-    if(bypassPassword === undefined){bypassPassword = false;}
+    if (bypassPassword === undefined) { bypassPassword = false; }
     if (bypassPassword == true) { correctCallback(); return; }
     hideShowElement("password", true);
     var password = "";
@@ -252,78 +253,109 @@ function showCurrentPage(newPageId) {
     currentPage.classList.remove("hidden");
 }
 
+//Attempt to connect to the socket and setup the handlers
+var connectionInterval;
+function connect() {
+    var attempt = function () {
+        print("debug", "Attempt connection to the socket");
+        if (socket) { socket = undefined; }
+        socket = new WebSocket("ws://" + location.host.split(":")[0] + ":4235");
+        socket.addEventListener("open", function (event) {
+            print("debug", "Socket open");
+            clearInterval(connectionInterval);
+            connectionInterval = undefined;
+
+            //If we lost the socket and got it back refresh to regenerate the page
+            if (socketWasClosed == true) {
+                window.location.reload();
+            }
+        });
+
+        socket.addEventListener("message", function (data) {
+            //Check for control signals
+            if(data.data == "reload"){setTimeout(function(){window.location.reload();}, 1000); return;}
+
+            var msg = JSON.parse(data.data);
+            print("debug", "Socket message received");
+            if (debug) { console.log(msg); }
+
+            //Send to onMsgCallbacks
+            for (var i = 0; i < onMsgFunctions.length; i++) {
+                onMsgFunctions[i](msg);
+            }
+
+            //Send to socket callbacks
+            var del = [];
+            for (var i = 0; i < socketCallbacks.length; i++) {
+                if (socketCallbacks[i].fn(socketCallbacks[i].id, true, msg) === true) {
+                    clearTimeout(socketCallbacks[i].timeout);
+                    del.push(i);
+                }
+            }
+            //Delete all the completed callbacks
+            for (var i = 0; i < del.length; i++) { socketCallbacks = socketCallbacks.splice(del[i], 1); }
+
+            //If the message is for this dashbored handle it
+            if (msg.id == dashboredId) {
+                switch (msg.payload.type) {
+                    case "lock": {
+                        print("info", "Request to lock dashbored");
+                        for (var i = 0; i < onLockFunctions.length; i++) {
+                            onLockFunctions[i]();
+                        }
+                        for (var i = 0; i < elementsHiddenWhileLocked.length; i++) {
+                            hideShowElement(elementsHiddenWhileLocked[i], false);
+                        }
+                        showCurrentPage();
+                        locked = true;
+                        break;
+                    }
+                    case "unlock": {
+                        if (msg.payload.unlock == true) {
+                            print("info", "Request to unlock dashbored");
+                            for (var i = 0; i < onUnlockFunctions.length; i++) {
+                                onUnlockFunctions[i]();
+                            }
+                            for (var i = 0; i < elementsHiddenWhileLocked.length; i++) {
+                                hideShowElement(elementsHiddenWhileLocked[i], true);
+                            }
+                            showCurrentPage();
+                            locked = false;
+                        }
+                        break;
+                    }
+                }
+            }
+        });
+
+        socket.addEventListener("error", function (error) {
+            print("error", "Socket error");
+        });
+
+        socket.addEventListener("close", function () {
+            print("debug", "Socket closed");
+            socketWasClosed = true;
+            message("error", "Disconnected From Server", "We are currently disconnected from the server! Attempting to get it back!", false);
+            connect();
+        });
+    }
+
+    //Retry every 5 seconds
+    if (!connectionInterval) {
+        connectionInterval = setInterval(function () {
+            attempt();
+        }, 5000);
+        attempt();
+    }
+}
+
 ///////////////////////////////////////////////////////////
 
 window.onload = function () {
     print("info", "Dashbored project by Hayden Donald\nhttps://github.com/haydendonald/NodeRed-Dashbored\nLet's Go!");
     print("debug", "Triggering onload functions");
 
-    socket.addEventListener('open', function (event) {
-        print("debug", "Socket open");
-    });
-
-    socket.addEventListener("message", function (data) {
-        var msg = JSON.parse(data.data);
-        print("debug", "Socket message received");
-        if (debug) { console.log(msg); }
-
-        //Send to onMsgCallbacks
-        for (var i = 0; i < onMsgFunctions.length; i++) {
-            onMsgFunctions[i](msg);
-        }
-
-        //Send to socket callbacks
-        var del = [];
-        for (var i = 0; i < socketCallbacks.length; i++) {
-            if (socketCallbacks[i].fn(socketCallbacks[i].id, true, msg) === true) {
-                clearTimeout(socketCallbacks[i].timeout);
-                del.push(i);
-            }
-        }
-        //Delete all the completed callbacks
-        for (var i = 0; i < del.length; i++) { socketCallbacks = socketCallbacks.splice(del[i], 1); }
-
-        //If the message is for this dashbored handle it
-        if (msg.id == dashboredId) {
-            switch (msg.payload.type) {
-                case "lock": {
-                    print("info", "Request to lock dashbored");
-                    for (var i = 0; i < onLockFunctions.length; i++) {
-                        onLockFunctions[i]();
-                    }
-                    for (var i = 0; i < elementsHiddenWhileLocked.length; i++) {
-                        hideShowElement(elementsHiddenWhileLocked[i], false);
-                    }
-                    showCurrentPage();
-                    locked = true;
-                    break;
-                }
-                case "unlock": {
-                    if (msg.payload.unlock == true) {
-                        print("info", "Request to unlock dashbored");
-                        for (var i = 0; i < onUnlockFunctions.length; i++) {
-                            onUnlockFunctions[i]();
-                        }
-                        for (var i = 0; i < elementsHiddenWhileLocked.length; i++) {
-                            hideShowElement(elementsHiddenWhileLocked[i], true);
-                        }
-                        showCurrentPage();
-                        locked = false;
-                    }
-                    break;
-                }
-            }
-        }
-    });
-
-    socket.addEventListener("error", function (error) {
-        print("error", "Socket error");
-        console.log(error);
-    });
-
-    socket.addEventListener("close", function () {
-        print("debug", "Socket closed");
-    });
+    connect();
 
     //Execute all the onload functions
     for (var i = 0; i < onLoadFunctions.length; i++) {

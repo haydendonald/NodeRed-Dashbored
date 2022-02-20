@@ -155,16 +155,16 @@ function askPassword(correctCallback, incorrectCallback, bypassPassword = false)
     //Convert the password to dots
     var convertStringToDots = function (string) {
         var ret = "";
-        for(var i = 0; i < string.length; i++){ret += "&bull;";}
+        for (var i = 0; i < string.length; i++) { ret += "&bull;"; }
         return ret;
     }
 
     //Set the button numbers
     var elms = document.getElementById("buttonPad").getElementsByTagName("button");
-    for(var i = 0; i < elms.length; i++) {
+    for (var i = 0; i < elms.length; i++) {
         //Backspace button
-        if(i == 10) {
-            elms[i].onclick = function() {
+        if (i == 10) {
+            elms[i].onclick = function () {
                 password = "";
                 document.getElementById("currentPassword").innerHTML = convertStringToDots(password);
             }
@@ -173,7 +173,7 @@ function askPassword(correctCallback, incorrectCallback, bypassPassword = false)
 
         //Num buttons
         elms[i].setAttribute("num", i != 9 ? i + 1 : 0);
-        elms[i].onclick = function(event) {
+        elms[i].onclick = function (event) {
             password += event.target.getAttribute("num");
             document.getElementById("currentPassword").innerHTML = convertStringToDots(password);
         }
@@ -219,17 +219,31 @@ function askPassword(correctCallback, incorrectCallback, bypassPassword = false)
         });
     }
 
-    document.getElementById("closePassword").onclick = function() {
+    document.getElementById("closePassword").onclick = function () {
         hideShowElement("password", false);
         if (incorrectCallback) { incorrectCallback(); }
     }
 }
 
+//Ask if the user is sure
+function askAreYouSure(yesCallback, noCallback, description) {
+    document.getElementById("areYouSureDesc").innerHTML = description;
+    document.getElementById("yesButton").onclick = function () {
+        hideShowElement("ask", false);
+        if (yesCallback) { yesCallback(); }
+    }
+    document.getElementById("noButton").onclick = function () {
+        hideShowElement("ask", false);
+        if (noCallback) { noCallback(); }
+    }
+    hideShowElement("ask", true);
+}
+
 //Hide all other pages except the current
 function showCurrentPage(newPageId) {
-    if(newPageId){currentPage = document.getElementById(newPageId);}
-    var others =  document.getElementsByTagName("page");
-    for(var i = 0; i < others.length; i++) {
+    if (newPageId) { currentPage = document.getElementById(newPageId); }
+    var others = document.getElementsByTagName("page");
+    for (var i = 0; i < others.length; i++) {
         others[i].classList.add("hidden");
     }
     currentPage.classList.remove("hidden");
@@ -274,7 +288,7 @@ window.onload = function () {
                     for (var i = 0; i < onLockFunctions.length; i++) {
                         onLockFunctions[i]();
                     }
-                    for(var i = 0; i < elementsHiddenWhileLocked.length; i++) {
+                    for (var i = 0; i < elementsHiddenWhileLocked.length; i++) {
                         hideShowElement(elementsHiddenWhileLocked[i], false);
                     }
                     showCurrentPage();
@@ -287,7 +301,7 @@ window.onload = function () {
                         for (var i = 0; i < onUnlockFunctions.length; i++) {
                             onUnlockFunctions[i]();
                         }
-                        for(var i = 0; i < elementsHiddenWhileLocked.length; i++) {
+                        for (var i = 0; i < elementsHiddenWhileLocked.length; i++) {
                             hideShowElement(elementsHiddenWhileLocked[i], true);
                         }
                         showCurrentPage();

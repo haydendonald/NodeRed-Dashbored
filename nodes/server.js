@@ -94,6 +94,8 @@ module.exports = function (RED) {
                     widgetElement.setAttribute("id", randomId);
                     var lockedAccess = widgetElement.getAttribute("locked-access") || "no";
                     var alwaysPassword = widgetElement.getAttribute("always-password") || "no";
+                    var ask = widgetElement.getAttribute("ask") || "no";
+                    var askText = widgetElement.getAttribute("ask-text") || "";
 
                     //Hide the widget when locked
                     if (lockedAccess == "no") {
@@ -106,7 +108,7 @@ module.exports = function (RED) {
                     //Insert the onload script
                     document.addScript(`
                         addOnLoadFunction(function() {
-                            ${widget.generateOnload(randomId, lockedAccess, alwaysPassword)}
+                            ${widget.generateOnload(randomId, lockedAccess, alwaysPassword, ask, askText)}
                         });
 
                         addOnMsgFunction(function(msg) {

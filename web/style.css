@@ -2,7 +2,7 @@
 #header, #nav {
     background-color: #252525;
 }
-html, #pages, page, #password {
+html, #pages, page, #password, #ask {
     background-color: #121212;
     color: white;
 }
@@ -224,6 +224,27 @@ button:focus {
 }
 .bgGreen {
     background-color: #228B22;
+}
+.fgOrange {
+    color: #FFD700;
+}
+
+/** Are you sure dialog */
+#ask {
+    padding-top: 5vh;
+    position: absolute;
+    width: 100%;
+    height: calc(100% - 5vh);
+    z-index: 20;
+    text-align: center;
+}
+#areYouSureDesc {
+    margin-top: 10px;
+}
+#yesButton, #noButton {
+    margin-top: 50px;
+    width: 200px;
+    height: 100px;
 }
 
 /** Mobile **/

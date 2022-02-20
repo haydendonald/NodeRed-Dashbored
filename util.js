@@ -2,11 +2,11 @@ module.exports = {
     /**
      * Create a tag with id
      * <[TAG] id=[ID] [ATTRIBUTES]>[INNER]</[TAG]>
-     * @param {The node element random id} id 
-     * @param {The tag to create} tag 
-     * @param {The element name} elementName
-     * @param {The content inside the tag} inner 
-     * @param {Any extra attributes to add} attributes 
+     * @param {string} id The node element random id
+     * @param {string} tag The tag to create
+     * @param {string} elementName The element name
+     * @param {string} inner The element name
+     * @param {string} attributes The element name
      */
     generateTag: (id, tag, elementName, inner, attributes = "") => {
         return `<${tag} id="${id}_${elementName}" ${attributes}>${inner}</${tag}>`;
@@ -15,10 +15,10 @@ module.exports = {
     /**
      * Generate the CSS
      * [SELECTOR][ID]_[NAME]: [INNER]
-     * @param {The node element} node 
-     * @param {The selector for example . for class or # for id} selector 
-     * @param {The name} name 
-     * @param {The actual CSS content} inner 
+     * @param {widget} node The node element
+     * @param {string} selector The selector for example . for class or # for id
+     * @param {string} name The name
+     * @param {string} inner The actual CSS content
      * @returns 
      */
     generateCSS: (node, selector, name, inner) => {
@@ -27,8 +27,8 @@ module.exports = {
 
     /**
      * Generate the class name with the use of generate CSS
-     * @param {The node element} node 
-     * @param {The name of the class to use} name 
+     * @param {widget} node The node element
+     * @param {string} name The name of the class to use
      */
     generateCSSClass: (node, name) => {
         return `n${node.id.split(".")[0]}_${name}`;
@@ -36,19 +36,24 @@ module.exports = {
 
     /**
      * 
-     * @param {The node element random id} id 
-     * @param {The name of the element} elementName 
+     * @param {string} id The node element random id
+     * @param {string} elementName The name of the element
      */
     getElement: (id, elementName) => {
         return `document.getElementById("${id}_${elementName}")`;
     },
 
-    //Generate a random string
+    /**
+     * Generate a random string
+     */
     randString: () => {
         return "r" + (Math.random() + 1).toString(36).substring(2);
     },
 
-    //Generate a string for the time with AM PM
+    /**
+     * Generate a string for the time with AM PM
+     * @param {Date} date The date object
+     */
     formatAMPM: (date) => {
         var hours = date.getHours();
         var minutes = date.getMinutes();

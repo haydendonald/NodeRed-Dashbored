@@ -61,6 +61,21 @@ function hideShowElement(id, show, sec = 0.2) {
     } catch (e) { }
 }
 
+
+
+///TO DOCUMENT
+
+/**
+ * Add a function to be called when the dashbored becomes locked
+ * @param {function} fn hi
+ */
+function addOnLockFunction(fn) {
+
+}
+addOnLoadFunction()
+
+
+
 ///////////////////////////////////////////////////////////
 
 window.onload = function () {

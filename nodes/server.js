@@ -1,4 +1,4 @@
-module.exports = function(RED) {
+module.exports = function (RED) {
     const path = require("path");
     const fs = require("fs");
     const WebSocket = require("ws");
@@ -72,7 +72,7 @@ module.exports = function(RED) {
                             iconUrl: out.weather[0].iconUrl
                         }));
                     });
-                } catch (e) {}
+                } catch (e) { }
             }
         }
 
@@ -132,7 +132,6 @@ module.exports = function(RED) {
                 var icon = page.getAttribute("icon") || "";
                 var navigationVisibility = page.getAttribute("navigation-visibility") || "yes";
                 var lockedAccess = page.getAttribute("locked-access") || "no";
-                var url = page.getAttribute("url") || "";
                 var id = "page_" + util.randString();
                 page.setAttribute("id", id);
 
@@ -161,13 +160,8 @@ module.exports = function(RED) {
                     `);
                 }
 
-                //If a url is specified load the url into the entire page
-                if (url != "") {
-                    page.innerHTML += `<iframe src="http://www.google.com/">Google</iframe><object type="text/html" data="${url}" width="100px" height="100px"></object>`;
-                } else {
-                    //Otherwise generate the widgets
-                    addWidgetsToPage(document, page, widgetIdsCSSDone);
-                }
+                //Add the widgets
+                addWidgetsToPage(document, page, widgetIdsCSSDone);
 
                 //Add our page
                 document.pages.innerHTML += page.outerHTML;

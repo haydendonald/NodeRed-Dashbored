@@ -11,6 +11,7 @@ var onMsgFunctions = [];
 var onLockFunctions = [];
 var onUnlockFunctions = [];
 var socketCallbacks = [];
+var elementsHiddenWhileLocked = [];
 var currentPage;
 var socket = new WebSocket("ws://" + location.host.split(":")[0] + ":4235");
 
@@ -139,6 +140,10 @@ function unlockDashbored() {
     });
 }
 
+function addElementHiddenWhileLocked(id) {
+    elementsHiddenWhileLocked.push(id);
+}
+
 /**
  * Ask for a password before performing the callback
  */
@@ -220,6 +225,16 @@ function askPassword(correctCallback, incorrectCallback, bypassPassword = false)
     }
 }
 
+//Hide all other pages except the current
+function showCurrentPage(newPageId) {
+    if(newPageId){currentPage = document.getElementById(newPageId);}
+    var others =  document.getElementsByTagName("page");
+    for(var i = 0; i < others.length; i++) {
+        others[i].classList.add("hidden");
+    }
+    currentPage.classList.remove("hidden");
+}
+
 ///////////////////////////////////////////////////////////
 
 window.onload = function () {
@@ -259,6 +274,10 @@ window.onload = function () {
                     for (var i = 0; i < onLockFunctions.length; i++) {
                         onLockFunctions[i]();
                     }
+                    for(var i = 0; i < elementsHiddenWhileLocked.length; i++) {
+                        hideShowElement(elementsHiddenWhileLocked[i], false);
+                    }
+                    showCurrentPage();
                     locked = true;
                     break;
                 }
@@ -268,6 +287,10 @@ window.onload = function () {
                         for (var i = 0; i < onUnlockFunctions.length; i++) {
                             onUnlockFunctions[i]();
                         }
+                        for(var i = 0; i < elementsHiddenWhileLocked.length; i++) {
+                            hideShowElement(elementsHiddenWhileLocked[i], true);
+                        }
+                        showCurrentPage();
                         locked = false;
                     }
                     break;

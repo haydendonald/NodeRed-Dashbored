@@ -131,58 +131,40 @@ module.exports = function (RED) {
                 var icon = page.getAttribute("icon") || "";
                 var navigationVisibility = page.getAttribute("navigation-visibility") || "yes";
                 var lockedAccess = page.getAttribute("locked-access") || "no";
+                var alwaysPassword = page.getAttribute("always-password") || "no";
                 var id = "page_" + util.randString();
                 page.setAttribute("id", id);
 
                 //Add page to navigation
                 if (navigationVisibility != "no") {
-                    console.log(lockedAccess);
                     document.nav.innerHTML += `<button id="trigger_${id}">${icon != "" ? "<i class='fa " + icon + "'></i> " : ""}<p class="mobile-hidden">${name}</p></button>`;
                     //When the button is clicked make this page visible and all others not
                     document.addScript(`
                         addOnLoadFunction(function() {
-                            var others =  document.getElementsByTagName("page");
-                            function hideAllPages() {
-                                for(var i = 0; i < others.length; i++) {
-                                    others[i].classList.add("hidden");
+                            //Change the page
+                            document.getElementById("trigger_${id}").onclick = function() {
+                                var action = function() {
+                                    showCurrentPage("${id}");
+                                };
+                                ${lockedAccess == "password" ? "if(locked){askPassword(action)}" : ""}
+                                ${lockedAccess == "yes" ? "if(locked){askPassword(action, undefined, true)}" : ""}
+                                if(!locked){
+                                    ${alwaysPassword == "yes" ? "askPassword(action);" : "action();"}
                                 }
                             }
 
-                            //Change the page
-                            document.getElementById("trigger_${id}").onclick = function() {
-                                askPassword(function() {
-                                    hideAllPages();
-                                    currentPage = document.getElementById("${id}");
-                                    currentPage.classList.remove("hidden");
-                                }, undefined, ${lockedAccess == "yes"});
-                            }
-
                             //Set the first page to visible
-                            if(${firstPage}){hideAllPages(); currentPage = document.getElementById("${id}"); currentPage.classList.remove("hidden");}
+                            if(${firstPage}){currentPage = document.getElementById("${id}"); showCurrentPage();}
                         });
                     `);
                 }
 
-                //Add the disabling of the page when locked
-                if (lockedAccess != "yes") {
-                    //Add the callbacks for lock changes
+                //Hide the page when locked
+                if (lockedAccess == "no") {
                     document.addScript(`
-                        addOnUnlockFunction(function() {
-                            currentPage.classList.remove("hidden");
-                        });
-                        addOnLockFunction(function() {
-                            document.getElementById("${id}").classList.add("hidden");
-                        });
-                    `);
-
-                    //Hide the page if locked
-                    if (dashbored.locked == true) {
-                        document.addScript(`
-                        addOnLoadFunction(function() {
-                            document.getElementById("${id}").classList.add("hidden");
-                        });
-                    `);
-                    }
+                    addElementHiddenWhileLocked("${id}");
+                    ${navigationVisibility != "no" ? "addElementHiddenWhileLocked('trigger_" + id + "');" : ""}
+                `);
                 }
 
                 //Add the widgets

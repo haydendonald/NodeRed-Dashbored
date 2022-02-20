@@ -29,3 +29,6 @@ If you know how to install it feel free to give it a shot!
 
 ----
 It's a good start??
+
+# Bugs
+if the user clicks back on the password dialog it will action that action when the user clicks something else

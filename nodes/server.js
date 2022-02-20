@@ -310,7 +310,7 @@ module.exports = function (RED) {
 
 
                             addOnLoadFunction(function() {
-                                hideShowElement("loader", false);
+                                setTimeout(function(){hideShowElement("loader", false, 0.5);}, 500);
                             });
                             var temp = document.getElementById("onLoadScripts");
                             temp.parentNode.removeChild(temp);

@@ -2,7 +2,7 @@
 #header, #nav {
     background-color: #252525;
 }
-html, #pages, page, #password, #ask {
+html, #pages, page, #password, #ask, #loader {
     background-color: #121212;
     color: white;
 }
@@ -257,15 +257,13 @@ button:focus {
         display: none;
     }
 }
-
-
 /** Loader **/
 
 #loader {
     position: absolute;
     z-index: 30;
     width: 100%;
-    height: 100%;
+    height: calc(100% - 100px);
     text-align: center;
     padding-top: 100px;
 }

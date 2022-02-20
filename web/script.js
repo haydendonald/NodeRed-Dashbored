@@ -76,9 +76,10 @@ function sendMsg(id, payload, callback) {
  * @param {boolean} show Should it be shown
  * @param {number} sec How long should it take to fade in seconds
  */
-function hideShowElement(id, show, sec = 0.2) {
+function hideShowElement(id, show, sec) {
+    if(sec === undefined){sec = 0.2;}
     try {
-        document.getElementById(id).style.transition = `opacity ${sec}s linear`;
+        document.getElementById(id).style.transition = "opacity " + sec + "s linear";
         if (show) {
             document.getElementById(id).classList.remove("hidden");
             setTimeout(function () { document.getElementById(id).style.opacity = 1; }, sec * 1000);
@@ -100,7 +101,8 @@ function hideShowElement(id, show, sec = 0.2) {
  * @param {string} description The description of the message
  * @param {number} closeAfterSec How long until it's closed. False will not close the message, True will close the message
  */
-function message(type, title, description, closeAfterSec = 3) {
+function message(type, title, description, closeAfterSec) {
+    if(closeAfterSec === undefined){closeAfterSec = 3;}
     console.log(description);
     //TODO
 }
@@ -147,7 +149,8 @@ function addElementHiddenWhileLocked(id) {
 /**
  * Ask for a password before performing the callback
  */
-function askPassword(correctCallback, incorrectCallback, bypassPassword = false) {
+function askPassword(correctCallback, incorrectCallback, bypassPassword) {
+    if(bypassPassword === undefined){bypassPassword = false;}
     if (bypassPassword == true) { correctCallback(); return; }
     hideShowElement("password", true);
     var password = "";

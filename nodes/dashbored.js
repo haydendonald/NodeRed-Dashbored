@@ -13,13 +13,20 @@ module.exports = function (RED) {
         var endpoint = config.endpoint || this.name.toLowerCase();
         var HTML = config.HTML || "";
         var CSS = config.CSS || "";
-        var locked = true;
+        var locked = false;
         var headerImage = "red/images/node-red.svg";
         var headerText = "Dashbored";
         var showClock = true;
         var showWeather = false;
         var navMode = "right";
         var password = "";
+
+        var widgetStyle = {
+            baseHeight: "100px",
+            baseWidth: "200px",
+            scale: 1,
+            backgroundColor: "yellow"
+        }
 
         //When a message is received from the dashbored
         node.onMessage = (data) => {
@@ -99,11 +106,30 @@ module.exports = function (RED) {
                         })
                     `);
 
-                    //Add any extra scripts/css for the widget
+                    //Generate and add the CSS
+                    var CSS = `
+                        #${randomId} {
+                            width: calc(${widgetStyle.baseWidth} * ${widgetStyle.scale});
+                            height: calc(${widgetStyle.baseHeight} * ${widgetStyle.scale});
+                            ${widget.style.minWidth ? "min-width: " + widget.style.minWidth + ";" : ""}
+                            ${widget.style.minWeight ? "min-height: " + widget.style.minWeight + ";" : ""}
+                            ${widget.style.maxWidth ? "max-width: " + widget.style.maxWidth + ";" : ""}
+                            ${widget.style.maxHeight ? "max-height: " + widget.style.maxHeight + ";" : ""}
+                            ${widgetStyle.backgroundColor ? "background-color: " + widgetStyle.backgroundColor + ";" : ""}
+                            float: left;
+                            margin: 10px;
+                            border-radius: 10px;
+                        }
+                    `;
+                    CSS += widget.generateCSS(randomId);
                     if (widget.generateCSS && !widgetIdsCSSDone[widget.id]) {
-                        document.head.innerHTML += `<style id="${widget.id}">${widget.generateCSS()}</style>`;
-                        widgetIdsCSSDone[widget.id] = {};
+                        CSS += widget.generateCustomCSS();
                     }
+                    widgetIdsCSSDone[widget.id] = {};
+                    document.head.innerHTML += `<style id="${widget.id}">${CSS}</style>`;
+                    widgetElement.rawTagName = "div"; //Make it a div because a widget type doesn't get rendered
+
+                    //Add any extra scripts
                     if (widget.generateScript) { html.querySelector("html").innerHTML += `<script id="${widget.id}" type="text/javascript">${widget.generateScript(randomId)}</script>`; }
 
                     elements[i].innerHTML = widget.generateHTML(randomId);
@@ -178,8 +204,6 @@ module.exports = function (RED) {
 
         //Handle the incoming HTTP request
         node.handleHTTP = (baseDocument, req, res) => {
-            console.log(locked);
-
             //Grab the elements from the document
             var document = {};
             document.html = htmlParse(baseDocument);

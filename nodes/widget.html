@@ -58,37 +58,34 @@
             //The default CSS for the button
             CSS: {
                 value: `
-                    .button {
-                        border: 3px solid black;
-                    }
                     .on {
-                        background-color: green;
+                        background-color: #32CD32;
                         color: black;
                     }
                     .off {
-                        background-color: red;
+                        background-color: #800000;
                         color: black;
                     }
                 `.replace(/^\s+|\s+$/gm, ''),
                 required: true
             }
         },
-        label: function() {
+        label: function () {
             return (this.name || "Toggle Button");
         },
-        oneditprepare: function() {
+        oneditprepare: function () {
             this.cssEditor = RED.editor.createEditor({
                 id: "node-input-css-editor",
                 mode: "ace/mode/css",
                 value: this.CSS
             });
         },
-        oneditsave: function() {
+        oneditsave: function () {
             this.CSS = this.cssEditor.getValue();
             this.cssEditor.destroy();
             delete this.cssEditor;
         },
-        oneditcancel: function() {
+        oneditcancel: function () {
             this.cssEditor.destroy();
             delete this.cssEditor;
         },

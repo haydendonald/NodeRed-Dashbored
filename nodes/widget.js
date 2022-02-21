@@ -32,6 +32,16 @@ module.exports = function (RED) {
         var nodeMsgFunctions = [];
         var id = node.id;
 
+        //The styling options for the widget
+        node.style = {
+            heightMultiplier: 1,
+            widthMultiplier: 1,
+            minWidth: undefined,
+            minWeight: undefined,
+            maxWidth: undefined,
+            maxHeight: undefined
+        }
+
         //When a message is received from the dashbored
         node.onMessage = (msg) => {
             if (msg.id == id) {
@@ -42,8 +52,19 @@ module.exports = function (RED) {
             }
         }
 
-        //Generate the CSS for the widget to be inserted into the dashbored
-        node.generateCSS = () => {
+        //Generate the CSS for the widget
+        node.generateCSS = (htmlId) => {
+            return `
+                #${htmlId}_button {
+                    width: calc(100% - 10px);
+                    height: calc(100% - 10px);
+                    margin: 5px;
+                }
+            `;
+        }
+
+        //Generate the CSS specified by the user
+        node.generateCustomCSS = () => {
             //Go through the CSS and add the ids
             var rebuild = "";
             var classes = CSS.split("}");
@@ -53,7 +74,6 @@ module.exports = function (RED) {
                 var output = `${selectors[0][0]}n${id.split(".")[0]}_${selectors[0].substring(1)} {${selectors[1]}}\n`;
                 rebuild += output;
             }
-
             return rebuild;
         }
 

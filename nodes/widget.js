@@ -75,6 +75,11 @@ module.exports = function (RED) {
 
                 ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
             } 
+            
+            //Hide the element initially if required
+            if(locked) {
+                ${lockedAccess == "no" ? "hideShowElement('" + htmlId + "', false);" : ""}
+            }
             `;
         }
 

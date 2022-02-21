@@ -74,10 +74,12 @@ module.exports = {
         }
 
         //Check for a password depending on what the options are
-        ${lockedAccess == "password" ? "if(locked){askPassword(checkAreYouSure);}" : ""}
-        ${lockedAccess == "yes" ? "if(locked){askPassword(checkAreYouSure, undefined, true);}" : ""}
         if (!locked) {
             ${alwaysPassword == "yes" ? "askPassword(checkAreYouSure);" : "checkAreYouSure()"}
+        }
+        else {
+            ${lockedAccess == "password" ? "if(locked){askPassword(checkAreYouSure);}" : ""}
+            ${lockedAccess == "yes" ? "if(locked){askPassword(checkAreYouSure, undefined, true);}" : ""}
         }
         `;
     }

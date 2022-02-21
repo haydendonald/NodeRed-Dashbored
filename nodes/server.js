@@ -37,7 +37,7 @@ module.exports = function (RED) {
                     RED.nodes.getNode(dashboards[endpoint].id).onMessage(JSON.parse(data));
                 }
                 for (var id in widgets) {
-                    RED.nodes.getNode(id).onMessage(JSON.parse(data));
+                    RED.nodes.getNode(id).widgetType.onMessage(JSON.parse(data));
                 }
             });
         });
@@ -127,10 +127,11 @@ module.exports = function (RED) {
     }
 
     //Setup the HTTP server
-    RED.httpNode.get(`/script.js`, (req, res) => { res.sendFile("script.js", { root: webFolder }); });
-    RED.httpNode.get(`/style.css`, (req, res) => { res.sendFile("style.css", { root: webFolder }); });
+    RED.httpNode.get("/script.js", (req, res) => { res.sendFile("script.js", { root: webFolder }); });
+    RED.httpNode.get("/style.css", (req, res) => { res.sendFile("style.css", { root: webFolder }); });
+    
     //Send the widget ids for the node red editor to populate (if theres a better way i'd like to know...)
-    RED.httpNode.get(`/dashboredgetallnodeids`, (req, res) => {
+    RED.httpNode.get("/dashboredgetallnodeids", (req, res) => {
         var send = [];
         for (var i in widgets) { send.push(`{"value":"${i}", "label":"${widgets[i]}"}`); }
         res.send(send);

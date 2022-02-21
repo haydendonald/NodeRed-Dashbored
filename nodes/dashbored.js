@@ -25,7 +25,7 @@ module.exports = function (RED) {
             baseHeight: "100px",
             baseWidth: "200px",
             scale: 1,
-            backgroundColor: "yellow"
+            backgroundColor: undefined
         }
 
         //When a message is received from the dashbored
@@ -95,13 +95,13 @@ module.exports = function (RED) {
                     //Insert the onload script
                     document.addScript(`
                         addOnLoadFunction(function() {
-                            ${widget.generateOnload(randomId, lockedAccess, alwaysPassword, ask, askText)}
+                            ${widget.widgetType.generateOnload(randomId, lockedAccess, alwaysPassword, ask, askText)}
                         });
 
                         addOnMsgFunction(function(msg) {
                             //Check if the id is equal to this widget, if so execute the actions
                             if(msg.id == "${widget.id}") {
-                                ${widget.generateOnMsg(randomId)}
+                                ${widget.widgetType.generateOnMsg(randomId)}
                             }
                         })
                     `);
@@ -111,28 +111,28 @@ module.exports = function (RED) {
                         #${randomId} {
                             width: calc(${widgetStyle.baseWidth} * ${widgetStyle.scale});
                             height: calc(${widgetStyle.baseHeight} * ${widgetStyle.scale});
-                            ${widget.style.minWidth ? "min-width: " + widget.style.minWidth + ";" : ""}
-                            ${widget.style.minWeight ? "min-height: " + widget.style.minWeight + ";" : ""}
-                            ${widget.style.maxWidth ? "max-width: " + widget.style.maxWidth + ";" : ""}
-                            ${widget.style.maxHeight ? "max-height: " + widget.style.maxHeight + ";" : ""}
+                            ${widget.widgetType.style.minWidth ? "min-width: " + widget.widgetType.style.minWidth + ";" : ""}
+                            ${widget.widgetType.style.minWeight ? "min-height: " + widget.widgetType.style.minWeight + ";" : ""}
+                            ${widget.widgetType.style.maxWidth ? "max-width: " + widget.widgetType.style.maxWidth + ";" : ""}
+                            ${widget.widgetType.style.maxHeight ? "max-height: " + widget.widgetType.style.maxHeight + ";" : ""}
                             ${widgetStyle.backgroundColor ? "background-color: " + widgetStyle.backgroundColor + ";" : ""}
                             float: left;
                             margin: 10px;
                             border-radius: 10px;
                         }
                     `;
-                    CSS += widget.generateCSS(randomId);
-                    if (widget.generateCSS && !widgetIdsCSSDone[widget.id]) {
-                        CSS += widget.generateCustomCSS();
+                    CSS += widget.widgetType.generateCSS(randomId);
+                    if (widget.widgetType.generateCSS && !widgetIdsCSSDone[widget.id]) {
+                        CSS += widget.widgetType.generateCustomCSS();
                     }
                     widgetIdsCSSDone[widget.id] = {};
                     document.head.innerHTML += `<style id="${widget.id}">${CSS}</style>`;
                     widgetElement.rawTagName = "div"; //Make it a div because a widget type doesn't get rendered
 
                     //Add any extra scripts
-                    if (widget.generateScript) { html.querySelector("html").innerHTML += `<script id="${widget.id}" type="text/javascript">${widget.generateScript(randomId)}</script>`; }
+                    if (widget.generateScript) { html.querySelector("html").innerHTML += `<script id="${widget.id}" type="text/javascript">${widget.widgetType.generateScript(randomId)}</script>`; }
 
-                    elements[i].innerHTML = widget.generateHTML(randomId);
+                    elements[i].innerHTML = widget.widgetType.generateHTML(randomId);
                 }
             }
         }

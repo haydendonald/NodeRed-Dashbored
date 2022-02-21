@@ -10,6 +10,14 @@
         <input type="text" id="node-config-input-server">
     </div>
     <div class="form-row">
+        <label for="node-config-input-widgetType">Type</label>
+        <input type="text" id="node-config-input-widgetType">
+    </div>
+
+
+
+
+    <div class="form-row">
         <label for="node-config-input-option-text">Text</label>
         <input type="text" id="node-config-input-text">
     </div>
@@ -42,6 +50,15 @@
                 required: true,
                 type: "dashbored-server"
             },
+            widgetType: {
+                value: "",
+                required: true
+            },
+
+
+            options: {},
+
+
             text: {
                 value: "Toggle Button",
                 required: true
@@ -74,6 +91,15 @@
             return (this.name || "Toggle Button");
         },
         oneditprepare: function () {
+            $("#node-config-input-widgetType").typedInput({
+                types: [{
+                    value: "widgetType",
+                    options: [{
+                        label: "Toggle Button", value: "toggleButton"
+                    }]
+                }]
+            });
+
             this.cssEditor = RED.editor.createEditor({
                 id: "node-input-css-editor",
                 mode: "ace/mode/css",

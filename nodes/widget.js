@@ -16,131 +16,47 @@
  */
 
 module.exports = function (RED) {
+    //Define the possible widget types
+    var types = {
+        "toggleButton": require("../widgets/toggleButton.js")
+    };
 
     function widget(config) {
         RED.nodes.createNode(this, config);
         var node = this;
-        const util = require("../util.js");
-
-        var name = config.name || "Toggle Button";
-        var server = RED.nodes.getNode(config.server);
-        var text = config.text || "Toggle Button";
-        var onValue = config.onValue || "on";
-        var offValue = config.offValue || "off";
-        var CSS = config.CSS || "";
-        var currentState = offValue;
         var nodeMsgFunctions = [];
-        var id = node.id;
-
-        //The styling options for the widget
-        node.style = {
-            heightMultiplier: 1,
-            widthMultiplier: 1,
-            minWidth: undefined,
-            minWeight: undefined,
-            maxWidth: undefined,
-            maxHeight: undefined
-        }
-
-        //When a message is received from the dashbored
-        node.onMessage = (msg) => {
-            if (msg.id == id) {
-                for (var i = 0; i < nodeMsgFunctions.length; i++) {
-                    nodeMsgFunctions[i](msg.payload);
-                    currentState = msg.payload;
-                }
+        var server = RED.nodes.getNode(config.server);
+        node.widgetType = types[config.widgetType];
+        node.widgetType.util = require("../util.js");
+        node.widgetType.id = node.id;
+        node.widgetType.name = config.name;
+        node.widgetType.CSS = config.CSS;
+        node.widgetType.sendToFlow = (msg) => {
+            for(var i = 0; i < nodeMsgFunctions.length; i++) {
+                nodeMsgFunctions[i](msg);
             }
         }
-
-        //Generate the CSS for the widget
-        node.generateCSS = (htmlId) => {
-            return `
-                #${htmlId}_button {
-                    width: calc(100% - 10px);
-                    height: calc(100% - 10px);
-                    margin: 5px;
-                }
-            `;
+        node.widgetType.sendToDashbored = (id, payload) => {
+            server.sendMsg(id, payload);
         }
-
-        //Generate the CSS specified by the user
-        node.generateCustomCSS = () => {
-            //Go through the CSS and add the ids
-            var rebuild = "";
-            var classes = CSS.split("}");
-            for (var i = 0; i < classes.length - 1; i++) {
-                var selectors = classes[i].split(" {");
-                selectors[0] = selectors[0].replace(/^\s+|\s+$/gm, '');
-                var output = `${selectors[0][0]}n${id.split(".")[0]}_${selectors[0].substring(1)} {${selectors[1]}}\n`;
-                rebuild += output;
-            }
-            return rebuild;
-        }
-
-        //Generate the HTML for the widget to be inserted into the dashbored
-        node.generateHTML = (id) => {
-            return `
-            ${util.generateTag(id, "button", "button", text, `class="${util.generateCSSClass(node, "button")} ${util.generateCSSClass(node, (currentState == offValue ? "off" : "on"))}" state="${currentState}"`)}
-            `;
-        }
-
-        //Generate the script to be executed in the dashbored when the page loads
-        node.generateOnload = (htmlId, lockedAccess, alwaysPassword, ask, askText) => {
-            return `
-            ${util.getElement(htmlId, "button")}.onclick = function(event) {
-                var yesAction = function() {
-                    sendMsg("${id}", event.target.getAttribute("state") == "${onValue}" ? "${offValue}" : "${onValue}");
-                }
-                var noAction = function(){console.log("no");}
-
-                ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
-            } 
-            
-            //Hide the element initially if required
-            if(locked) {
-                ${lockedAccess == "no" ? "hideShowElement('" + htmlId + "', false);" : ""}
-            }
-            `;
-        }
-
-        //Generate the script to be executed in the dashboard when a msg comes in to the widget
-        //msg can be used to get the msg object
-        node.generateOnMsg = (htmlId) => {
-            return `
-            ${util.getElement(htmlId, "button")}.setAttribute("state", msg.payload);
-            if(msg.payload == "${onValue}") {
-                ${util.getElement(htmlId, "button")}.classList.add("${util.generateCSSClass(node, "on")}");
-                ${util.getElement(htmlId, "button")}.classList.remove("${util.generateCSSClass(node, "off")}");
-            }
-            else {
-                ${util.getElement(htmlId, "button")}.classList.add("${util.generateCSSClass(node, "off")}");
-                ${util.getElement(htmlId, "button")}.classList.remove("${util.generateCSSClass(node, "on")}");
-            }
-            `;
-        }
-
-        //Generate any extra scripts to add to the document for the widget
-        node.generateScript;
+        if(!node.widgetType){RED.log.error(`Widget ${name} (${id}) has an invalid type ${config.widgetType}`);}
+        node.widgetType.setupWidget();
 
         //Add this widget to the server
-        server.addWidget(id, name);
+        server.addWidget(node.id, node.widgetType.name);
 
         //When an input is passed to the node in the flow
         node.input = (msg) => {
-            if (msg.payload) {
-                currentState = msg.payload;
-                server.sendMsg(id, currentState);
-            }
+            node.widgetType.onFlowMessage(msg);
         }
 
-        //Functions to be called when a msg comes from the dashbored
-        //fn(msg)
+        //Add a callback for the sendToFlow function
         node.addNodeMsgFunction = (fn) => {
             nodeMsgFunctions.push(fn);
-        }
+        };
 
         //On redeploy
-        node.on("close", () => { });
+        node.on("close", () => { node.widgetType.onClose(); });
     }
 
     RED.nodes.registerType("dashbored-widget", widget);

@@ -33,7 +33,7 @@ module.exports = function (RED) {
         var id = node.id;
 
         //When a message is received from the dashbored
-        var onMessage = (msg) => {
+        node.onMessage = (msg) => {
             if (msg.id == id) {
                 for (var i = 0; i < nodeMsgFunctions.length; i++) {
                     nodeMsgFunctions[i](msg.payload);
@@ -43,7 +43,7 @@ module.exports = function (RED) {
         }
 
         //Generate the CSS for the widget to be inserted into the dashbored
-        var generateCSS = () => {
+        node.generateCSS = () => {
             //Go through the CSS and add the ids
             var rebuild = "";
             var classes = CSS.split("}");
@@ -58,14 +58,14 @@ module.exports = function (RED) {
         }
 
         //Generate the HTML for the widget to be inserted into the dashbored
-        var generateHTML = (id) => {
+        node.generateHTML = (id) => {
             return `
             ${util.generateTag(id, "button", "button", text, `class="${util.generateCSSClass(node, "button")} ${util.generateCSSClass(node, (currentState == offValue ? "off" : "on"))}" state="${currentState}"`)}
             `;
         }
 
         //Generate the script to be executed in the dashbored when the page loads
-        var generateOnload = (htmlId, lockedAccess, alwaysPassword, ask, askText) => {
+        node.generateOnload = (htmlId, lockedAccess, alwaysPassword, ask, askText) => {
             return `
             ${util.getElement(htmlId, "button")}.onclick = function(event) {
                 var yesAction = function() {
@@ -85,7 +85,7 @@ module.exports = function (RED) {
 
         //Generate the script to be executed in the dashboard when a msg comes in to the widget
         //msg can be used to get the msg object
-        var generateOnMsg = (htmlId) => {
+        node.generateOnMsg = (htmlId) => {
             return `
             ${util.getElement(htmlId, "button")}.setAttribute("state", msg.payload);
             if(msg.payload == "${onValue}") {
@@ -100,19 +100,10 @@ module.exports = function (RED) {
         }
 
         //Generate any extra scripts to add to the document for the widget
-        var generateScript;
+        node.generateScript;
 
-        //Add this dashboard to the server
-        server.addWidget({
-            id,
-            name,
-            onMessage,
-            generateCSS,
-            generateHTML,
-            generateOnload,
-            generateOnMsg,
-            generateScript
-        });
+        //Add this widget to the server
+        server.addWidget(id, name);
 
         //When an input is passed to the node in the flow
         node.input = (msg) => {

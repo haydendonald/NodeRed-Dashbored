@@ -36,8 +36,8 @@ module.exports = function (RED) {
                 for (var endpoint in dashboards) {
                     RED.nodes.getNode(dashboards[endpoint].id).onMessage(JSON.parse(data));
                 }
-                for (var i in widgets) {
-                    widgets[i].onMessage(JSON.parse(data));
+                for (var id in widgets) {
+                    RED.nodes.getNode(id).onMessage(JSON.parse(data));
                 }
             });
         });
@@ -113,9 +113,9 @@ module.exports = function (RED) {
             RED.log.info(`- Added Dashbored [${name}] at /${endpoint}`);
         }
 
-        node.addWidget = (widget) => {
-            RED.log.info(`- Added widget ${widget.name} (${widget.id})`);
-            widgets[widget.id] = widget;
+        node.addWidget = (id, name) => {
+            RED.log.info(`- Added widget ${name} (${id})`);
+            widgets[id] = name;
         }
 
         //On redeploy
@@ -132,7 +132,7 @@ module.exports = function (RED) {
     //Send the widget ids for the node red editor to populate (if theres a better way i'd like to know...)
     RED.httpNode.get(`/dashboredgetallnodeids`, (req, res) => {
         var send = [];
-        for (var i in widgets) { send.push(`{"value":"${i}", "label":"${widgets[i].name}"}`); }
+        for (var i in widgets) { send.push(`{"value":"${i}", "label":"${widgets[i]}"}`); }
         res.send(send);
     })
     RED.httpNode.get("/*", (req, res) => {

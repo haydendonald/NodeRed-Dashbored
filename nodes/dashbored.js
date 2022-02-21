@@ -63,7 +63,7 @@ module.exports = function (RED) {
             var elements = page.querySelectorAll("*");
             for (var i = 0; i < elements.length; i++) {
                 if (elements[i].rawTagName == "widget") {
-                    var widget = server.getWidgets()[elements[i].id];
+                    var widget = RED.nodes.getNode(elements[i].id);
                     var widgetElement = elements[i];
                     if (!widget) {
                         RED.log.warn(`Widget ${elements[i].id} was not found`);

@@ -6,7 +6,7 @@
 
 module.exports = {
     widget: "toggleButton",
-    version: "0.0.1",
+    version: "0.0.2",
     label: "Toggle Button",
     description: "Toggles between two states",
     style: {
@@ -165,11 +165,6 @@ module.exports = {
 
                 ${this.util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
             } 
-            
-            //Hide the element initially if required
-            if(locked) {
-                ${lockedAccess == "no" ? "hideShowElement('" + htmlId + "', false);" : ""}
-            }
         `;
     },
 

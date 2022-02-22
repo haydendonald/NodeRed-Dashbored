@@ -96,6 +96,11 @@ module.exports = function (RED) {
                     document.addScript(`
                         addOnLoadFunction(function() {
                             ${widget.widgetType.generateOnload(randomId, lockedAccess, alwaysPassword, ask, askText)}
+
+                            //Hide the element initially if required
+                            if(locked) {
+                                ${lockedAccess == "no" ? "hideShowElement('" + randomId + "', false);" : ""}
+                            }
                         });
 
                         addOnMsgFunction(function(msg) {

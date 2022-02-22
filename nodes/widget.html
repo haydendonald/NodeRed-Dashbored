@@ -1,6 +1,7 @@
 <!-- NodeRed Documentation https://nodered.org/docs/creating-nodes/edit-dialog -->
 
 <script type="text/x-red" data-template-name="dashbored-widget">
+    <p id="widget-id"><p>
     <div class="form-row">
         <label for="node-config-input-name">Name</label>
         <input type="text" id="node-config-input-name" placeholder="Name">
@@ -13,27 +14,9 @@
         <label for="node-config-input-widgetType">Type</label>
         <input type="text" id="node-config-input-widgetType">
     </div>
-
-
-
-
-    <div class="form-row">
-        <label for="node-config-input-option-text">Text</label>
-        <input type="text" id="node-config-input-text">
-    </div>
-    <div class="form-row">
-        <label for="node-config-input-option-onValue">On Value</label>
-        <input type="text" id="node-config-input-onValue">
-    </div>
-    <div class="form-row">
-        <label for="node-config-input-option-offValue">Off Value</label>
-        <input type="text" id="node-config-input-offValue">
-    </div>
-
-    <!-- CSS Editor -->
-    <div class="form-row">
-        <label for="node-config-input-option-offColor">CSS</label>
-        <div style="height: 250px; min-height:150px;" class="node-text-editor" id="node-input-css-editor"></div>
+    <hr>
+    <div class="form-row" id="widget-type-populate-area">
+        <p style="color: red">Please deploy to create the widget and populate the settings here</p>
     </div>
 </script>
 
@@ -53,67 +36,73 @@
             widgetType: {
                 value: "",
                 required: true
-            },
-
-
-            options: {},
-
-
-            text: {
-                value: "Toggle Button",
-                required: true
-            },
-            onValue: {
-                value: "on",
-                required: true
-            },
-            offValue: {
-                value: "off",
-                required: true
-            },
-
-            //The default CSS for the button
-            CSS: {
-                value: `
-                    .on {
-                        background-color: #32CD32;
-                        color: black;
-                    }
-                    .off {
-                        background-color: #800000;
-                        color: black;
-                    }
-                `.replace(/^\s+|\s+$/gm, ''),
-                required: true
             }
         },
         label: function () {
             return (this.name || "Toggle Button");
         },
-        oneditprepare: function () {
+        oneditprepare: async function () {
+            $("#widget-id").html("Widget ID = " + this.id);
+
+            //Grab the widget
+            try {
+                var widget = await $.ajax({
+                    type: "GET",
+                    url: "./dashboredAPI",
+                    data: "widgets=" + this.id
+                });
+            } catch (e) { }
+
+            //Grab the types
+            try {
+                var widgetTypes = await $.ajax({
+                    type: "GET",
+                    url: "./dashboredAPI",
+                    data: "widgetTypes"
+                });
+            }
+            catch (e) { console.error("Failed to get the widget types!!"); return; }
+
+            widgetType = widgetTypes[widget.widgetType];
+
+            //Populate the values to start
+            for (var i in widgetType.config) {
+                if(this[i] === undefined) {
+                    //Default
+                    this[i] = widgetType.config[i];
+                }
+            }
+
+            //Populate the widget type config options
+            var div = $("#widget-type-populate-area");
+            div.html("");
+            div.append(widgetType.configHTML);
+
+            //Run any oneditprepare scripts
+            if(widgetType.configScript.oneditprepare){eval(widgetType.configScript.oneditprepare);}
+            this.widgetType = widgetType;
+
+            //Set the widget type selector
+            var types = [];
+            for (var i in widgetTypes) {
+                types.push({
+                    label: widgetTypes[i].name,
+                    value: i
+                });
+            }
             $("#node-config-input-widgetType").typedInput({
                 types: [{
                     value: "widgetType",
-                    options: [{
-                        label: "Toggle Button", value: "toggleButton"
-                    }]
+                    options: types
                 }]
             });
-
-            this.cssEditor = RED.editor.createEditor({
-                id: "node-input-css-editor",
-                mode: "ace/mode/css",
-                value: this.CSS
-            });
+            $("#node-config-input-widgetType").attr(widget.widgetType, true);
         },
         oneditsave: function () {
-            this.CSS = this.cssEditor.getValue();
-            this.cssEditor.destroy();
-            delete this.cssEditor;
+            if (this.widgetType.configScript.oneditprepare) { eval(widgetType.configScript.oneditsave); }
         },
         oneditcancel: function () {
-            this.cssEditor.destroy();
-            delete this.cssEditor;
+            if (this.widgetType.configScript.oneditcancel) { eval(widgetType.configScript.oneditcancel); }
         },
     });
 </script>

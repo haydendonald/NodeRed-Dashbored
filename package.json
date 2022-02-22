@@ -17,9 +17,7 @@
             "dashbored-widget": "./nodes/widget.js",
             "dashbored-dashbored": "./nodes/dashbored.js",
             "dashbored-widget-node": "./nodes/widgetNode.js",
-            "dashbored-node": "./nodes/dashboredNode.js",
-
-            "dashbored-widget-toggleButton": "./widgets/toggleButton/toggleButton.js"
+            "dashbored-node": "./nodes/dashboredNode.js"
         }
     },
     "author": "Hayden Donald",

@@ -7,6 +7,23 @@ module.exports = function (RED) {
     var dashboards = {};
     var widgets = {};
 
+    //Define the possible widget types
+    const widgetTypes = function () {
+        //Insert widgets to include here
+        var requires = [
+            require("../widgets/toggleButton.js")
+        ];
+
+        //Generate the map
+        var ret = {};
+        for (var i in requires) {
+            var curr = requires[i];
+            RED.log.debug(`Added widget ${curr.widget}@${curr.version} to the dashbored project`);
+            ret[curr.widget] = curr;
+        }
+        return ret;
+    }();
+
     function server(config) {
         RED.nodes.createNode(this, config);
         var node = this;
@@ -118,6 +135,10 @@ module.exports = function (RED) {
             widgets[id] = name;
         }
 
+        node.getWidgetTypes = () => {
+            return widgetTypes;
+        }
+
         //On redeploy
         node.on("close", () => {
             kickClients();
@@ -129,13 +150,60 @@ module.exports = function (RED) {
     //Setup the HTTP server
     RED.httpNode.get("/script.js", (req, res) => { res.sendFile("script.js", { root: webFolder }); });
     RED.httpNode.get("/style.css", (req, res) => { res.sendFile("style.css", { root: webFolder }); });
-    
+
     //Send the widget ids for the node red editor to populate (if theres a better way i'd like to know...)
     RED.httpNode.get("/dashboredgetallnodeids", (req, res) => {
         var send = [];
         for (var i in widgets) { send.push(`{"value":"${i}", "label":"${widgets[i]}"}`); }
         res.send(send);
-    })
+    });
+
+    RED.httpNode.get("/dashboredAPI", (req, res) => {
+        if (!req.query) { return; }
+        if (req.query.widgets !== undefined) {
+            var generate = function (widget) {
+                return {
+                    label: widget.name,
+                    values: widget.widgetType.values,
+                    widgetType: widget.widgetType.widget,
+                    configHTML: widget.widgetType.configHTML,
+                    configScript: widget.widgetType.configScript
+                }
+            }
+            var send = [];
+            if (req.query.widgets != "") {
+                //Single widget
+                var node = RED.nodes.getNode(req.query.widgets);
+                if (!node) { res.status(404); res.send("{}"); return; }
+                send = generate(node);
+            }
+            else {
+                //All widgets
+                for (var i in widgets) {
+                    var node = RED.nodes.getNode(i);
+                    if (node) {
+                        send.push(node);
+                    }
+                }
+            }
+            res.send(send);
+        }
+        if (req.query.widgetTypes !== undefined) {
+            var send = {};
+            for (var i in widgetTypes) {
+                var type = widgetTypes[i];
+                send[i] = {
+                    name: type.label,
+                    description: type.description,
+                    configHTML: type.configHTML,
+                    configScript: type.configScript,
+                    config: type.config
+                };
+            }
+            res.send(send);
+        }
+    });
+
     RED.httpNode.get("/*", (req, res) => {
         for (var endpoint in dashboards) {
             if ("/" + endpoint == req.url) {

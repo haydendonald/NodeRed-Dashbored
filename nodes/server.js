@@ -198,7 +198,8 @@ module.exports = function (RED) {
                     description: type.description,
                     configHTML: type.configHTML,
                     configScript: type.configScript,
-                    config: type.config
+                    config: type.config,
+                    defaultConfig: type.defaultConfig
                 };
             }
             res.send(send);

@@ -42,44 +42,54 @@ module.exports = {
     }(),
     //Scripts to call on the NodeRed config dashbored
     configScript: {
+        //When the user opens the config panel get things ready
         oneditprepare: `
-            this.cssEditor = RED.editor.createEditor({
+            element.cssEditor = RED.editor.createEditor({
                 id: "dashbored-css",
                 mode: "ace/mode/css",
-                value: this.CSS
+                value: element.CSS
             });
 
             //Set the values in the inputs
-            $("#dashbored-text").val(this.text);
-            $("#dashbored-onValue").val(this.onValue);
-            $("#dashbored-offValue").val(this.offValue);
+            $("#dashbored-text").val(element.text);
+            $("#dashbored-onValue").val(element.onValue);
+            $("#dashbored-offValue").val(element.offValue);
         `,
+        //When the user clicks save on the editor set our values
         oneditsave: `
-            console.log(this);
-            //Add the defaults
-            this._def.defaults["text"] = {value: "", required: true};
-            this._def.defaults["onValue"] = {value: "", required: true};
-            this._def.defaults["offValue"] = {value: "", required: true};
-            this._def.defaults["CSS"] = {value: "", required: true};
+            //Add the defaults (this is required)
+            element._def.defaults["text"] = {value: "", required: true};
+            element._def.defaults["onValue"] = {value: "", required: true};
+            element._def.defaults["offValue"] = {value: "", required: true};
+            element._def.defaults["CSS"] = {value: "", required: true};
 
-            //Save the values
-            this.text = $("#dashbored-text").val();
-            this.onValue = $("#dashbored-onValue").val();
-            this.offValue = $("#dashbored-offValue").val();
-            this.CSS = this.cssEditor.getValue();
+            //Save the values (this is also required)
+            element.text = $("#dashbored-text").val();
+            element.onValue = $("#dashbored-onValue").val();
+            element.offValue = $("#dashbored-offValue").val();
+            element.CSS = element.cssEditor.getValue();
 
             //Delete the CSS editor
-            this.cssEditor.destroy();
-            delete this.cssEditor;
+            element.cssEditor.destroy();
+            delete element.cssEditor;
         `,
+        //When the user cancels the edit dialog do some cleanup if required
         oneditcancel: `
             //Delete the CSS editor
-            this.cssEditor.destroy();
-            delete this.cssEditor;
+            element.cssEditor.destroy();
+            delete element.cssEditor;
+        `,
+        //When the user clicks the "reset configuration" set the options to their defaults
+        reset: `
+            $("#dashbored-text").val(defaultConfig.text);
+            $("#dashbored-onValue").val(defaultConfig.onValue);
+            $("#dashbored-offValue").val(defaultConfig.offValue);
+            element.cssEditor.setValue(defaultConfig.CSS);
+            element.cssEditor.clearSelection();
         `
     },
     //Default config
-    config: {
+    defaultConfig: {
         text: "Toggle Button",
         onValue: "on",
         offValue: "off",
@@ -94,6 +104,8 @@ module.exports = {
             }
         `.replace(/^\s+|\s+$/gm, '')
     },
+    //Current config
+    config: {},
 
     //Setup the widget
     setupWidget: function () {

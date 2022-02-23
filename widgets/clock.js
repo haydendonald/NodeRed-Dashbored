@@ -69,7 +69,7 @@ module.exports = {
     generateOnload: function (htmlId, lockedAccess, alwaysPassword, ask, askText) {
         return `
             setInterval(function() {
-                ${this.util.getElement(htmlId, "h1")}.innerHTML = formatAMPM(new Date());
+                ${this.util.getElement(htmlId, "clock")}.innerHTML = formatAMPM(new Date());
             }, 500);
         `;
     },

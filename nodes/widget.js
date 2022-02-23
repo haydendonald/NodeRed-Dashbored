@@ -5,20 +5,23 @@ module.exports = function (RED) {
         var nodeMsgFunctions = [];
         var server = RED.nodes.getNode(config.server);
         var name = config.name;
-        types = server.getWidgetTypes();
 
-        node.widgetType = types[config.widgetType];
+        node.widgetType = server.getWidgetTypes()[config.widgetType].create();
         node.widgetType.util = require("../util.js");
         node.widgetType.id = node.id;
 
-        
-        //Copy the config to the widgetType
-        for(var i in config) {
+        //Copy config to the widget type
+        for (var i in node.widgetType.defaultConfig) {
+            if(!config[i]) {
+                config[i] = node.widgetType.defaultConfig[i];
+            }
             node.widgetType.config[i] = config[i];
         }
 
+        console.log(node.widgetType.config);
+
         node.widgetType.sendToFlow = (msg) => {
-            for(var i = 0; i < nodeMsgFunctions.length; i++) {
+            for (var i = 0; i < nodeMsgFunctions.length; i++) {
                 nodeMsgFunctions[i](msg);
             }
         }
@@ -26,11 +29,9 @@ module.exports = function (RED) {
             server.sendMsg(id, payload);
         }
 
-        if(!node.widgetType){RED.log.error(`Widget ${name} (${id}) has an invalid type ${config.widgetType}`);}
-        node.widgetType.setupWidget();
+        if (!node.widgetType) { RED.log.error(`Widget ${name} (${node.id}) has an invalid type ${config.widgetType}`); }
 
-        //Add this widget to the server
-        server.addWidget(node.id, node.name, node.widgetType.label, node.widgetType.version);
+        node.widgetType.setupWidget();
 
         //When an input is passed to the node in the flow
         node.input = (msg) => {
@@ -41,6 +42,10 @@ module.exports = function (RED) {
         node.addNodeMsgFunction = (fn) => {
             nodeMsgFunctions.push(fn);
         };
+
+
+        //Add this widget to the server
+        server.addWidget(node.id, node.name, server.getWidgetTypes()[config.widgetType].label, server.getWidgetTypes()[config.widgetType].version);
 
         //On redeploy
         node.on("close", () => { node.widgetType.onClose(); });

@@ -193,14 +193,17 @@ module.exports = function (RED) {
             var send = {};
             for (var i in widgetTypes) {
                 var type = widgetTypes[i];
-                send[i] = {
-                    name: type.label,
-                    description: type.description,
-                    configHTML: type.configHTML,
-                    configScript: type.configScript,
-                    config: type.config,
-                    defaultConfig: type.defaultConfig
-                };
+                var createdType = type.create();
+                if (!type.doNotSendToEditor) {
+                    send[i] = {
+                        name: type.label,
+                        description: type.description,
+                        configHTML: createdType.configHTML,
+                        configScript: createdType.configScript,
+                        config: createdType.config,
+                        defaultConfig: createdType.defaultConfig
+                    };
+                }
             }
             res.send(send);
         }

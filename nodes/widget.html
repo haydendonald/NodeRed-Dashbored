@@ -26,7 +26,7 @@
         category: "config",
         defaults: {
             name: {
-                value: "Toggle Button",
+                value: "Widget",
                 required: true
             },
             server: {
@@ -84,8 +84,15 @@
 
             var currentWidgetType;
             var setupWidgetType = function (element) {
+                //Populate the default config to start
+                for (var i in currentWidgetType.defaultConfig) {
+                    if (element[i] === undefined) {
+                        //Default
+                        element[i] = currentWidgetType.defaultConfig[i];
+                    }
+                }
 
-                //Populate the values to start
+                //Now populate the config values (if set)
                 for (var i in currentWidgetType.config) {
                     if (element[i] === undefined) {
                         //Default
@@ -102,7 +109,7 @@
                 if (currentWidgetType.configScript.oneditprepare) { eval(currentWidgetType.configScript.oneditprepare); }
             }
 
-            $("#reset").on("click", function() {
+            $("#reset").on("click", function () {
                 console.log(currentWidgetType);
                 console.log("fr");
                 var element = self;

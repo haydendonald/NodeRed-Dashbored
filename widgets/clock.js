@@ -8,91 +8,97 @@ module.exports = {
     version: "0.0.1",
     label: "Simple Clock",
     description: "Shows a basic clock",
-    style: {
-        heightMultiplier: 1,
-        widthMultiplier: 1,
-        minWidth: undefined,
-        minWeight: undefined,
-        maxWidth: undefined,
-        maxHeight: undefined
-    },
-    //Insert the HTML into the config on the NodeRed flow
-    configHTML: function () {
-        return `
-        <p>There is no configuration for this widget :)</p>
-        `;
-    }(),
-    //Scripts to call on the NodeRed config dashbored
-    configScript: {
-        oneditprepare: undefined,
-        oneditsave: undefined,
-        oneditcancel: undefined
-    },
-    //Default config
-    config: {},
+    create: function () {
+        return {
+            style: {
+                heightMultiplier: 1,
+                widthMultiplier: 1,
+                minWidth: undefined,
+                minWeight: undefined,
+                maxWidth: undefined,
+                maxHeight: undefined
+            },
+            //Insert the HTML into the config on the NodeRed flow
+            configHTML: function () {
+                return `
+                <p>There is no configuration for this widget :)</p>
+                `;
+            }(),
+            //Scripts to call on the NodeRed config dashbored
+            configScript: {
+                oneditprepare: undefined,
+                oneditsave: undefined,
+                oneditcancel: undefined,
+                reset: undefined
+            },
+            //Default config
+            defaultConfig: {},
+            config: {},
 
-    //Setup the widget
-    setupWidget: function () { },
+            //Setup the widget
+            setupWidget: function () { },
 
-    //Send a message to the NodeRed flow (Will be allocated by widget.js)
-    sendToFlow: function (msg) { },
+            //Send a message to the NodeRed flow (Will be allocated by widget.js)
+            sendToFlow: function (msg) { },
 
-    //Send a message to the widgets in the NodeRed flows (Will be allocated by widget.js)
-    sendToDashbored: function (id, payload) { },
+            //Send a message to the widgets in the NodeRed flows (Will be allocated by widget.js)
+            sendToDashbored: function (id, payload) { },
 
-    //When node red redeploys or closes
-    onClose: function () { },
+            //When node red redeploys or closes
+            onClose: function () { },
 
-    //When a message comes from the dashbored
-    onMessage: function (msg) { },
+            //When a message comes from the dashbored
+            onMessage: function (msg) { },
 
-    //When a message comes from a node red flow
-    onFlowMessage: function (msg) { },
+            //When a message comes from a node red flow
+            onFlowMessage: function (msg) { },
 
-    //Generate the CSS for the widget
-    generateCSS: function (htmlId) {
-        return `
-            #${htmlId}_clock {
-                
+            //Generate the CSS for the widget
+            generateCSS: function (htmlId) {
+                return `
+                    #${htmlId}_clock {
+                        
+                    }
+                `;
+            },
+
+            //Generate the HTML for the widget that will be inserted into the dashbored
+            generateHTML: function (htmlId) {
+                return `
+                    ${this.util.generateTag(htmlId, "h1", "clock", this.config.text)}
+                `;
+            },
+
+            //Generate the script that will be executed when the dashbored loads
+            generateOnload: function (htmlId, lockedAccess, alwaysPassword, ask, askText) {
+                return `
+                    setInterval(function() {
+                        ${this.util.getElement(htmlId, "clock")}.innerHTML = formatAMPM(new Date());
+                    }, 500);
+                `;
+            },
+
+            //Generate the script that will be called when a message comes from NodeRed on the dashbored
+            generateOnMsg: function (htmlId) {
+                return "";
+            },
+
+            //Generate any extra scripts to add to the document
+            generateScript: function () { },
+
+            //Generate the CSS specified by the user in the node configuration
+            generateCustomCSS: function () {
+                // //Go through the CSS and add the ids
+                // var rebuild = "";
+                // var classes = this.config.CSS.split("}");
+                // for (var i = 0; i < classes.length - 1; i++) {
+                //     var selectors = classes[i].split(" {");
+                //     selectors[0] = selectors[0].replace(/^\s+|\s+$/gm, '');
+                //     var output = `${selectors[0][0]}n${this.id.split(".")[0]}_${selectors[0].substring(1)} {${selectors[1]}}\n`;
+                //     rebuild += output;
+                // }
+                // return rebuild;
             }
-        `;
-    },
-
-    //Generate the HTML for the widget that will be inserted into the dashbored
-    generateHTML: function (htmlId) {
-        return `
-            ${this.util.generateTag(htmlId, "h1", "clock", this.config.text)}
-        `;
-    },
-
-    //Generate the script that will be executed when the dashbored loads
-    generateOnload: function (htmlId, lockedAccess, alwaysPassword, ask, askText) {
-        return `
-            setInterval(function() {
-                ${this.util.getElement(htmlId, "clock")}.innerHTML = formatAMPM(new Date());
-            }, 500);
-        `;
-    },
-
-    //Generate the script that will be called when a message comes from NodeRed on the dashbored
-    generateOnMsg: function (htmlId) {
-        return "";
-    },
-
-    //Generate any extra scripts to add to the document
-    generateScript: function () { },
-
-    //Generate the CSS specified by the user in the node configuration
-    generateCustomCSS: function () {
-        //Go through the CSS and add the ids
-        var rebuild = "";
-        var classes = this.config.CSS.split("}");
-        for (var i = 0; i < classes.length - 1; i++) {
-            var selectors = classes[i].split(" {");
-            selectors[0] = selectors[0].replace(/^\s+|\s+$/gm, '');
-            var output = `${selectors[0][0]}n${this.id.split(".")[0]}_${selectors[0].substring(1)} {${selectors[1]}}\n`;
-            rebuild += output;
         }
-        return rebuild;
-    },
+    }
 }

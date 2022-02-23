@@ -79,7 +79,9 @@
             });
 
             if(!widget){return;}
-            $("#node-config-input-widgetType").attr(widget.widgetType, true);
+
+            //https://nodered.org/docs/api/ui/typedInput/#methods
+            $("#node-config-input-widgetType").typedInput("value", widget.widgetType);
             currentWidgetType = widgetTypes[widget.widgetType];
 
             //Populate the values to start
@@ -97,13 +99,13 @@
 
             //Run any oneditprepare scripts
             if(currentWidgetType.configScript.oneditprepare){eval(currentWidgetType.configScript.oneditprepare);}
-            this.widgetType = currentWidgetType;
+            this.currentWidgetType = currentWidgetType;
         },
         oneditsave: function () {
-            if (this.widgetType.configScript.oneditprepare) { eval(currentWidgetType.configScript.oneditsave); }
+            if (this.currentWidgetType.configScript.oneditsave) { eval(this.currentWidgetType.configScript.oneditsave); }
         },
         oneditcancel: function () {
-            if (this.widgetType.configScript.oneditcancel) { eval(currentWidgetType.configScript.oneditcancel); }
+            if (this.currentWidgetType.configScript.oneditcancel) { eval(this.currentWidgetType.configScript.oneditcancel); }
         },
     });
 </script>

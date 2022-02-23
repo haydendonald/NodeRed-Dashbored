@@ -53,14 +53,15 @@ module.exports = {
             $("#dashbored-text").val(this.text);
             $("#dashbored-onValue").val(this.onValue);
             $("#dashbored-offValue").val(this.offValue);
-
+        `,
+        oneditsave: `
+            console.log(this);
             //Add the defaults
             this._def.defaults["text"] = {value: "", required: true};
             this._def.defaults["onValue"] = {value: "", required: true};
             this._def.defaults["offValue"] = {value: "", required: true};
             this._def.defaults["CSS"] = {value: "", required: true};
-        `,
-        oneditsave: `
+
             //Save the values
             this.text = $("#dashbored-text").val();
             this.onValue = $("#dashbored-onValue").val();

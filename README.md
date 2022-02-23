@@ -32,4 +32,3 @@ It's a good start??
 
 # Bugs
 if the user clicks back on the password dialog it will action that action when the user clicks something else
-* the dashbored is not staying locked when refreshed. Probably an issue with the server not sending the latest locked state or not storing this correctly

@@ -8,8 +8,13 @@ module.exports = function (RED) {
         types = server.getWidgetTypes();
 
         node.widgetType = types[config.widgetType];
+
+        
+        console.log(this);
+
         node.widgetType.util = require("../util.js");
         node.widgetType.id = node.id;
+
         
         //Copy the config to the widgetType
         for(var i in config) {

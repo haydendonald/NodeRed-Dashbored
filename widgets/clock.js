@@ -57,7 +57,13 @@ module.exports = {
             generateCSS: function (htmlId) {
                 return `
                     #${htmlId}_clock {
-                        
+                        text-align: center;
+                        margin: 5px;
+
+                        margin: auto;
+                        width: 50%;
+                        border: 3px solid green;
+                        padding: 10px;
                     }
                 `;
             },
@@ -79,26 +85,13 @@ module.exports = {
             },
 
             //Generate the script that will be called when a message comes from NodeRed on the dashbored
-            generateOnMsg: function (htmlId) {
-                return "";
-            },
+            generateOnMsg: function (htmlId) {return "";},
 
             //Generate any extra scripts to add to the document
             generateScript: function () { },
 
             //Generate the CSS specified by the user in the node configuration
-            generateCustomCSS: function () {
-                // //Go through the CSS and add the ids
-                // var rebuild = "";
-                // var classes = this.config.CSS.split("}");
-                // for (var i = 0; i < classes.length - 1; i++) {
-                //     var selectors = classes[i].split(" {");
-                //     selectors[0] = selectors[0].replace(/^\s+|\s+$/gm, '');
-                //     var output = `${selectors[0][0]}n${this.id.split(".")[0]}_${selectors[0].substring(1)} {${selectors[1]}}\n`;
-                //     rebuild += output;
-                // }
-                // return rebuild;
-            }
+            generateCustomCSS: function () { return "";}
         }
     }
 }

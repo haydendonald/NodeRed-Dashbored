@@ -32,3 +32,6 @@ It's a good start??
 
 # Bugs
 if the user clicks back on the password dialog it will action that action when the user clicks something else
+
+# Todo
+* Widgets / dashboreds need to be able to remember their state after redeploy

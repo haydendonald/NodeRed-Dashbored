@@ -17,9 +17,7 @@ module.exports = function (RED) {
             }
             node.widgetType.config[i] = config[i];
         }
-
-        console.log(node.widgetType.config);
-
+        
         node.widgetType.sendToFlow = (msg) => {
             for (var i = 0; i < nodeMsgFunctions.length; i++) {
                 nodeMsgFunctions[i](msg);

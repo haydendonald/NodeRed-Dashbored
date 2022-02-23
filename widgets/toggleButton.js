@@ -6,7 +6,7 @@
 
 module.exports = {
     widget: "toggleButton",
-    version: "0.0.2",
+    version: "1.0.0",
     label: "Toggle Button",
     description: "Toggles between two states",
     create: function () {

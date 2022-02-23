@@ -11,7 +11,8 @@ module.exports = function (RED) {
     const widgetTypes = function () {
         //Insert widgets to include here
         var requires = [
-            require("../widgets/toggleButton.js")
+            require("../widgets/toggleButton.js"),
+            require("../widgets/clock.js")
         ];
 
         //Generate the map
@@ -130,8 +131,8 @@ module.exports = function (RED) {
             RED.log.info(`- Added Dashbored [${name}] at /${endpoint}`);
         }
 
-        node.addWidget = (id, name) => {
-            RED.log.info(`- Added widget ${name} (${id})`);
+        node.addWidget = (id, name, type, widgetTypeVersion) => {
+            RED.log.info(`- Added widget ${name} (${id}) with type ${type}@${widgetTypeVersion}`);
             widgets[id] = name;
         }
 

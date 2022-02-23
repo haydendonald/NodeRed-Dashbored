@@ -63,25 +63,6 @@
             }
             catch (e) { console.error("Failed to get the widget types!!"); return; }
 
-            widgetType = widgetTypes[widget.widgetType];
-
-            //Populate the values to start
-            for (var i in widgetType.config) {
-                if(this[i] === undefined) {
-                    //Default
-                    this[i] = widgetType.config[i];
-                }
-            }
-
-            //Populate the widget type config options
-            var div = $("#widget-type-populate-area");
-            div.html("");
-            div.append(widgetType.configHTML);
-
-            //Run any oneditprepare scripts
-            if(widgetType.configScript.oneditprepare){eval(widgetType.configScript.oneditprepare);}
-            this.widgetType = widgetType;
-
             //Set the widget type selector
             var types = [];
             for (var i in widgetTypes) {
@@ -96,13 +77,33 @@
                     options: types
                 }]
             });
+
+            if(!widget){return;}
             $("#node-config-input-widgetType").attr(widget.widgetType, true);
+            currentWidgetType = widgetTypes[widget.widgetType];
+
+            //Populate the values to start
+            for (var i in currentWidgetType.config) {
+                if(this[i] === undefined) {
+                    //Default
+                    this[i] = currentWidgetType.config[i];
+                }
+            }
+
+            //Populate the widget type config options
+            var div = $("#widget-type-populate-area");
+            div.html("");
+            div.append(currentWidgetType.configHTML);
+
+            //Run any oneditprepare scripts
+            if(currentWidgetType.configScript.oneditprepare){eval(currentWidgetType.configScript.oneditprepare);}
+            this.widgetType = currentWidgetType;
         },
         oneditsave: function () {
-            if (this.widgetType.configScript.oneditprepare) { eval(widgetType.configScript.oneditsave); }
+            if (this.widgetType.configScript.oneditprepare) { eval(currentWidgetType.configScript.oneditsave); }
         },
         oneditcancel: function () {
-            if (this.widgetType.configScript.oneditcancel) { eval(widgetType.configScript.oneditcancel); }
+            if (this.widgetType.configScript.oneditcancel) { eval(currentWidgetType.configScript.oneditcancel); }
         },
     });
 </script>

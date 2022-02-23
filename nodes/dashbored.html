@@ -92,19 +92,26 @@
         },
         oneditprepare: async function() {
             //Do a call to the server and request the widgets in memory
-            var widgetIds = await $.ajax({
+            var widgets = await $.ajax({
                 type: "GET",
-                url: "./dashboredgetallnodeids"
+                url: "./dashboredAPI",
+                data: "widgets"
             });
-            for (var i = 0; i < widgetIds.length; i++) {
-                widgetIds[i] = JSON.parse(widgetIds[i]);
+            var options = [];
+            var wids = {};
+            for (var i = 0; i < widgets.length; i++) {
+                options.push({
+                    label: widgets[i].name,
+                    value: widgets[i].id
+                });
+                wids[widgets[i].id] = widgets[i];
             }
 
             $("#node-input-widgets").typedInput({
                 types: [{
-                    value: "widIds",
+                    value: "widgets",
                     multiple: "true",
-                    options: widgetIds
+                    options: options
                 }]
             });
 
@@ -117,15 +124,12 @@
 
             //Copy the selected widgets to the clipboard
             $("#node-input-widgets-add").click(() => {
-                var widgets = $("#node-input-widgets").val().split(",");
-                for (var i = 0; i < widgets.length; i++) {
-                    for (var j = 0; j < widgetIds.length; j++) {
-                        if (widgetIds[j].value == widgets[i]) {
-                            navigator.clipboard.writeText(`<widget name="${widgetIds[j].label}" id="${widgetIds[j].value}"></widget>`);
-                            break;
-                        }
-                    }
+                var selected = $("#node-input-widgets").val().split(",");
+                var clipboard = "";
+                for (var i = 0; i < selected.length; i++) {
+                    clipboard += `<widget name="${wids[selected[i]].name}" id="${wids[selected[i]].id}"></widget>`;
                 }
+                navigator.clipboard.writeText(clipboard);
             });
 
             //Setup the editors

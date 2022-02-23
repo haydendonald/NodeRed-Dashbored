@@ -4,6 +4,7 @@ module.exports = function (RED) {
         var node = this;
         var nodeMsgFunctions = [];
         var server = RED.nodes.getNode(config.server);
+        var name = config.name;
         types = server.getWidgetTypes();
 
         node.widgetType = types[config.widgetType];
@@ -23,11 +24,12 @@ module.exports = function (RED) {
         node.widgetType.sendToDashbored = (id, payload) => {
             server.sendMsg(id, payload);
         }
+
         if(!node.widgetType){RED.log.error(`Widget ${name} (${id}) has an invalid type ${config.widgetType}`);}
         node.widgetType.setupWidget();
 
         //Add this widget to the server
-        server.addWidget(node.id, node.widgetType.name);
+        server.addWidget(node.id, node.name, node.widgetType.label, node.widgetType.version);
 
         //When an input is passed to the node in the flow
         node.input = (msg) => {

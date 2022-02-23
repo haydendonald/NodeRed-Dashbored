@@ -59,11 +59,6 @@ module.exports = {
                     #${htmlId}_clock {
                         text-align: center;
                         margin: 5px;
-
-                        margin: auto;
-                        width: 50%;
-                        border: 3px solid green;
-                        padding: 10px;
                     }
                 `;
             },

@@ -23,73 +23,73 @@ module.exports = {
             //Insert the HTML into the config on the NodeRed flow
             configHTML: function () {
                 return `
-        <div class="form-row">
-            <label for="dashbored-text">Text</label>
-            <input type="text" id="dashbored-text" placeholder="Text">
-        </div>
-        <div class="form-row">
-            <label for="dashbored-onValue">On Value</label>
-            <input type="text" id="dashbored-onValue" placeholder="on">
-        </div>
-        <div class="form-row">
-            <label for="dashbored-offValue">Off Value</label>
-            <input type="text" id="dashbored-offValue" placeholder="off">
-        </div>
+                    <div class="form-row">
+                        <label for="dashbored-text">Text</label>
+                        <input type="text" id="dashbored-text" placeholder="Text">
+                    </div>
+                    <div class="form-row">
+                        <label for="dashbored-onValue">On Value</label>
+                        <input type="text" id="dashbored-onValue" placeholder="on">
+                    </div>
+                    <div class="form-row">
+                        <label for="dashbored-offValue">Off Value</label>
+                        <input type="text" id="dashbored-offValue" placeholder="off">
+                    </div>
 
-        <!-- CSS Editor -->
-        <div class="form-row">
-            <label for="dashbored-css">CSS</label>
-            <div style="height: 250px; min-height:150px;" class="node-text-editor" id="dashbored-css"></div>
-        </div>
-        `;
+                    <!-- CSS Editor -->
+                    <div class="form-row">
+                        <label for="dashbored-css">CSS</label>
+                        <div style="height: 250px; min-height:150px;" class="node-text-editor" id="dashbored-css"></div>
+                    </div>
+                `;
             }(),
             //Scripts to call on the NodeRed config dashbored
             configScript: {
                 //When the user opens the config panel get things ready
                 oneditprepare: `
-            element.cssEditor = RED.editor.createEditor({
-                id: "dashbored-css",
-                mode: "ace/mode/css",
-                value: element.CSS
-            });
+                    element.cssEditor = RED.editor.createEditor({
+                        id: "dashbored-css",
+                        mode: "ace/mode/css",
+                        value: element.CSS
+                    });
 
-            //Set the values in the inputs
-            $("#dashbored-text").val(element.text);
-            $("#dashbored-onValue").val(element.onValue);
-            $("#dashbored-offValue").val(element.offValue);
-        `,
+                    //Set the values in the inputs
+                    $("#dashbored-text").val(element.text);
+                    $("#dashbored-onValue").val(element.onValue);
+                    $("#dashbored-offValue").val(element.offValue);
+                `,
                 //When the user clicks save on the editor set our values
                 oneditsave: `
-            //Add the defaults (this is required)
-            element._def.defaults["text"] = {value: "", required: true};
-            element._def.defaults["onValue"] = {value: "", required: true};
-            element._def.defaults["offValue"] = {value: "", required: true};
-            element._def.defaults["CSS"] = {value: "", required: true};
+                    //Add the defaults (this is required)
+                    element._def.defaults["text"] = {value: "", required: true};
+                    element._def.defaults["onValue"] = {value: "", required: true};
+                    element._def.defaults["offValue"] = {value: "", required: true};
+                    element._def.defaults["CSS"] = {value: "", required: true};
 
-            //Save the values (this is also required)
-            element.text = $("#dashbored-text").val();
-            element.onValue = $("#dashbored-onValue").val();
-            element.offValue = $("#dashbored-offValue").val();
-            element.CSS = element.cssEditor.getValue();
+                    //Save the values (this is also required)
+                    element.text = $("#dashbored-text").val();
+                    element.onValue = $("#dashbored-onValue").val();
+                    element.offValue = $("#dashbored-offValue").val();
+                    element.CSS = element.cssEditor.getValue();
 
-            //Delete the CSS editor
-            element.cssEditor.destroy();
-            delete element.cssEditor;
-        `,
+                    //Delete the CSS editor
+                    element.cssEditor.destroy();
+                    delete element.cssEditor;
+                `,
                 //When the user cancels the edit dialog do some cleanup if required
                 oneditcancel: `
-            //Delete the CSS editor
-            element.cssEditor.destroy();
-            delete element.cssEditor;
-        `,
+                    //Delete the CSS editor
+                    element.cssEditor.destroy();
+                    delete element.cssEditor;
+                `,
                 //When the user clicks the "reset configuration" set the options to their defaults
                 reset: `
-            $("#dashbored-text").val(defaultConfig.text);
-            $("#dashbored-onValue").val(defaultConfig.onValue);
-            $("#dashbored-offValue").val(defaultConfig.offValue);
-            element.cssEditor.setValue(defaultConfig.CSS);
-            element.cssEditor.clearSelection();
-        `
+                    $("#dashbored-text").val(defaultConfig.text);
+                    $("#dashbored-onValue").val(defaultConfig.onValue);
+                    $("#dashbored-offValue").val(defaultConfig.offValue);
+                    element.cssEditor.setValue(defaultConfig.CSS);
+                    element.cssEditor.clearSelection();
+                `
             },
             //Default config
             defaultConfig: {
@@ -97,15 +97,15 @@ module.exports = {
                 onValue: "on",
                 offValue: "off",
                 CSS: `
-            .on {
-                background-color: #32CD32;
-                color: black;
-            }
-            .off {
-                background-color: #800000;
-                color: black;
-            }
-        `.replace(/^\s+|\s+$/gm, '')
+                    .on {
+                        background-color: #32CD32;
+                        color: black;
+                    }
+                    .off {
+                        background-color: #800000;
+                        color: black;
+                    }
+                `.replace(/^\s+|\s+$/gm, '')
             },
             //Current config
             config: {},
@@ -146,17 +146,16 @@ module.exports = {
             //Generate the CSS for the widget
             generateCSS: function (htmlId) {
                 return `
-            #${htmlId}_button {
-                width: calc(100% - 10px);
-                height: calc(100% - 10px);
-                margin: 5px;
-            }
-        `;
+                    #${htmlId}_button {
+                        width: calc(100% - 10px);
+                        height: calc(100% - 10px);
+                        margin: 5px;
+                    }
+                `;
             },
 
             //Generate the CSS specified by the user in the node configuration
             generateCustomCSS: function () {
-                console.log(this.config.css);
                 if(!this.config.CSS){return "";}
                 
                 //Go through the CSS and add the ids
@@ -174,37 +173,37 @@ module.exports = {
             //Generate the HTML for the widget that will be inserted into the dashbored
             generateHTML: function (htmlId) {
                 return `
-            ${this.util.generateTag(htmlId, "button", "button", this.config.text, `class="${this.util.generateCSSClass(this.id, "button")} ${this.util.generateCSSClass(this.id, (this.currentState == this.config.offValue ? "off" : "on"))}" state="${this.currentState}"`)}
-        `;
+                    ${this.util.generateTag(htmlId, "button", "button", this.config.text, `class="${this.util.generateCSSClass(this.id, "button")} ${this.util.generateCSSClass(this.id, (this.currentState == this.config.offValue ? "off" : "on"))}" state="${this.currentState}"`)}
+                `;
             },
 
             //Generate the script that will be executed when the dashbored loads
             generateOnload: function (htmlId, lockedAccess, alwaysPassword, ask, askText) {
                 return `
-            ${this.util.getElement(htmlId, "button")}.onclick = function(event) {
-                var yesAction = function() {
-                    sendMsg("${this.id}", event.target.getAttribute("state") == "${this.config.onValue}" ? "${this.config.offValue}" : "${this.config.onValue}");
-                }
-                var noAction = function(){console.log("no");}
+                    ${this.util.getElement(htmlId, "button")}.onclick = function(event) {
+                        var yesAction = function() {
+                            sendMsg("${this.id}", event.target.getAttribute("state") == "${this.config.onValue}" ? "${this.config.offValue}" : "${this.config.onValue}");
+                        }
+                        var noAction = function(){}
 
-                ${this.util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
-            } 
-        `;
+                        ${this.util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
+                    } 
+                `;
             },
 
             //Generate the script that will be called when a message comes from NodeRed on the dashbored
             generateOnMsg: function (htmlId) {
                 return `
-            ${this.util.getElement(htmlId, "button")}.setAttribute("state", msg.payload);
-            if(msg.payload == "${this.config.onValue}") {
-                ${this.util.getElement(htmlId, "button")}.classList.add("${this.util.generateCSSClass(this.id, "on")}");
-                ${this.util.getElement(htmlId, "button")}.classList.remove("${this.util.generateCSSClass(this.id, "off")}");
-            }
-            else {
-                ${this.util.getElement(htmlId, "button")}.classList.add("${this.util.generateCSSClass(this.id, "off")}");
-                ${this.util.getElement(htmlId, "button")}.classList.remove("${this.util.generateCSSClass(this.id, "on")}");
-            }
-        `;
+                    ${this.util.getElement(htmlId, "button")}.setAttribute("state", msg.payload);
+                    if(msg.payload == "${this.config.onValue}") {
+                        ${this.util.getElement(htmlId, "button")}.classList.add("${this.util.generateCSSClass(this.id, "on")}");
+                        ${this.util.getElement(htmlId, "button")}.classList.remove("${this.util.generateCSSClass(this.id, "off")}");
+                    }
+                    else {
+                        ${this.util.getElement(htmlId, "button")}.classList.add("${this.util.generateCSSClass(this.id, "off")}");
+                        ${this.util.getElement(htmlId, "button")}.classList.remove("${this.util.generateCSSClass(this.id, "on")}");
+                    }
+                `;
             },
 
             //Generate any extra scripts to add to the document

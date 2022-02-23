@@ -35,3 +35,6 @@ if the user clicks back on the password dialog it will action that action when t
 
 # Todo
 * Widgets / dashboreds need to be able to remember their state after redeploy
+* Finish the dashbored settings
+* Finish the server settings
+* Fix the weather

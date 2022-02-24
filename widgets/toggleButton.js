@@ -11,7 +11,6 @@ module.exports = {
     description: "Toggles between two states",
     create: function () {
         return {
-
             style: {
                 heightMultiplier: 1,
                 widthMultiplier: 1,
@@ -110,20 +109,31 @@ module.exports = {
             //Current config
             config: {},
 
+            //Default value(s)
+            getDefaultValues: function() {
+                return {
+                    state: this.config.offValue
+                }
+            },
+
             //Check if the configuration is valid
-            checkConfig: function() {
+            checkConfig: function () {
                 return Object.keys(this.config).length != 0;
             },
 
             //Setup the widget
-            setupWidget: function () {
-                this.currentState = this.config.offValue;
-            },
+            setupWidget: function () {},
 
             //Send a message to the NodeRed flow (Will be allocated by widget.js)
             sendToFlow: function (msg) { },
             //Send a message to the widgets in the NodeRed flows (Will be allocated by widget.js)
             sendToDashbored: function (id, payload) { },
+
+            //Set a value (Will be allocated by widget.js)
+            setValue: function (name, value) { },
+
+            //Get a value (Will be allocated by widget.js)
+            getValue: function (name) { },
 
             //When node red redeploys or closes
             onClose: function () { },
@@ -138,8 +148,8 @@ module.exports = {
             //When a message comes from a node red flow
             onFlowMessage: function (msg) {
                 if (msg.payload) {
-                    this.currentState = msg.payload;
-                    this.sendToDashbored(this.id, this.currentState);
+                    this.setValue("state", msg.payload);
+                    this.sendToDashbored(this.id, msg.payload);
                 }
             },
 
@@ -156,8 +166,8 @@ module.exports = {
 
             //Generate the CSS specified by the user in the node configuration
             generateCustomCSS: function () {
-                if(!this.config.CSS){return "";}
-                
+                if (!this.config.CSS) { return ""; }
+
                 //Go through the CSS and add the ids
                 var rebuild = "";
                 var classes = this.config.CSS.split("}");
@@ -173,7 +183,7 @@ module.exports = {
             //Generate the HTML for the widget that will be inserted into the dashbored
             generateHTML: function (htmlId) {
                 return `
-                    ${this.util.generateTag(htmlId, "button", "button", this.config.text, `class="${this.util.generateCSSClass(this.id, "button")} ${this.util.generateCSSClass(this.id, (this.currentState == this.config.offValue ? "off" : "on"))}" state="${this.currentState}"`)}
+                    ${this.util.generateTag(htmlId, "button", "button", this.config.text, `class="${this.util.generateCSSClass(this.id, "button")} ${this.util.generateCSSClass(this.id, (this.getValue("state") == this.config.offValue ? "off" : "on"))}" state="${this.getValue("state")}"`)}
                 `;
             },
 

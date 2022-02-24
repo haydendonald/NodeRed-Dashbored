@@ -5,6 +5,8 @@ module.exports = function (RED) {
         var nodeMsgFunctions = [];
         var server = RED.nodes.getNode(config.server);
         var name = config.name;
+        var restoreState = config.restoreState || true;
+        var flowContext = this.context().global;
 
         node.widgetType = server.getWidgetTypes()[config.widgetType].create();
         node.widgetType.util = require("../util.js");
@@ -12,12 +14,12 @@ module.exports = function (RED) {
 
         //Copy config to the widget type
         for (var i in node.widgetType.defaultConfig) {
-            if(!config[i]) {
+            if (!config[i]) {
                 config[i] = node.widgetType.defaultConfig[i];
             }
             node.widgetType.config[i] = config[i];
         }
-        
+
         node.widgetType.sendToFlow = (msg) => {
             for (var i = 0; i < nodeMsgFunctions.length; i++) {
                 nodeMsgFunctions[i](msg);
@@ -25,6 +27,23 @@ module.exports = function (RED) {
         }
         node.widgetType.sendToDashbored = (id, payload) => {
             server.sendMsg(id, payload);
+        }
+        node.widgetType.setValue = (name, value) => {
+            var temp = flowContext.get(node.id);
+            temp[name] = value;
+            flowContext.set(node.id, temp);
+        }
+        node.widgetType.getValue = (name) => {
+            return flowContext.get(node.id)[name];
+        }
+
+        //If the values don't agree or we're set not to restore values set the default values
+        var defaultValues = node.widgetType.getDefaultValues();
+        for(var i in defaultValues) {
+            if(!flowContext.get(node.id) || flowContext.get(node.id)[i] === undefined || restoreState != true) {
+                //A value is unset set the defaults
+                flowContext.set(node.id, node.widgetType.getDefaultValues());
+            }
         }
 
         if (!node.widgetType) { RED.log.error(`Widget ${name} (${node.id}) has an invalid type ${config.widgetType}`); }

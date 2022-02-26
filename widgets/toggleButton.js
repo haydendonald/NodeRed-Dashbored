@@ -20,25 +20,26 @@ module.exports = {
                 maxHeight: undefined
             },
             //Insert the HTML into the config on the NodeRed flow
+            //The ids MUST be node-config-input-<WIDGETNAME>-<CONFIGNAME> otherwise they may not be set
             configHTML: function () {
                 return `
                     <div class="form-row">
-                        <label for="dashbored-text">Text</label>
-                        <input type="text" id="dashbored-text" placeholder="Text">
+                        <label for="config-input-toggleButton-text">Text</label>
+                        <input type="text" id="node-config-input-toggleButton-text" placeholder="Text">
                     </div>
                     <div class="form-row">
-                        <label for="dashbored-onValue">On Value</label>
-                        <input type="text" id="dashbored-onValue" placeholder="on">
+                        <label for="node-config-input-toggleButton-onValue">On Value</label>
+                        <input type="text" id="node-config-input-toggleButton-onValue" placeholder="on">
                     </div>
                     <div class="form-row">
-                        <label for="dashbored-offValue">Off Value</label>
-                        <input type="text" id="dashbored-offValue" placeholder="off">
+                        <label for="node-config-input-toggleButton-offValue">Off Value</label>
+                        <input type="text" id="node-config-input-toggleButton-offValue" placeholder="off">
                     </div>
 
                     <!-- CSS Editor -->
                     <div class="form-row">
-                        <label for="dashbored-css">CSS</label>
-                        <div style="height: 250px; min-height:150px;" class="node-text-editor" id="dashbored-css"></div>
+                        <label for="CSS">CSS</label>
+                        <div style="height: 250px; min-height:150px;" class="node-text-editor" id="CSS"></div>
                     </div>
                 `;
             }(),
@@ -47,29 +48,15 @@ module.exports = {
                 //When the user opens the config panel get things ready
                 oneditprepare: `
                     element.cssEditor = RED.editor.createEditor({
-                        id: "dashbored-css",
+                        id: "CSS",
                         mode: "ace/mode/css",
-                        value: element.CSS
+                        value: element["toggleButton-CSS"]
                     });
-
-                    //Set the values in the inputs
-                    $("#dashbored-text").val(element.text);
-                    $("#dashbored-onValue").val(element.onValue);
-                    $("#dashbored-offValue").val(element.offValue);
                 `,
                 //When the user clicks save on the editor set our values
                 oneditsave: `
-                    //Add the defaults (this is required)
-                    element._def.defaults["text"] = {value: "", required: true};
-                    element._def.defaults["onValue"] = {value: "", required: true};
-                    element._def.defaults["offValue"] = {value: "", required: true};
-                    element._def.defaults["CSS"] = {value: "", required: true};
-
-                    //Save the values (this is also required)
-                    element.text = $("#dashbored-text").val();
-                    element.onValue = $("#dashbored-onValue").val();
-                    element.offValue = $("#dashbored-offValue").val();
-                    element.CSS = element.cssEditor.getValue();
+                    //Set the CSS value
+                    element["toggleButton-CSS"] = element.cssEditor.getValue();
 
                     //Delete the CSS editor
                     element.cssEditor.destroy();
@@ -83,19 +70,20 @@ module.exports = {
                 `,
                 //When the user clicks the "reset configuration" set the options to their defaults
                 reset: `
-                    $("#dashbored-text").val(defaultConfig.text);
-                    $("#dashbored-onValue").val(defaultConfig.onValue);
-                    $("#dashbored-offValue").val(defaultConfig.offValue);
-                    element.cssEditor.setValue(defaultConfig.CSS);
+                    $("#node-config-input-toggleButton-text").val(defaultConfig.text.value);
+                    $("#node-config-input-toggleButton-onValue").val(defaultConfig.onValue.value);
+                    $("#node-config-input-toggleButton-offValue").val(defaultConfig.offValue.value);
+                    element.cssEditor.setValue(defaultConfig.CSS.value);
                     element.cssEditor.clearSelection();
                 `
             },
             //Default config
             defaultConfig: {
-                text: "Toggle Button",
-                onValue: "on",
-                offValue: "off",
-                CSS: `
+                text: { value: "Toggle Button", required: true },
+                onValue: { value: "on", required: true },
+                offValue: { value: "off", required: true },
+                CSS: {
+                    value: `
                     .on {
                         background-color: #32CD32;
                         color: black;
@@ -104,28 +92,31 @@ module.exports = {
                         background-color: #800000;
                         color: black;
                     }
-                `.replace(/^\s+|\s+$/gm, '')
+                `.replace(/^\s+|\s+$/gm, ''), required: true
+                }
             },
             //Current config
             config: {},
 
             //Default value(s)
-            getDefaultValues: function() {
+            getDefaultValues: function () {
                 return {
                     state: this.config.offValue
                 }
             },
 
-            //Check if the configuration is valid
-            checkConfig: function () {
-                return Object.keys(this.config).length != 0;
-            },
-
             //Setup the widget
-            setupWidget: function () {},
+            setupWidget: function (config) {
+                //Set the configuration
+                this.config.text = config["toggleButton-text"];
+                this.config.onValue = config["toggleButton-onValue"];
+                this.config.offValue = config["toggleButton-offValue"];
+                this.config.CSS = config["toggleButton-CSS"];
+            },
 
             //Send a message to the NodeRed flow (Will be allocated by widget.js)
             sendToFlow: function (msg) { },
+
             //Send a message to the widgets in the NodeRed flows (Will be allocated by widget.js)
             sendToDashbored: function (id, payload) { },
 

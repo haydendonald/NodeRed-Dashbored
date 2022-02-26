@@ -32,7 +32,9 @@ module.exports = {
                 reset: undefined
             },
             //Default config
-            defaultConfig: {},
+            defaultConfig: {
+                test: {value: "", required: true}
+            },
             config: {},
 
             //Setup the widget

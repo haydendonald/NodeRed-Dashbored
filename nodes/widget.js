@@ -8,17 +8,11 @@ module.exports = function (RED) {
         var restoreState = config.restoreState || true;
         var flowContext = this.context().global;
 
+        console.log(config);
+
         node.widgetType = server.getWidgetTypes()[config.widgetType].create();
         node.widgetType.util = require("../util.js");
         node.widgetType.id = node.id;
-
-        //Copy config to the widget type
-        for (var i in node.widgetType.defaultConfig) {
-            if (!config[i]) {
-                config[i] = node.widgetType.defaultConfig[i];
-            }
-            node.widgetType.config[i] = config[i];
-        }
 
         node.widgetType.sendToFlow = (msg) => {
             for (var i = 0; i < nodeMsgFunctions.length; i++) {
@@ -48,7 +42,8 @@ module.exports = function (RED) {
 
         if (!node.widgetType) { RED.log.error(`Widget ${name} (${node.id}) has an invalid type ${config.widgetType}`); }
 
-        node.widgetType.setupWidget();
+        //Setup the widget
+        node.widgetType.setupWidget(config);
 
         //When an input is passed to the node in the flow
         node.input = (msg) => {
@@ -59,7 +54,6 @@ module.exports = function (RED) {
         node.addNodeMsgFunction = (fn) => {
             nodeMsgFunctions.push(fn);
         };
-
 
         //Add this widget to the server
         server.addWidget(node.id, node.name, server.getWidgetTypes()[config.widgetType].label, server.getWidgetTypes()[config.widgetType].version);

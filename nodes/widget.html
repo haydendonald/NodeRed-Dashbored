@@ -26,9 +26,8 @@
 </script>
 
 <script type="text/javascript">
-    RED.nodes.registerType("dashbored-widget", {
-        category: "config",
-        defaults: {
+    async function generate() {
+        var defaults = {
             name: {
                 value: "Widget",
                 required: true
@@ -43,110 +42,116 @@
                 required: true
             },
             restoreState: {
-                value: true,
+                value: "false",
                 required: true
             }
-        },
-        label: function () {
-            return (this.name || "Toggle Button");
-        },
-        oneditprepare: async function () {
-            var self = this;
-            $("#widget-id").html("ID: " + this.id);
+        }
 
-            //Grab the widget
-            try {
-                var widget = await $.ajax({
-                    type: "GET",
-                    url: "./dashboredAPI",
-                    data: "widgets=" + this.id
-                });
-            } catch (e) { }
-
-            //Grab the types
-            try {
-                var widgetTypes = await $.ajax({
-                    type: "GET",
-                    url: "./dashboredAPI",
-                    data: "widgetTypes"
-                });
-            }
-            catch (e) { console.error("Failed to get the widget types!!"); return; }
-
-            //Set the widget type selector
-            var types = [];
-            for (var i in widgetTypes) {
-                types.push({
-                    label: widgetTypes[i].name,
-                    value: i
-                });
-            }
-            $("#node-config-input-widgetType").typedInput({
-                types: [{
-                    value: "widgetType",
-                    options: types
-                }]
+        //Get the widget types
+        try {
+            var widgetTypes = await $.ajax({
+                type: "GET",
+                url: "./dashboredAPI",
+                data: "widgetTypes"
             });
+        }
+        catch (e) { console.error("Failed to get the widget types!!"); return; }
 
-            if (!widget) { return; }
+        //Add the default configs for the widgets
+        for (var i in widgetTypes) {
+            for (var j in widgetTypes[i].defaultConfig) {
+                defaults[i + "-" + j] = widgetTypes[i].defaultConfig[j];
+            }
+        }
+        
+        RED.nodes.registerType("dashbored-widget", {
+            category: "config",
+            defaults,
+            label: function () {
+                return (this.name || "Toggle Button");
+            },
+            oneditprepare: async function () {
+                var self = this;
+                $("#widget-id").html("ID: " + this.id);
 
-            var currentWidgetType;
-            var setupWidgetType = function (element) {
-                //Populate the default config to start
-                for (var i in currentWidgetType.defaultConfig) {
-                    if (element[i] === undefined) {
-                        //Default
-                        element[i] = currentWidgetType.defaultConfig[i];
+                //Grab the widget
+                try {
+                    var widget = await $.ajax({
+                        type: "GET",
+                        url: "./dashboredAPI",
+                        data: "widgets=" + this.id
+                    });
+                } catch (e) { }
+
+                //Set the widget type selector
+                var types = [];
+                for (var i in widgetTypes) {
+                    types.push({
+                        label: widgetTypes[i].name,
+                        value: i
+                    });
+                }
+                $("#node-config-input-widgetType").typedInput({
+                    types: [{
+                        value: "widgetType",
+                        options: types
+                    }]
+                });
+
+                if (!widget) { return; }
+
+                var currentWidgetType;
+                var setupWidgetType = function (element) {
+                    //Populate the widget type config options
+                    var div = $("#widget-type-populate-area");
+                    div.html("");
+                    div.append(currentWidgetType.configHTML);
+
+                    //Set the field values
+                    for(var i in currentWidgetType.defaultConfig) {
+                        $(`#node-config-input-${currentWidgetType.widget}-${i}`).val(element[`${currentWidgetType.widget}-${i}`]);
                     }
+
+                    //Run any oneditprepare scripts
+                    if (currentWidgetType.configScript.oneditprepare) { eval(currentWidgetType.configScript.oneditprepare); }
                 }
 
-                //Now populate the config values (if set)
-                for (var i in currentWidgetType.config) {
-                    if (element[i] === undefined) {
-                        //Default
-                        element[i] = currentWidgetType.config[i];
-                    }
-                }
+                $("#reset").on("click", function () {
+                    var element = self;
+                    var defaultConfig = currentWidgetType.defaultConfig;
+                    if (currentWidgetType.configScript.reset) { eval(currentWidgetType.configScript.reset); }
+                });
 
-                //Populate the widget type config options
-                var div = $("#widget-type-populate-area");
-                div.html("");
-                div.append(currentWidgetType.configHTML);
+                //https://nodered.org/docs/api/ui/typedInput/#methods
+                $("#node-config-input-widgetType").typedInput("value", this.widgetType);
+                currentWidgetType = widgetTypes[this.widgetType];
 
-                //Run any oneditprepare scripts
-                if (currentWidgetType.configScript.oneditprepare) { eval(currentWidgetType.configScript.oneditprepare); }
-            }
-
-            $("#reset").on("click", function () {
-                console.log(currentWidgetType);
-                console.log("fr");
-                var element = self;
-                var defaultConfig = currentWidgetType.defaultConfig;
-                if (currentWidgetType.configScript.reset) { eval(currentWidgetType.configScript.reset); }
-            });
-
-            //https://nodered.org/docs/api/ui/typedInput/#methods
-            $("#node-config-input-widgetType").typedInput("value", this.widgetType);
-            currentWidgetType = widgetTypes[this.widgetType];
-
-            this.currentWidgetType = currentWidgetType;
-            setupWidgetType(self);
-
-            //When the user changes the type rerender
-            $("#node-config-input-widgetType").on("change", function (event, type) {
-                currentWidgetType = widgetTypes[event.target.value];
-                self.currentWidgetType = currentWidgetType;
+                this.currentWidgetType = currentWidgetType;
                 setupWidgetType(self);
-            });
-        },
-        oneditsave: function () {
-            var element = this;
-            if (this.currentWidgetType.configScript.oneditsave) { eval(this.currentWidgetType.configScript.oneditsave); }
-            this.widgetType = $("#node-config-input-widgetType").val();
-        },
-        oneditcancel: function () {
-            var element = this;
-            if (this.currentWidgetType.configScript.oneditcancel) { eval(this.currentWidgetType.configScript.oneditcancel); }
-        },
-    });
+
+                //When the user changes the type rerender
+                $("#node-config-input-widgetType").on("change", function (event, type) {
+                    currentWidgetType = widgetTypes[event.target.value];
+                    self.currentWidgetType = currentWidgetType;
+                    setupWidgetType(self);
+                });
+            },
+            oneditsave: function () {
+                //Find all the elements generated and save their values
+                for(var i in this.currentWidgetType.defaultConfig) {
+                    this[`${this.currentWidgetType.widget}-${i}`] = $(`#node-config-input-${this.currentWidgetType.widget}-${i}`).val();
+                }
+
+                //Call the widget type to do any more
+                var element = this;
+                if (this.currentWidgetType.configScript.oneditsave) { eval(this.currentWidgetType.configScript.oneditsave); }
+                this.widgetType = $("#node-config-input-widgetType").val();
+            },
+            oneditcancel: function () {
+                var element = this;
+                if (this.currentWidgetType.configScript.oneditcancel) { eval(this.currentWidgetType.configScript.oneditcancel); }
+            },
+        });
+    }
+    generate();
 </script>

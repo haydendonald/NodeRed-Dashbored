@@ -196,6 +196,7 @@ module.exports = function (RED) {
                 var createdType = type.create();
                 if (!type.doNotSendToEditor) {
                     send[i] = {
+                        widget: type.widget,
                         name: type.label,
                         description: type.description,
                         configHTML: createdType.configHTML,

@@ -21,12 +21,11 @@ module.exports = function (RED) {
         var navMode = "right";
         var password = "";
 
-        var widgetStyle = {
-            baseHeight: "100px",
-            baseWidth: "200px",
-            scale: 1,
-            backgroundColor: undefined
-        }
+        var baseHeight = "150px";
+        var baseWidth = "200px";
+        var scale = 1;
+        var widgetBackgroundColor = "yellow";
+        var titleColor = "pink";
 
         //When a message is received from the dashbored
         node.onMessage = (data) => {
@@ -112,20 +111,59 @@ module.exports = function (RED) {
                     `);
 
                     //Generate and add the CSS
-                    var CSS = `
-                        #${randomId} {
-                            width: calc(${widgetStyle.baseWidth} * ${widgetStyle.scale});
-                            height: calc(${widgetStyle.baseHeight} * ${widgetStyle.scale});
-                            ${widget.widgetType.style.minWidth ? "min-width: " + widget.widgetType.style.minWidth + ";" : ""}
-                            ${widget.widgetType.style.minWeight ? "min-height: " + widget.widgetType.style.minWeight + ";" : ""}
-                            ${widget.widgetType.style.maxWidth ? "max-width: " + widget.widgetType.style.maxWidth + ";" : ""}
-                            ${widget.widgetType.style.maxHeight ? "max-height: " + widget.widgetType.style.maxHeight + ";" : ""}
-                            ${widgetStyle.backgroundColor ? "background-color: " + widgetStyle.backgroundColor + ";" : ""}
+                    var CSS = function () {
+                        var ret = `
+                        #${randomId} {`;
+                        var widthMultiplier = scale * widget.widthMultiplier * widget.widgetType.widthMultiplier;
+                        var heightMultiplier = scale * widget.heightMultiplier * widget.widgetType.heightMultiplier;
+
+                        ret += `width: calc(${baseWidth} * ${widthMultiplier}) ;`;
+                        ret += `height: calc(${baseHeight} * ${heightMultiplier});`;
+
+                        if (widget.widgetType.minWidth) {
+                            ret += `"min-width: ${widget.widgetType.minWidth};`;
+                        }
+                        if (widget.widgetType.minHeight) {
+                            ret += `"min-height: ${widget.widgetType.minHeight};`;
+                        }
+                        if (widget.widgetType.maxWidth) {
+                            ret += `max-width: ${widget.widgetType.maxWidth};`;
+                        }
+                        if (widget.widgetType.maxHeight) {
+                            ret += `max-height: ${widget.widgetType.maxHeight};`;
+                        }
+
+                        if (backgroundColor) {
+                            ret += `background-color: ${backgroundColor};`;
+                        }
+
+                        ret += `
                             float: left;
                             margin: 10px;
                             border-radius: 10px;
+                        }`;
+
+                        //If there is a title update the CSS
+                        if (widget.title) {
+                            ret += `
+                            #${randomId}_title {
+                                ${titleColor ? "color: " + titleColor + ";" : ""}
+                                font-size: 1.5em;
+                                height: 30px;
+                                margin-top: 10px;
+                                margin-bottom: 10px;
+                                text-align: center;
+                            }
+                            #${randomId}_content {
+                                width: 100%;
+                                height: calc(100% - 50px);
+                            }
+                            `
                         }
-                    `;
+
+                        return ret;
+                    }();
+
                     CSS += widget.widgetType.generateCSS(randomId);
                     if (widget.widgetType.generateCSS && !widgetIdsCSSDone[widget.id]) {
                         CSS += widget.widgetType.generateCustomCSS();
@@ -137,7 +175,12 @@ module.exports = function (RED) {
                     //Add any extra scripts
                     if (widget.generateScript) { html.querySelector("html").innerHTML += `<script id="${widget.id}" type="text/javascript">${widget.widgetType.generateScript(randomId)}</script>`; }
 
-                    elements[i].innerHTML = widget.widgetType.generateHTML(randomId);
+                    //Add the HTML
+                    var widgetHTML = widget.widgetType.generateHTML(randomId);
+                    elements[i].innerHTML = `
+                        ${widget.title ? `${util.generateTag(randomId, "h1", "title", widget.title)}` : ""}
+                        ${widget.title ? `${util.generateTag(randomId, "div", "content", widgetHTML)}` : widgetHTML}
+                    `;
                 }
             }
         }

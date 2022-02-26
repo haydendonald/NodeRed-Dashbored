@@ -10,10 +10,7 @@ module.exports = function (RED) {
     //Define the possible widget types
     const widgetTypes = function () {
         //Insert widgets to include here
-        var requires = [
-            require("../widgets/toggleButton.js"),
-            require("../widgets/clock.js")
-        ];
+        var requires = require("../widgets/widgets.js");
 
         //Generate the map
         var ret = {};

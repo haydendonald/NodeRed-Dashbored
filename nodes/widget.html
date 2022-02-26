@@ -14,6 +14,16 @@
         <input type="text" id="node-config-input-widgetType">
     </div>
     <div class="form-row">
+        <label>Size (W x H)</label>
+        <input type="number" style="width: 10%" id="node-config-input-widthMultiplier" min="0">
+        x
+        <input type="number" style="width: 10%" id="node-config-input-heightMultiplier" min="0">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-title">Title</label>
+        <input type="text" id="node-config-input-title">
+    </div>
+    <div class="form-row">
         <label for="node-config-input-restoreState">Restore State on Redeploy</label>
         <input type="checkbox" id="node-config-input-restoreState">
     </div>
@@ -41,8 +51,20 @@
                 value: "",
                 required: true
             },
+            widthMultiplier: {
+                value: 1,
+                required: true
+            },
+            heightMultiplier: {
+                value: 1,
+                required: true
+            },
+            title: {
+                value: "",
+                required: false
+            },
             restoreState: {
-                value: "false",
+                value: "true",
                 required: true
             }
         }
@@ -63,7 +85,7 @@
                 defaults[i + "-" + j] = widgetTypes[i].defaultConfig[j];
             }
         }
-        
+
         RED.nodes.registerType("dashbored-widget", {
             category: "config",
             defaults,
@@ -108,7 +130,7 @@
                     div.append(currentWidgetType.configHTML);
 
                     //Set the field values
-                    for(var i in currentWidgetType.defaultConfig) {
+                    for (var i in currentWidgetType.defaultConfig) {
                         $(`#node-config-input-${currentWidgetType.widget}-${i}`).val(element[`${currentWidgetType.widget}-${i}`]);
                     }
 
@@ -138,7 +160,7 @@
             },
             oneditsave: function () {
                 //Find all the elements generated and save their values
-                for(var i in this.currentWidgetType.defaultConfig) {
+                for (var i in this.currentWidgetType.defaultConfig) {
                     this[`${this.currentWidgetType.widget}-${i}`] = $(`#node-config-input-${this.currentWidgetType.widget}-${i}`).val();
                 }
 

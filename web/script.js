@@ -91,10 +91,6 @@ function hideShowElement(id, show, sec) {
     } catch (e) { }
 }
 
-
-
-///TO DOCUMENT
-
 /**
  * Show a message popup
  * @param {string} type The type of message. (info, warn, error) 
@@ -102,11 +98,12 @@ function hideShowElement(id, show, sec) {
  * @param {string} description The description of the message
  * @param {number} closeAfterSec How long until it's closed. False will not close the message, True will close the message
  */
-function message(type, title, description, closeAfterSec) {
+ function message(type, title, description, closeAfterSec) {
     if (closeAfterSec === undefined) { closeAfterSec = 3; }
     console.log(description);
     //TODO
 }
+
 
 /**
  * Add a function to be called when the dashbored becomes locked

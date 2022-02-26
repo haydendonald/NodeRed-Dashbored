@@ -10,6 +10,10 @@ module.exports = function (RED) {
 
         console.log(config);
 
+        node.widthMultiplier = parseInt(config.widthMultiplier) || 1;
+        node.heightMultiplier = parseInt(config.heightMultiplier) || 1;
+        node.title = config.title || "";
+
         node.widgetType = server.getWidgetTypes()[config.widgetType].create();
         node.widgetType.util = require("../util.js");
         node.widgetType.id = node.id;
@@ -31,19 +35,20 @@ module.exports = function (RED) {
             return flowContext.get(node.id)[name];
         }
 
-        //If the values don't agree or we're set not to restore values set the default values
-        var defaultValues = node.widgetType.getDefaultValues();
-        for(var i in defaultValues) {
-            if(!flowContext.get(node.id) || flowContext.get(node.id)[i] === undefined || restoreState != true) {
-                //A value is unset set the defaults
-                flowContext.set(node.id, node.widgetType.getDefaultValues());
-            }
-        }
-
         if (!node.widgetType) { RED.log.error(`Widget ${name} (${node.id}) has an invalid type ${config.widgetType}`); }
 
         //Setup the widget
         node.widgetType.setupWidget(config);
+
+        //If the values don't agree or we're set not to restore values set the default values
+        var defaultValues = node.widgetType.getDefaultValues();
+        for (var i in defaultValues) {
+            if (!flowContext.get(node.id) || flowContext.get(node.id)[i] === undefined || restoreState != true) {
+                //A value is unset set the defaults
+                flowContext.set(node.id, node.widgetType.getDefaultValues());
+                break;
+            }
+        }
 
         //When an input is passed to the node in the flow
         node.input = (msg) => {

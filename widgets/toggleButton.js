@@ -1,8 +1,7 @@
 /**
  * Toggle Button Widget for Dashbored
- *
+ * https://github.com/haydendonald/NodeRed-Dashbored
 */
-
 
 module.exports = {
     widget: "toggleButton",
@@ -11,14 +10,13 @@ module.exports = {
     description: "Toggles between two states",
     create: function () {
         return {
-            style: {
-                heightMultiplier: 1,
-                widthMultiplier: 1,
-                minWidth: undefined,
-                minWeight: undefined,
-                maxWidth: undefined,
-                maxHeight: undefined
-            },
+            widthMultiplier: 1,
+            heightMultiplier: 1,
+            minWidth: undefined,
+            minWeight: undefined,
+            maxWidth: undefined,
+            maxHeight: undefined,
+
             //Insert the HTML into the config on the NodeRed flow
             //The ids MUST be node-config-input-<WIDGETNAME>-<CONFIGNAME> otherwise they may not be set
             configHTML: function () {
@@ -188,7 +186,9 @@ module.exports = {
                         var noAction = function(){}
 
                         ${this.util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
-                    } 
+                    }
+
+                    ${this.util.getElement(htmlId, "button")}.setAttribute("state", "${this.getValue("state")}");
                 `;
             },
 

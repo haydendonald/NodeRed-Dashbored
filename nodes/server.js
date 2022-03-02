@@ -115,6 +115,11 @@ module.exports = function (RED) {
             return widgets;
         }
 
+        //Get the weather
+        node.getWeather = () => {
+            getWeather();
+        }
+
         //Return the dashboreds
         node.getDashboreds = () => {
             return dashboards;

@@ -266,6 +266,11 @@ function connect() {
             if (socketWasClosed == true) {
                 window.location.reload();
             }
+
+            //Request the weather
+            sendMsg(dashboredId, {
+                type: "weather"
+            });
         });
 
         socket.addEventListener("message", function (data) {

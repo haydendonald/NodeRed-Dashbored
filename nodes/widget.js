@@ -8,8 +8,6 @@ module.exports = function (RED) {
         var restoreState = config.restoreState || true;
         var flowContext = this.context().global;
 
-        console.log(config);
-
         node.widthMultiplier = parseInt(config.widthMultiplier) || 1;
         node.heightMultiplier = parseInt(config.heightMultiplier) || 1;
         node.title = config.title || "";

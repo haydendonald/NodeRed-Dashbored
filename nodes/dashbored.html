@@ -44,44 +44,40 @@
         <input type="text" id="node-config-input-server">
     </div>
     <div class="form-row">
-        <label for="node-config-input-name"><i class="icon-tag"></i> Path</label>
-        <input type="text" id="node-config-input-name" placeholder="Name">
+        <label for="node-config-input-endpoint"><i class="icon-tag"></i> Path</label>
+        <input type="text" id="node-config-input-endpoint" placeholder="dashbored">
     </div>
     <div class="form-row">
-        <label for="node-config-input-name"><i class="icon-tag"></i> Password</label>
-        <input type="text" id="node-config-input-name" placeholder="Name">
+        <label for="node-config-input-password"><i class="icon-tag"></i> Password</label>
+        <input type="text" id="node-config-input-password" placeholder="">
     </div>
     <div class="form-row">
-        <label for="node-config-input-name"><i class="icon-tag"></i> Header Image</label>
-        <input type="text" id="node-config-input-name" placeholder="Name">
+        <label for="node-config-input-headerImage"><i class="icon-tag"></i> Header Image</label>
+        <input type="text" id="node-config-input-headerImage" placeholder="red/images/node-red.svg">
     </div>
     <div class="form-row">
-        <label for="node-config-input-name"><i class="icon-tag"></i> Header Title</label>
-        <input type="text" id="node-config-input-name" placeholder="Name">
+        <label for="node-config-input-headerText"><i class="icon-tag"></i> Header Title</label>
+        <input type="text" id="node-config-input-headerText" placeholder="Dashbored">
     </div>
     <div class="form-row">
-        <label for="node-config-input-name"><i class="icon-tag"></i> Show Clock</label>
-        <input type="text" id="node-config-input-name" placeholder="Name">
+        <label for="node-config-input-showClock"><i class="icon-tag"></i> Show Clock</label>
+        <input type="checkbox" id="node-config-input-showClock" placeholder="true">
     </div>
     <div class="form-row">
-        <label for="node-config-input-name"><i class="icon-tag"></i> Show Weather</label>
-        <input type="text" id="node-config-input-name" placeholder="Name">
+        <label for="node-config-input-showWeather"><i class="icon-tag"></i> Show Weather</label>
+        <input type="checkbox" id="node-config-input-showWeather" placeholder="true">
     </div>
     <div class="form-row">
-        <label for="node-config-input-name"><i class="icon-tag"></i> Navigation Bar Position</label>
-        <input type="text" id="node-config-input-name" placeholder="Name">
+        <label for="node-config-input-navMode"><i class="icon-tag"></i> Navigation Bar Position</label>
+        <input type="text" id="node-config-input-navMode" placeholder="right">
     </div>
     <div class="form-row">
-        <label for="node-config-input-name"><i class="icon-tag"></i> Widget Width</label>
-        <input type="text" id="node-config-input-name" placeholder="Name">
+        <label for="node-config-input-baseWidth"><i class="icon-tag"></i> Widget Width</label>
+        <input type="text" id="node-config-input-baseWidth" placeholder="200px">
     </div>
     <div class="form-row">
-        <label for="node-config-input-name"><i class="icon-tag"></i> Widget Height</label>
-        <input type="text" id="node-config-input-name" placeholder="Name">
-    </div>
-    <div class="form-row">
-        <label for="node-config-input-name"><i class="icon-tag"></i> Widget Background Color</label>
-        <input type="text" id="node-config-input-name" placeholder="Name">
+        <label for="node-config-input-baseHeight"><i class="icon-tag"></i> Widget Height</label>
+        <input type="text" id="node-config-input-baseHeight" placeholder="150px">
     </div>
 </script>
 
@@ -96,6 +92,42 @@
                 value: "",
                 required: true,
                 type: "dashbored-server"
+            },
+            endpoint: {
+                value: "dashbored",
+                required: true
+            },
+            password: {
+                value: "",
+                required: false
+            },
+            headerImage: {
+                value: "red/images/node-red.svg",
+                required: false
+            },
+            headerText: {
+                value: "Dashbored",
+                required: false
+            },
+            showClock: {
+                value: "true",
+                required: false
+            },
+            showWeather: {
+                value: "true",
+                required: false
+            },
+            navMode: {
+                value: "right",
+                required: true
+            },
+            baseHeight: {
+                value: "150px",
+                required: true
+            },
+            baseWidth: {
+                value: "200px",
+                required: true
             },
 
             //The default HTML for the dashbored
@@ -125,10 +157,10 @@
                 required: true
             }
         },
-        label: function() {
+        label: function () {
             return (this.name || "Dashbored");
         },
-        oneditprepare: async function() {
+        oneditprepare: async function () {
             //Do a call to the server and request the widgets in memory
             var widgets = await $.ajax({
                 type: "GET",
@@ -150,6 +182,18 @@
                     value: "widgets",
                     multiple: "true",
                     options: options
+                }]
+            });
+
+            //Add the nav bar options
+            $("#node-config-input-navMode").typedInput({
+                types: [{
+                    value: "navMode",
+                    options: [
+                        { value: "bottom", label: "Bottom" },
+                        { value: "top", label: "Top" },
+                        { value: "left", label: "Left" },
+                    ]
                 }]
             });
 
@@ -182,7 +226,7 @@
                 value: this.CSS
             });
         },
-        oneditsave: function() {
+        oneditsave: function () {
             this.HTML = this.htmlEditor.getValue();
             this.htmlEditor.destroy();
             delete this.htmlEditor;
@@ -190,7 +234,7 @@
             this.cssEditor.destroy();
             delete this.cssEditor;
         },
-        oneditcancel: function() {
+        oneditcancel: function () {
             this.htmlEditor.destroy();
             delete this.htmlEditor;
             this.cssEditor.destroy();

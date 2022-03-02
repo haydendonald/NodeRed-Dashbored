@@ -69,12 +69,14 @@ page {
     font-size: calc(80px / 3);
     margin-left: 10px;
     margin-top: calc(80px / 4);
+    float: left;
 }
 
 #header img {
     width: auto;
     height: 60px;
     margin: 10px;
+    float: left;
 }
 
 #clockWeather {

@@ -11,21 +11,18 @@ module.exports = function (RED) {
         var server = RED.nodes.getNode(config.server);
         var name = config.name || "dashbored";
         var endpoint = config.endpoint || this.name.toLowerCase();
-        var HTML = config.HTML || "";
-        var CSS = config.CSS || "";
+        var HTML = config.HTML;
+        var CSS = config.CSS;
         var locked = false;
-        var headerImage = "red/images/node-red.svg";
-        var headerText = "Dashbored";
-        var showClock = true;
-        var showWeather = false;
-        var navMode = "right";
-        var password = "";
+        var headerImage = config.headerImage;
+        var headerText = config.headerText;
+        var showClock = config.showClock == "true" || config.showClock == true;
+        var showWeather = config.showWeather == "true" || config.showWeather == true;
+        var navMode = config.navMode || "bottom";
+        var password = config.password;
 
-        var baseHeight = "150px";
-        var baseWidth = "200px";
-        var scale = 1;
-        var widgetBackgroundColor = "yellow";
-        var titleColor = "pink";
+        var baseHeight = config.baseHeight || "150px";
+        var baseWidth = config.baseWidth || "200px";
 
         //When a message is received from the dashbored
         node.onMessage = (data) => {
@@ -58,6 +55,11 @@ module.exports = function (RED) {
                         server.sendMsg(id, {
                             type: "lock"
                         });
+                        break;
+                    }
+                    //Get the weather
+                    case "weather": {
+                        server.getWeather();
                         break;
                     }
                 }
@@ -114,8 +116,8 @@ module.exports = function (RED) {
                     var CSS = function () {
                         var ret = `
                         #${randomId} {`;
-                        var widthMultiplier = scale * widget.widthMultiplier * widget.widgetType.widthMultiplier;
-                        var heightMultiplier = scale * widget.heightMultiplier * widget.widgetType.heightMultiplier;
+                        var widthMultiplier = widget.widthMultiplier * widget.widgetType.widthMultiplier;
+                        var heightMultiplier = widget.heightMultiplier * widget.widgetType.heightMultiplier;
 
                         ret += `width: calc(${baseWidth} * ${widthMultiplier}) ;`;
                         ret += `height: calc(${baseHeight} * ${heightMultiplier});`;
@@ -133,9 +135,9 @@ module.exports = function (RED) {
                             ret += `max-height: ${widget.widgetType.maxHeight};`;
                         }
 
-                        if (backgroundColor) {
-                            ret += `background-color: ${backgroundColor};`;
-                        }
+                        // if (backgroundColor) {
+                        //     ret += `background-color: ${backgroundColor};`;
+                        // }
 
                         ret += `
                             float: left;
@@ -147,7 +149,6 @@ module.exports = function (RED) {
                         if (widget.title) {
                             ret += `
                             #${randomId}_title {
-                                ${titleColor ? "color: " + titleColor + ";" : ""}
                                 font-size: 1.5em;
                                 height: 30px;
                                 margin-top: 10px;
@@ -269,16 +270,17 @@ module.exports = function (RED) {
 
             //Set the header
             document.header.innerHTML += `
-                ${headerText ? "" : "<h1>" + headerText + "</h1>"}
                 ${headerImage ? "<img src='" + headerImage + "' alt='dashbored logo'>" : ""}
+                ${headerText ? "<h1>" + headerText + "</h1>" : ""}
             `;
+
             document.html.querySelector("#clockWeather").innerHTML = `
-                ${showClock ? "<h2 id='clock'>" + util.formatAMPM(new Date) + "</h2>" : ""}
-                ${showWeather ? "<div id='weather'><img id='weatherImg'></img><h2 id='weatherTemp'></h2></div>" : ""}
+                ${showClock == true ? "<h2 id='clock'>" + util.formatAMPM(new Date) + "</h2>" : ""}
+                ${showWeather == true ? "<div id='weather'><img id='weatherImg'></img><h2 id='weatherTemp'></h2></div>" : ""}
             `;
 
             //Set the listener for the clock updates
-            if (showClock) {
+            if (showClock == true) {
                 document.addScript(`
                     addOnLoadFunction(function(msg) {
                         setInterval(function() {

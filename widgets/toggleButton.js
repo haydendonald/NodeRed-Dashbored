@@ -113,7 +113,7 @@ module.exports = {
             },
 
             //Send a message to the NodeRed flow (Will be allocated by widget.js)
-            sendToFlow: function (msg) { },
+            sendToFlow: function (msg, messageType) { },
 
             //Send a message to the widgets in the NodeRed flows (Will be allocated by widget.js)
             sendToDashbored: function (id, payload) { },
@@ -130,16 +130,23 @@ module.exports = {
             //When a message comes from the dashbored
             onMessage: function (msg) {
                 if (msg.id == this.id) {
-                    this.sendToFlow(msg.payload);
+                    this.sendToFlow({"state": msg.payload}, "set");
                 }
             },
 
             //When a message comes from a node red flow
             onFlowMessage: function (msg) {
-                if (msg.payload) {
-                    this.setValue("state", msg.payload);
-                    this.sendToDashbored(this.id, msg.payload);
+                if (msg.payload && msg.payload.state) {
+                    this.setValue("state", msg.payload.state);
+                    this.sendToDashbored(this.id, msg.payload.state);
                 }
+            },
+
+            //When an get request comes from the flow generate a message and return the current values
+            onFlowGetMessage: function(msg) {
+                this.sendToFlow({
+                    "state": this.getValue("state")
+                }, "get");
             },
 
             //Generate the CSS for the widget

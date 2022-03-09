@@ -5,6 +5,5 @@
 
 //Add widget requires here to include the widget
 module.exports = [
-    require("../widgets/toggleButton.js"),
-    require("../widgets/clock.js")
+    require("../widgets/toggleButton.js")
 ]

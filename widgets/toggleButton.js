@@ -16,6 +16,7 @@ module.exports = {
             minWeight: undefined,
             maxWidth: undefined,
             maxHeight: undefined,
+            widget: undefined, //Reference back to the widget node
 
             //Insert the HTML into the config on the NodeRed flow
             //The ids MUST be node-config-input-<WIDGETNAME>-<CONFIGNAME> otherwise they may not be set
@@ -103,8 +104,17 @@ module.exports = {
                 }
             },
 
+            //Return the current values
+            getValues: function () {
+                return {
+                    state: this.widget.getValue("state")
+                }
+            },
+
             //Setup the widget
-            setupWidget: function (config) {
+            setupWidget: function (widget, config) {
+                this.widget = widget;
+
                 //Set the configuration
                 this.config.text = config["toggleButton-text"];
                 this.config.onValue = config["toggleButton-onValue"];
@@ -112,41 +122,22 @@ module.exports = {
                 this.config.CSS = config["toggleButton-CSS"];
             },
 
-            //Send a message to the NodeRed flow (Will be allocated by widget.js)
-            sendToFlow: function (msg, messageType) { },
-
-            //Send a message to the widgets in the NodeRed flows (Will be allocated by widget.js)
-            sendToDashbored: function (id, payload) { },
-
-            //Set a value (Will be allocated by widget.js)
-            setValue: function (name, value) { },
-
-            //Get a value (Will be allocated by widget.js)
-            getValue: function (name) { },
-
             //When node red redeploys or closes
             onClose: function () { },
 
             //When a message comes from the dashbored
             onMessage: function (msg) {
                 if (msg.id == this.id) {
-                    this.sendToFlow({"state": msg.payload}, "set");
+                    this.widget.sendStatusToFlow("set");
                 }
             },
 
             //When a message comes from a node red flow
             onFlowMessage: function (msg) {
                 if (msg.payload && msg.payload.state) {
-                    this.setValue("state", msg.payload.state);
-                    this.sendToDashbored(this.id, msg.payload.state);
+                    this.widget.setValue("state", msg.payload.state);
+                    this.widget.sendToDashbored(this.id, msg.payload.state);
                 }
-            },
-
-            //When an get request comes from the flow generate a message and return the current values
-            onFlowGetMessage: function(msg) {
-                this.sendToFlow({
-                    "state": this.getValue("state")
-                }, "get");
             },
 
             //Generate the CSS for the widget
@@ -179,7 +170,7 @@ module.exports = {
             //Generate the HTML for the widget that will be inserted into the dashbored
             generateHTML: function (htmlId) {
                 return `
-                    ${this.util.generateTag(htmlId, "button", "button", this.config.text, `class="${this.util.generateCSSClass(this.id, "button")} ${this.util.generateCSSClass(this.id, (this.getValue("state") == this.config.offValue ? "off" : "on"))}" state="${this.getValue("state")}"`)}
+                    ${this.util.generateTag(htmlId, "button", "button", this.config.text, `class="${this.util.generateCSSClass(this.id, "button")} ${this.util.generateCSSClass(this.id, (this.widget.getValue("state") == this.config.offValue ? "off" : "on"))}" state="${this.widget.getValue("state")}"`)}
                 `;
             },
 
@@ -195,7 +186,7 @@ module.exports = {
                         ${this.util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
                     }
 
-                    ${this.util.getElement(htmlId, "button")}.setAttribute("state", "${this.getValue("state")}");
+                    ${this.util.getElement(htmlId, "button")}.setAttribute("state", "${this.widget.getValue("state")}");
                 `;
             },
 

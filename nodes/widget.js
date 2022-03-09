@@ -2,7 +2,7 @@ module.exports = function (RED) {
     function widget(config) {
         RED.nodes.createNode(this, config);
         var self = this;
-        var nodeMsgFunctions = [];
+        var nodeMsgFunctions = {};
         var server = RED.nodes.getNode(config.server);
         var name = config.name;
         var restoreState = config.restoreState || true;
@@ -17,9 +17,9 @@ module.exports = function (RED) {
         this.widgetType.id = this.id;
 
         //Send to the flow
-        this.sendToFlow = function (msg, messageType, get = undefined) {
-            for (var i = 0; i < nodeMsgFunctions.length; i++) {
-                nodeMsgFunctions[i](msg, messageType, get);
+        this.sendToFlow = function (msg, messageType, get = undefined, nodeId = undefined) {
+            for (var i in nodeMsgFunctions) {
+                nodeMsgFunctions[i](msg, messageType, get, nodeId);
             }
         }
 
@@ -47,13 +47,13 @@ module.exports = function (RED) {
         }
 
         //Send the current status to the flow
-        this.sendStatusToFlow = function (type) {
-            this.sendToFlow(this.widgetType.getValues(), type);
+        this.sendStatusToFlow = function (type, nodeId) {
+            this.sendToFlow(this.widgetType.getValues(), type, undefined, nodeId);
         }
 
         //Add a callback for the sendToFlow function
-        this.addNodeMsgFunction = function (fn) {
-            nodeMsgFunctions.push(fn);
+        this.addNodeMsgFunction = function (nodeId, fn) {
+            nodeMsgFunctions[nodeId] = fn;
         };
 
         if (!this.widgetType) { RED.log.error(`Widget ${name} (${this.id}) has an invalid type ${config.widgetType}`); }
@@ -75,17 +75,15 @@ module.exports = function (RED) {
         }
 
         //When an input is passed to the node in the flow
-        this.input = (msg) => {
+        this.input = (msg, nodeId) => {
             switch (msg.topic) {
                 case "get": {
-                    this.sendToFlow(this.widgetType.getValues(), "get");
+                    this.sendToFlow(this.widgetType.getValues(), "get", undefined, nodeId);
                     break;
                 }
                 case "set": {
                     this.widgetType.onFlowMessage(msg);
-
-                   // this.sendStatusToFlow("set");
-                    //this.sendToFlow(this.widgetType.getValues(), "set"); //TODO this needs to allow for not sending on nodes etc
+                    this.sendStatusToFlow("set", nodeId);
                     break;
                 }
             }

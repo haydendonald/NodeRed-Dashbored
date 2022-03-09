@@ -17,34 +17,39 @@ module.exports = function (RED) {
         node.widgetType.id = node.id;
 
         //Send to the flow
-        node.widgetType.sendToFlow = (msg, messageType, get = undefined) => {
+        this.sendToFlow = function(msg, messageType, get = undefined) {
             for (var i = 0; i < nodeMsgFunctions.length; i++) {
                 nodeMsgFunctions[i](msg, messageType, get);
             }
         }
+        //node.widgetType.sendToFlow = sendToFlow;
 
         //Send to the dashbored
-        node.widgetType.sendToDashbored = (id, payload) => {
+        this.sendToDashbored = function(id, payload) {
             server.sendMsg(id, payload);
         }
+        //node.widgetType.sendToDashbored = sendToDashbored;
 
         //Set a value
-        node.widgetType.setValue = (name, value) => {
+        this.setValue = function(name, value) {
             var temp = flowContext.get(node.id);
             temp[name] = value;
             flowContext.set(node.id, temp);
         }
-        
+        //node.widgetType.setValue = setValue;
+
         //Get a value
-        node.widgetType.getValue = (name) => {
+        this.getValue = function(name) {
             return flowContext.get(node.id)[name];
         }
+        //node.widgetType.getValue = getValue;
 
         //Request a value from the flow
-        node.widgetType.getFlowValue = (names) => {
-            if(typeof names != "Array"){names = [names];}
+        this.getFlowValue = function(names) {
+            if (typeof names != "Array") { names = [names]; }
             node.widgetType.sendToFlow(undefined, undefined, names)
         }
+        //node.widgetType.getFlowValue = getFlowValue;
 
         //Add a callback for the sendToFlow function
         node.addNodeMsgFunction = (fn) => {
@@ -62,7 +67,7 @@ module.exports = function (RED) {
             if (!flowContext.get(node.id) || flowContext.get(node.id)[i] === undefined || restoreState != true) {
                 //A value is unset set the defaults
                 flowContext.set(node.id, node.widgetType.getDefaultValues());
-                setTimeout(function() {
+                setTimeout(function () {
                     node.widgetType.sendToFlow(undefined, "get", Object.keys(node.widgetType.getDefaultValues())); //Request to the flow to get all values
                 }, 1000);
                 break;
@@ -73,6 +78,9 @@ module.exports = function (RED) {
         node.input = (msg) => {
             switch (msg.topic) {
                 case "get": {
+                    this.sendToFlow({
+                        "state": this.getValue("state")
+                    }, "get");
                     node.widgetType.onFlowGetMessage(msg);
                     break;
                 }

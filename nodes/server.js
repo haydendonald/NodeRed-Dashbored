@@ -194,6 +194,7 @@ module.exports = function (RED) {
         if (req.query.widgetTypes !== undefined) {
             var send = {};
             for (var i in widgetTypes) {
+                console.log(widgetTypes[i]);
                 var type = widgetTypes[i];
                 var createdType = type.create();
                 if (!type.doNotSendToEditor) {

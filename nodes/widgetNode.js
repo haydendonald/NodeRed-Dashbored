@@ -4,24 +4,9 @@ module.exports = function (RED) {
         var node = this;
         var widget = RED.nodes.getNode(config.widget);
 
-        // var listenToGetFromOthers = true; //Listen to the get requests from other nodes
-        // var outputMode = "others"; //off, onlyDashbored, onlyInput, others, always
 
-        /**
-         * Input >> SET >> Output (Value)
-         * Input >> GET >> Output (value)
-         *          SET >> Output (set)
-         *          GET >> Output (get)
-         * 
-         * topics
-         * set                  response
-         * get                  response
-         *                      set
-         *                      get
-         */
-
-        
-
+        var onlyOutputOnInput = true; //Only output if the value was get/set from the input
+        var sendSetToOutput = false; //When set from the input output the change to the output
 
 
 
@@ -33,71 +18,50 @@ module.exports = function (RED) {
         //Add a callback for when a message comes from the dashbored
         widget.addNodeMsgFunction(this.id, (output, outputType, get, nodeId) => {
             var sendOutput = function () {
-                node.send([
-                    //Output
-                    output ? {
-                        "topic": outputType,
-                        "payload": output
-                    } : undefined,
-                    //Get
-                    get ? {
-                        "topic": "get",
-                        "payload": get
-                    } : undefined
-                ]);
+                node.send([{
+                    "topic": outputType,
+                    "payload": output
+                }, undefined]);
             }
 
-            
+            //If a get payload exists just send it
+            if (get) {
+                node.send([undefined, {
+                    "topic": "get",
+                    "payload": get
+                }]);
+                return;
+            }
 
-            // //If it's a get
-            // console.log(outputType);
-            // if (outputType == "get") {
-            //     if (listenToGetFromOthers == true) {
-            //         console.log(nodeId);
-            //         if (nodeId != undefined) {
-            //             sendOutput();
-            //             return;
-            //         }
-            //     }
-            //     else if (nodeId == node.id) {
-            //         sendOutput();
-            //         return;
-            //     }
-            // }
+            if (onlyOutputOnInput == true) {
+                //Only output if it was requested from the node
+                if (nodeId == this.id) {
+                    sendOutput();
+                }
+            }
 
-            // //If its a set
-            // switch (outputMode) {
-            //     //Do nothing
-            //     case "off": {
-            //         break;
-            //     }
-            //     //Only when the user clicks something on the dashbored
-            //     case "onlyDashbored": {
-            //         if (nodeId === undefined) {
-            //             sendOutput();
-            //         }
-            //         break;
-            //     }
-            //     //Only when the state changes from the input or dashbored
-            //     case "onlyInput": {
-            //         if (nodeId == this.id || nodeId == undefined) {
-            //             sendOutput();
-            //         }
-            //         break;
-            //     }
-            //     //Only when the state changes from the input of another widget node or dashbored
-            //     case "others": {
-            //         if (nodeId != this.id || nodeId == undefined) {
-            //             sendOutput();
-            //         }
-            //         break;
-            //     }
-            //     //Always output
-            //     case "always": {
-            //         sendOutput();
-            //         break;
-            //     }
-            // }
+            //Set
+            if (outputType == "set") {
+                if (nodeId == this.id) {
+                    if (sendSetToOutput == true) {
+                        sendOutput();
+                    }
+                }
+                else {
+                    sendOutput();
+                }
+            }
+            //Get
+            else {
+                if (onlyOutputOnInput == true) {
+                    if (nodeId == this.id) {
+                        sendOutput();
+                    }
+                }
+                else {
+                    sendOutput();
+                }
+            }
         });
 
         //On redeploy

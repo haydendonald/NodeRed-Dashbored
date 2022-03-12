@@ -4,8 +4,26 @@ module.exports = function (RED) {
         var node = this;
         var widget = RED.nodes.getNode(config.widget);
 
-        var listenToGetFromOthers = true; //Listen to the get requests from other nodes
-        var outputMode = "others"; //off, onlyDashbored, onlyInput, others, always
+        // var listenToGetFromOthers = true; //Listen to the get requests from other nodes
+        // var outputMode = "others"; //off, onlyDashbored, onlyInput, others, always
+
+        /**
+         * Input >> SET >> Output (Value)
+         * Input >> GET >> Output (value)
+         *          SET >> Output (set)
+         *          GET >> Output (get)
+         * 
+         * topics
+         * set                  response
+         * get                  response
+         *                      set
+         *                      get
+         */
+
+        
+
+
+
 
         //Pass the input message to the widget
         node.on("input", (msg) => {
@@ -29,55 +47,57 @@ module.exports = function (RED) {
                 ]);
             }
 
-            //If it's a get
-            console.log(outputType);
-            if (outputType == "get") {
-                if (listenToGetFromOthers == true) {
-                    console.log(nodeId);
-                    if (nodeId != undefined) {
-                        sendOutput();
-                        return;
-                    }
-                }
-                else if (nodeId == node.id) {
-                    sendOutput();
-                    return;
-                }
-            }
+            
 
-            //If its a set
-            switch (outputMode) {
-                //Do nothing
-                case "off": {
-                    break;
-                }
-                //Only when the user clicks something on the dashbored
-                case "onlyDashbored": {
-                    if (nodeId === undefined) {
-                        sendOutput();
-                    }
-                    break;
-                }
-                //Only when the state changes from the input or dashbored
-                case "onlyInput": {
-                    if (nodeId == this.id || nodeId == undefined) {
-                        sendOutput();
-                    }
-                    break;
-                }
-                //Only when the state changes from the input of another widget node or dashbored
-                case "others": {
-                    if (nodeId != this.id || nodeId == undefined) {
-                        sendOutput();
-                    }
-                    break;
-                }
-                //Always output
-                case "always": {
-                    sendOutput();
-                    break;
-                }
-            }
+            // //If it's a get
+            // console.log(outputType);
+            // if (outputType == "get") {
+            //     if (listenToGetFromOthers == true) {
+            //         console.log(nodeId);
+            //         if (nodeId != undefined) {
+            //             sendOutput();
+            //             return;
+            //         }
+            //     }
+            //     else if (nodeId == node.id) {
+            //         sendOutput();
+            //         return;
+            //     }
+            // }
+
+            // //If its a set
+            // switch (outputMode) {
+            //     //Do nothing
+            //     case "off": {
+            //         break;
+            //     }
+            //     //Only when the user clicks something on the dashbored
+            //     case "onlyDashbored": {
+            //         if (nodeId === undefined) {
+            //             sendOutput();
+            //         }
+            //         break;
+            //     }
+            //     //Only when the state changes from the input or dashbored
+            //     case "onlyInput": {
+            //         if (nodeId == this.id || nodeId == undefined) {
+            //             sendOutput();
+            //         }
+            //         break;
+            //     }
+            //     //Only when the state changes from the input of another widget node or dashbored
+            //     case "others": {
+            //         if (nodeId != this.id || nodeId == undefined) {
+            //             sendOutput();
+            //         }
+            //         break;
+            //     }
+            //     //Always output
+            //     case "always": {
+            //         sendOutput();
+            //         break;
+            //     }
+            // }
         });
 
         //On redeploy

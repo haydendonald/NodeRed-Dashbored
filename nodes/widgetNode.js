@@ -4,10 +4,12 @@ module.exports = function (RED) {
         var node = this;
         var widget = RED.nodes.getNode(config.widget);
 
+        console.log(config);
 
-        var onlyOutputOnInput = true; //Only output if the value was get/set from the input
-        var sendSetToOutput = false; //When set from the input output the change to the output
 
+        var onlyOutputOnInput = config.onlyOutputOnInput; //Only output if the value was get/set from the input
+        var sendSetToOutput = config.sendSetToOutput; //When set from the input output the change to the output
+        var getOutputOthers = config.getOutputOthers; //Output get requests from other node inputs
 
 
         //Pass the input message to the widget
@@ -33,35 +35,28 @@ module.exports = function (RED) {
                 return;
             }
 
+            //Only output if it was requested from the node
             if (onlyOutputOnInput == true) {
-                //Only output if it was requested from the node
-                if (nodeId == this.id) {
-                    sendOutput();
+                if (nodeId != this.id) {
+                    return;
                 }
             }
 
-            //Set
-            if (outputType == "set") {
-                if (nodeId == this.id) {
-                    if (sendSetToOutput == true) {
-                        sendOutput();
-                    }
-                }
-                else {
-                    sendOutput();
+            //Block sets if not set to output them
+            if(sendSetToOutput != true) {
+                if(outputType == "set" && nodeId == this.id) {
+                    return;
                 }
             }
-            //Get
-            else {
-                if (onlyOutputOnInput == true) {
-                    if (nodeId == this.id) {
-                        sendOutput();
-                    }
-                }
-                else {
-                    sendOutput();
+
+            //Block get requests from others if not set
+            if(getOutputOthers != true) {
+                if(outputType == "get" && nodeId != this.id) {
+                    return;
                 }
             }
+
+            sendOutput();
         });
 
         //On redeploy

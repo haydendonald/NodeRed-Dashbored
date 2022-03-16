@@ -18,7 +18,9 @@ module.exports = function (RED) {
 
         //Send to the flow
         this.sendToFlow = function (msg, messageType, get = undefined, nodeId = undefined) {
+            console.log(nodeMsgFunctions);
             for (var i in nodeMsgFunctions) {
+                console.log(i);
                 nodeMsgFunctions[i](msg, messageType, get, nodeId);
             }
         }

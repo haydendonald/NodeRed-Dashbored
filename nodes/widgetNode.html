@@ -7,6 +7,24 @@
         <label for="node-input-widget"><i class="icon-bookmark"></i> Widget</label>
         <input type="text" id="node-input-widget">
     </div>
+
+
+    <div class="form-row">
+        <label for="node-input-onlyOutputOnInput">Only output when a input is received</label>
+        <input type="checkbox" id="node-input-onlyOutputOnInput">
+    </div>
+
+    <div class="form-row">
+        <label for="node-input-sendSetToOutput">When a set message is sent to the input output the set message</label>
+        <input type="checkbox" id="node-input-sendSetToOutput">
+    </div>
+
+
+    <div class="form-row">
+        <label for="node-input-getOutputOthers">When another node sends get to the input output the get request here</label>
+        <input type="checkbox" id="node-input-getOutputOthers">
+    </div>
+
 </script>
 
 <script type="text/javascript">
@@ -15,7 +33,16 @@
         color: "#F5F5DC",
         defaults: {
             name: {value: ""},
-            widget: {value: "", required: true, type: "dashbored-widget"}
+            widget: {value: "", required: true, type: "dashbored-widget"},
+            onlyOutputOnInput: {
+                value: false
+            },
+            sendSetToOutput: {
+                value: false
+            },
+            getOutputOthers: {
+                value: false
+            }
         },
         inputs: 1,
         outputs: 2,

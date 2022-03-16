@@ -4,12 +4,13 @@
 */
 
 module.exports = {
-    widget: "toggleButton",
+    type: "toggleButton",
     version: "1.0.0",
     label: "Toggle Button",
     description: "Toggles between two states",
     create: function () {
         return {
+            type: this.type,
             widthMultiplier: 1,
             heightMultiplier: 1,
             minWidth: undefined,

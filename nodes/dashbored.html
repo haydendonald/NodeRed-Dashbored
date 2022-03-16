@@ -171,7 +171,7 @@
             var wids = {};
             for (var i = 0; i < widgets.length; i++) {
                 options.push({
-                    label: widgets[i].name,
+                    label: widgets[i].label,
                     value: widgets[i].id
                 });
                 wids[widgets[i].id] = widgets[i];
@@ -209,7 +209,8 @@
                 var selected = $("#node-input-widgets").val().split(",");
                 var clipboard = "";
                 for (var i = 0; i < selected.length; i++) {
-                    clipboard += `<widget name="${wids[selected[i]].name}" id="${wids[selected[i]].id}"></widget>`;
+                    console.log(selected[i]);
+                    clipboard += `<widget name="${wids[selected[i]].label}" id="${wids[selected[i]].id}"></widget>`;
                 }
                 navigator.clipboard.writeText(clipboard);
             });

@@ -4,9 +4,6 @@ module.exports = function (RED) {
         var node = this;
         var widget = RED.nodes.getNode(config.widget);
 
-        console.log(config);
-
-
         var onlyOutputOnInput = config.onlyOutputOnInput; //Only output if the value was get/set from the input
         var sendSetToOutput = config.sendSetToOutput; //When set from the input output the change to the output
         var getOutputOthers = config.getOutputOthers; //Output get requests from other node inputs

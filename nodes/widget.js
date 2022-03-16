@@ -15,6 +15,10 @@ module.exports = function (RED) {
         this.widgetType = server.getWidgetTypes()[config.widgetType].create();
         this.widgetType.util = require("../util.js");
         this.widgetType.id = this.id;
+        this.widgetType.type = config.widgetType;
+        this.widgetType.version = config.version;
+        this.widgetType.label = config.label;
+        this.widgetType.description = config.description;
 
         //Send to the flow
         this.sendToFlow = function (msg, messageType, get = undefined, nodeId = undefined) {

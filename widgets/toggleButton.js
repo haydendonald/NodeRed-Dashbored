@@ -10,7 +10,6 @@ module.exports = {
     description: "Toggles between two states",
     create: function () {
         return {
-            type: this.type,
             widthMultiplier: 1,
             heightMultiplier: 1,
             minWidth: undefined,
@@ -129,6 +128,7 @@ module.exports = {
             //When a message comes from the dashbored
             onMessage: function (msg) {
                 if (msg.id == this.id) {
+                    this.widget.setValue("state", msg.payload);
                     this.widget.sendStatusToFlow("set");
                 }
             },

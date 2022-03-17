@@ -26,18 +26,18 @@ module.exports = function (RED) {
         var baseWidth = config.baseWidth || "200px";
 
         //Add a callback to listen to msg functions
-        node.addNodeMsgFunction = function(fn) {
+        node.addNodeMsgFunction = function (fn) {
             nodeMsgFunctions.push(fn);
         }
 
         //Send a message to the flow
         function sendMsgToFlow(payload) {
-            for(var i in nodeMsgFunctions) {
+            for (var i in nodeMsgFunctions) {
                 nodeMsgFunctions[i](payload);
             }
         }
 
-        node.lockDashbored = function(sessionId) {
+        node.lockDashbored = function (sessionId) {
             this.onMessage({
                 id: id,
                 sessionId: sessionId,
@@ -49,7 +49,7 @@ module.exports = function (RED) {
         }
 
         //Unlock a dashbored. If id is undefined it will unlock all dashboreds
-        node.unlockDashbored = function(sessionId) {
+        node.unlockDashbored = function (sessionId) {
             this.onMessage({
                 id: id,
                 sessionId: sessionId,
@@ -60,7 +60,7 @@ module.exports = function (RED) {
             });
         }
 
-        node.reloadDashbored = function(sessionId) {
+        node.reloadDashbored = function (sessionId) {
             this.onMessage({
                 id: id,
                 sessionId: sessionId,
@@ -89,13 +89,18 @@ module.exports = function (RED) {
                     case "unlock": {
                         var correct = false;
                         if (data.payload.password !== undefined) {
-                            if (data.payload.password == password) { correct = true; locked = false; }
+                            if (data.payload.password == password) {
+                                correct = true;
+                                if(data.sessionId == undefined) {
+                                    locked = false;
+                                }
+                            }
                         }
                         server.sendMsg(id, data.sessionId, {
                             type: "unlock",
                             unlock: correct
                         });
-                        if(correct == true) {
+                        if (correct == true) {
                             sendMsgToFlow({
                                 id: id,
                                 event: "unlock"
@@ -104,7 +109,9 @@ module.exports = function (RED) {
                         break;
                     }
                     case "lock": {
-                        locked = true;
+                        if(data.sessionId == undefined) {
+                            locked = true;
+                        }
                         server.sendMsg(id, data.sessionId, {
                             type: "lock"
                         });

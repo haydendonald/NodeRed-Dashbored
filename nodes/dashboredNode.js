@@ -10,8 +10,9 @@ module.exports = function(RED)
         var node = this;
         var dashbored = RED.nodes.getNode(config.dashbored);
 
-        dashbored.addNodeMsgFunction((payload) => {
+        dashbored.addNodeMsgFunction((topic, payload) => {
             node.send({
+                "topic": topic,
                 "payload": payload
             });
         });

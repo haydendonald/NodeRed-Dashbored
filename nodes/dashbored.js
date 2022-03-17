@@ -31,9 +31,9 @@ module.exports = function (RED) {
         }
 
         //Send a message to the flow
-        function sendMsgToFlow(payload) {
+        function sendMsgToFlow(topic, payload) {
             for (var i in nodeMsgFunctions) {
-                nodeMsgFunctions[i](payload);
+                nodeMsgFunctions[i](topic, payload);
             }
         }
 
@@ -101,9 +101,9 @@ module.exports = function (RED) {
                             unlock: correct
                         });
                         if (correct == true) {
-                            sendMsgToFlow({
+                            sendMsgToFlow("unlock", {
                                 id: id,
-                                event: "unlock"
+                                sessionId: data.sessionId
                             });
                         }
                         break;
@@ -115,9 +115,9 @@ module.exports = function (RED) {
                         server.sendMsg(id, data.sessionId, {
                             type: "lock"
                         });
-                        sendMsgToFlow({
+                        sendMsgToFlow("lock",{
                             id: id,
-                            event: "lock"
+                            sessionId: data.sessionId
                         });
                         break;
                     }
@@ -129,7 +129,8 @@ module.exports = function (RED) {
                     //Reload the dashbored
                     case "reload": {
                         server.sendMsg(id, data.sessionId, {
-                            type: "reload"
+                            type: "reload",
+                            sessionId: data.sessionId
                         });
                         break;
                     }
@@ -405,10 +406,11 @@ module.exports = function (RED) {
             addPagesToDashbored(document);
 
             //Add the onload scripts and delete the element
+            var sessionId = util.randString();
             document.addScript(`
                 //Global variables
                 var dashboredId = "${id}";
-                var sessionId = "${util.randString()}";
+                var sessionId = "${sessionId}";
                 var locked = ${locked};
 
                 addOnLoadFunction(function() {
@@ -419,6 +421,13 @@ module.exports = function (RED) {
             `);
 
             document.head.innerHTML += `<script id="onLoadScripts" type="text/javascript">${document.onloadScripts}</script>`;
+
+            //Update the flow
+            sendMsgToFlow("session", {
+                id: id,
+                sessionId: sessionId
+            });
+
             res.send(document.html.innerHTML);
         }
 

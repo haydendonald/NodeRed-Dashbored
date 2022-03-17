@@ -91,6 +91,11 @@ module.exports = {
                         background-color: #800000;
                         color: black;
                     }
+                    #button {
+                        width: calc(100% - 10px);
+                        height: calc(100% - 10px);
+                        margin: 5px;
+                    }
                 `.replace(/^\s+|\s+$/gm, ''), required: true
                 }
             },
@@ -142,36 +147,14 @@ module.exports = {
             },
 
             //Generate the CSS for the widget
-            generateCSS: function (htmlId) {
-                return `
-                    #${htmlId}_button {
-                        width: calc(100% - 10px);
-                        height: calc(100% - 10px);
-                        margin: 5px;
-                    }
-                `;
-            },
-
-            //Generate the CSS specified by the user in the node configuration
-            generateCustomCSS: function () {
-                if (!this.config.CSS) { return ""; }
-
-                //Go through the CSS and add the ids
-                var rebuild = "";
-                var classes = this.config.CSS.split("}");
-                for (var i = 0; i < classes.length - 1; i++) {
-                    var selectors = classes[i].split(" {");
-                    selectors[0] = selectors[0].replace(/^\s+|\s+$/gm, '');
-                    var output = `${selectors[0][0]}n${this.id.split(".")[0]}_${selectors[0].substring(1)} {${selectors[1]}}\n`;
-                    rebuild += output;
-                }
-                return rebuild;
+            generateCSS: function() {
+                return this.config.CSS;
             },
 
             //Generate the HTML for the widget that will be inserted into the dashbored
             generateHTML: function (htmlId) {
                 return `
-                    ${this.util.generateTag(htmlId, "button", "button", this.config.text, `class="${this.util.generateCSSClass(this.id, "button")} ${this.util.generateCSSClass(this.id, (this.widget.getValue("state") == this.config.offValue ? "off" : "on"))}" state="${this.widget.getValue("state")}"`)}
+                    ${this.util.generateTag(htmlId, "button", "button", this.config.text, `class="${this.util.generateCSSClass(htmlId, "button")} ${this.util.generateCSSClass(htmlId, (this.widget.getValue("state") == this.config.offValue ? "off" : "on"))}" state="${this.widget.getValue("state")}"`)}
                 `;
             },
 
@@ -196,12 +179,12 @@ module.exports = {
                 return `
                     ${this.util.getElement(htmlId, "button")}.setAttribute("state", msg.payload);
                     if(msg.payload == "${this.config.onValue}") {
-                        ${this.util.getElement(htmlId, "button")}.classList.add("${this.util.generateCSSClass(this.id, "on")}");
-                        ${this.util.getElement(htmlId, "button")}.classList.remove("${this.util.generateCSSClass(this.id, "off")}");
+                        ${this.util.getElement(htmlId, "button")}.classList.add("${this.util.generateCSSClass(htmlId, "on")}");
+                        ${this.util.getElement(htmlId, "button")}.classList.remove("${this.util.generateCSSClass(htmlId, "off")}");
                     }
                     else {
-                        ${this.util.getElement(htmlId, "button")}.classList.add("${this.util.generateCSSClass(this.id, "off")}");
-                        ${this.util.getElement(htmlId, "button")}.classList.remove("${this.util.generateCSSClass(this.id, "on")}");
+                        ${this.util.getElement(htmlId, "button")}.classList.add("${this.util.generateCSSClass(htmlId, "off")}");
+                        ${this.util.getElement(htmlId, "button")}.classList.remove("${this.util.generateCSSClass(htmlId, "on")}");
                     }
                 `;
             },

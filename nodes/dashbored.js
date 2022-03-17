@@ -169,10 +169,15 @@ module.exports = function (RED) {
                         return ret;
                     }();
 
-                    CSS += widget.widgetType.generateCSS(randomId);
-                    if (widget.widgetType.generateCSS && !widgetIdsCSSDone[widget.id]) {
-                        CSS += widget.widgetType.generateCustomCSS();
+                    //Go through the CSS and add the ids
+                    var classes = widget.widgetType.generateCSS().split("}");
+                    for (var j = 0; j < classes.length - 1; j++) {
+                        var selectors = classes[j].split(" {");
+                        selectors[0] = selectors[0].replace(/^\s+|\s+$/gm, '');
+                        var output = `${selectors[0][0]}${randomId}_${selectors[0].substring(1)} {${selectors[1]}}\n`;
+                        CSS += output;
                     }
+
                     widgetIdsCSSDone[widget.id] = {};
                     document.head.innerHTML += `<style id="${widget.id}">${CSS}</style>`;
                     widgetElement.rawTagName = "div"; //Make it a div because a widget type doesn't get rendered

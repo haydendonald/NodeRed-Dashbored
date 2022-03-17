@@ -15,23 +15,23 @@ module.exports = {
     /**
      * Generate the CSS
      * [SELECTOR][ID]_[NAME]: [INNER]
-     * @param {string} id The node's id
+     * @param {string} id The node element random id
      * @param {string} selector The selector for example . for class or # for id
      * @param {string} name The name
      * @param {string} inner The actual CSS content
      * @returns 
      */
     generateCSS: (id, selector, name, inner) => {
-        return `${selector}n${id.split(".")[0]}_${name} ${inner}`;
+        return `${selector}${id.split(".")[0]}_${name} ${inner}`;
     },
 
     /**
      * Generate the class name with the use of generate CSS
-     * @param {string} id The node's id
+     * @param {string} id The node element random id
      * @param {string} name The name of the class to use
      */
     generateCSSClass: (id, name) => {
-        return `n${id.split(".")[0]}_${name}`;
+        return `${id.split(".")[0]}_${name}`;
     },
 
     /**

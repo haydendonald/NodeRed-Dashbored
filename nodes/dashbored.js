@@ -270,6 +270,9 @@ module.exports = function (RED) {
                 document.onloadScripts += script;
             }
 
+            //Add the title
+            document.head.innerHTML += `<title>${headerText}</title>`;
+
             //Add the CSS from the dashbored
             document.head.innerHTML += `<style>${CSS}</style>`;
 

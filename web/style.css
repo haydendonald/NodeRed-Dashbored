@@ -1,22 +1,4 @@
-/* Main colours */
-#header, #nav {
-    background-color: #252525;
-}
-html, #pages, page, #password, #ask, #loader {
-    background-color: #121212;
-    color: white;
-}
-button {
-    background-color: #3700B3;
-    color: white;
-}
-button:hover {
-    background-color: #FFFFFF;
-    color: black;
-}
-
 /* Pages section */
-
 #pages {
     position: absolute;
     top: 80px;
@@ -47,9 +29,7 @@ page {
     font-size: 1.2em;
 }
 
-
 /* Header */
-
 #header {
     text-align: left;
     position: absolute;
@@ -150,7 +130,6 @@ page {
 }
 
 * {
-    font-family: "Inter var", ui-sans-serif, system-ui, -apple-system, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     padding: 0;
     margin: 0;
 }
@@ -232,22 +211,6 @@ button:focus {
     left: calc(25%);
     width: 50%;
     padding-bottom: 10px;
-}
-
-.bgRed {
-    background-color: #DC143C;
-}
-.bgGreen {
-    background-color: #228B22;
-}
-.bgBlue {
-    background-color: rgb(64, 119, 221);
-}
-.bgYellow {
-    background-color: #FFD700;
-}
-.fgOrange {
-    color: #FFD700;
 }
 
 /** Are you sure dialog */

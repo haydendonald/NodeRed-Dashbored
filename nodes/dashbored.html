@@ -151,8 +151,42 @@
             //The default CSS for the dashbored
             CSS: {
                 value: `
-                /* You can add any CSS here to have it effect the entire dashbored! */
-                html {}
+                /* Global styling */
+                * {
+                    font-family: "Inter var", ui-sans-serif, system-ui, -apple-system, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+                }
+
+                #header, #nav {
+                    background-color: #252525;
+                }
+
+                html, #pages, page, #password, #ask, #loader {
+                    background-color: #121212;
+                    color: white;
+                }
+
+                .bgRed {
+                    background-color: #DC143C;
+                }
+                .bgGreen {
+                    background-color: #228B22;
+                }
+                .bgBlue {
+                    background-color: rgb(64, 119, 221);
+                }
+                .bgYellow {
+                    background-color: #FFD700;
+                }
+
+                /* Buttons */
+                button {
+                    background-color: #434343;
+                    color: white;
+                }
+                button:hover {
+                    background-color: #FFFFFF;
+                    color: black;
+                }
                 `.replace(/^\s+|\s+$/gm, ''),
                 required: true
             }

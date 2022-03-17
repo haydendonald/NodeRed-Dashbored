@@ -128,7 +128,10 @@ module.exports = function (RED) {
                     }
                     //Reload the dashbored
                     case "reload": {
-                        break; //TODO
+                        server.sendMsg(id, data.sessionId, {
+                            type: "reload"
+                        });
+                        break;
                     }
                 }
             }

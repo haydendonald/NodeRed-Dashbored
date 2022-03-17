@@ -381,6 +381,10 @@ function connect() {
                         }
                         break;
                     }
+                    case "reload": {
+                        window.location.reload();
+                        break;
+                    }
                 }
             }
         });

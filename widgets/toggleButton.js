@@ -96,6 +96,9 @@ module.exports = {
                         height: calc(100% - 10px);
                         margin: 5px;
                     }
+                    #widget {}
+                    #title {}
+                    #content {}
                 `.replace(/^\s+|\s+$/gm, ''), required: true
                 }
             },

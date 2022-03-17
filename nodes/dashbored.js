@@ -83,7 +83,7 @@ module.exports = function (RED) {
                         break;
                     }
                     var randomId = util.randString();
-                    widgetElement.setAttribute("id", randomId);
+                    widgetElement.setAttribute("id", `${randomId}_widget`);
                     var lockedAccess = widgetElement.getAttribute("locked-access") || "no";
                     var alwaysPassword = widgetElement.getAttribute("always-password") || "no";
                     var ask = widgetElement.getAttribute("ask") || "no";
@@ -119,7 +119,7 @@ module.exports = function (RED) {
                     //Generate and add the CSS
                     var CSS = function () {
                         var ret = `
-                        #${randomId} {`;
+                        #${randomId}_widget {`;
                         var widthMultiplier = widget.widthMultiplier * widget.widgetType.widthMultiplier;
                         var heightMultiplier = widget.heightMultiplier * widget.widgetType.heightMultiplier;
 
@@ -138,10 +138,6 @@ module.exports = function (RED) {
                         if (widget.widgetType.maxHeight) {
                             ret += `max-height: ${widget.widgetType.maxHeight};`;
                         }
-
-                        // if (backgroundColor) {
-                        //     ret += `background-color: ${backgroundColor};`;
-                        // }
 
                         ret += `
                             float: left;

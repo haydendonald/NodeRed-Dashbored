@@ -61,11 +61,13 @@ function sendMsg(id, payload, callback) {
                     callback(id, false);
                 }, 1000),
                 id: id,
+                sessionId: sessionId,
                 fn: callback
             });
     }
     socket.send(JSON.stringify({
         id: id,
+        sessionId, sessionId,
         payload: payload
     }));
 }
@@ -351,7 +353,7 @@ function connect() {
             for (var i = 0; i < del.length; i++) { socketCallbacks = socketCallbacks.splice(del[i], 1); }
 
             //If the message is for this dashbored handle it
-            if (msg.id == dashboredId) {
+            if ((msg.id == dashboredId || msg.id == undefined) && (msg.sessionId == sessionId || msg.sessionId == undefined)) {
                 switch (msg.payload.type) {
                     case "lock": {
                         print("info", "Request to lock dashbored");

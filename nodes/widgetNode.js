@@ -15,10 +15,11 @@ module.exports = function (RED) {
         });
 
         //Add a callback for when a message comes from the dashbored
-        widget.addNodeMsgFunction(this.id, (output, outputType, get, nodeId) => {
+        widget.addNodeMsgFunction(this.id, (output, outputType, get, sessionId, nodeId) => {
             var sendOutput = function () {
                 node.send([{
                     "topic": outputType,
+                    "sessionId": sessionId,
                     "payload": output
                 }, undefined]);
             }

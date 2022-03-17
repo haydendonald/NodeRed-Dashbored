@@ -8,6 +8,33 @@ module.exports = function(RED)
     {
         RED.nodes.createNode(this, config);
         var node = this;
+        var dashbored = RED.nodes.getNode(config.dashbored);
+
+        dashbored.addNodeMsgFunction((payload) => {
+            node.send({
+                "payload": payload
+            });
+        });
+
+        //On input fron the flow
+        node.on("input", (msg) => {
+            if(msg.payload != undefined) {
+                switch(msg.payload.action) {
+                    case "lock": {
+                        dashbored.lockDashbored(msg.payload.id);
+                        break;
+                    }
+                    case "unlock": {
+                        dashbored.unlockDashbored(msg.payload.id);
+                        break;
+                    }
+                    case "reload": {
+                        dashbored.reloadDashbored(msg.payload.id);
+                        break;
+                    }
+                }
+            }
+        });
 
         //On redeploy
         node.on("close", () => {});

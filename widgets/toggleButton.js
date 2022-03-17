@@ -137,7 +137,7 @@ module.exports = {
             onMessage: function (msg) {
                 if (msg.id == this.id) {
                     this.widget.setValue("state", msg.payload);
-                    this.widget.sendStatusToFlow("set");
+                    this.widget.sendStatusToFlow("set", msg.sessionId);
                 }
             },
 
@@ -145,7 +145,7 @@ module.exports = {
             onFlowMessage: function (msg) {
                 if (msg.payload && msg.payload.state) {
                     this.widget.setValue("state", msg.payload.state);
-                    this.widget.sendToDashbored(this.id, msg.payload.state);
+                    this.widget.sendToDashbored(this.id, msg.sessionId, msg.payload.state);
                 }
             },
 

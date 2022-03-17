@@ -21,15 +21,15 @@ module.exports = function (RED) {
         this.widgetType.description = config.description;
 
         //Send to the flow
-        this.sendToFlow = function (msg, messageType, get = undefined, nodeId = undefined) {
+        this.sendToFlow = function (msg, messageType, get = undefined, sessionId = undefined, nodeId = undefined) {
             for (var i in nodeMsgFunctions) {
-                nodeMsgFunctions[i](msg, messageType, get, nodeId);
+                nodeMsgFunctions[i](msg, messageType, get, sessionId, nodeId);
             }
         }
 
         //Send to the dashbored
-        this.sendToDashbored = function (id, payload) {
-            server.sendMsg(id, payload);
+        this.sendToDashbored = function (id, sessionId, payload) {
+            server.sendMsg(id, sessionId, payload);
         }
 
         //Set a value
@@ -51,8 +51,8 @@ module.exports = function (RED) {
         }
 
         //Send the current status to the flow
-        this.sendStatusToFlow = function (type, nodeId) {
-            this.sendToFlow(this.widgetType.getValues(), type, undefined, nodeId);
+        this.sendStatusToFlow = function (type, sessionId, nodeId) {
+            this.sendToFlow(this.widgetType.getValues(), type, undefined, sessionId, nodeId);
         }
 
         //Add a callback for the sendToFlow function
@@ -87,7 +87,7 @@ module.exports = function (RED) {
                 }
                 case "set": {
                     this.widgetType.onFlowMessage(msg);
-                    this.sendStatusToFlow("set", nodeId);
+                    this.sendStatusToFlow("set", undefined, nodeId);
                     break;
                 }
             }

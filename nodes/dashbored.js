@@ -6,6 +6,7 @@ module.exports = function (RED) {
 
         RED.nodes.createNode(this, config);
         var node = this;
+        var nodeMsgFunctions = [];
 
         var id = node.id;
         var server = RED.nodes.getNode(config.server);
@@ -24,6 +25,52 @@ module.exports = function (RED) {
         var baseHeight = config.baseHeight || "150px";
         var baseWidth = config.baseWidth || "200px";
 
+        //Add a callback to listen to msg functions
+        node.addNodeMsgFunction = function(fn) {
+            nodeMsgFunctions.push(fn);
+        }
+
+        //Send a message to the flow
+        function sendMsgToFlow(payload) {
+            for(var i in nodeMsgFunctions) {
+                nodeMsgFunctions[i](payload);
+            }
+        }
+
+        node.lockDashbored = function(sessionId) {
+            this.onMessage({
+                id: id,
+                sessionId: sessionId,
+                payload: {
+                    type: "lock",
+                    password: password
+                }
+            });
+        }
+
+        //Unlock a dashbored. If id is undefined it will unlock all dashboreds
+        node.unlockDashbored = function(sessionId) {
+            this.onMessage({
+                id: id,
+                sessionId: sessionId,
+                payload: {
+                    type: "unlock",
+                    password: password
+                }
+            });
+        }
+
+        node.reloadDashbored = function(sessionId) {
+            this.onMessage({
+                id: id,
+                sessionId: sessionId,
+                payload: {
+                    type: "reload",
+                    password: password
+                }
+            });
+        }
+
         //When a message is received from the dashbored
         node.onMessage = (data) => {
             if (data.id == id) {
@@ -33,7 +80,7 @@ module.exports = function (RED) {
                         if (data.payload.password !== undefined) {
                             if (data.payload.password == password) { correct = true; }
                         }
-                        server.sendMsg(id, {
+                        server.sendMsg(id, data.sessionId, {
                             type: "password",
                             correct
                         });
@@ -44,16 +91,26 @@ module.exports = function (RED) {
                         if (data.payload.password !== undefined) {
                             if (data.payload.password == password) { correct = true; locked = false; }
                         }
-                        server.sendMsg(id, {
+                        server.sendMsg(id, data.sessionId, {
                             type: "unlock",
                             unlock: correct
                         });
+                        if(correct == true) {
+                            sendMsgToFlow({
+                                id: id,
+                                event: "unlock"
+                            });
+                        }
                         break;
                     }
                     case "lock": {
                         locked = true;
-                        server.sendMsg(id, {
+                        server.sendMsg(id, data.sessionId, {
                             type: "lock"
+                        });
+                        sendMsgToFlow({
+                            id: id,
+                            event: "lock"
                         });
                         break;
                     }
@@ -61,6 +118,10 @@ module.exports = function (RED) {
                     case "weather": {
                         server.getWeather();
                         break;
+                    }
+                    //Reload the dashbored
+                    case "reload": {
+                        break; //TODO
                     }
                 }
             }
@@ -337,6 +398,7 @@ module.exports = function (RED) {
             document.addScript(`
                 //Global variables
                 var dashboredId = "${id}";
+                var sessionId = "${util.randString()}";
                 var locked = ${locked};
 
                 addOnLoadFunction(function() {

@@ -88,7 +88,7 @@ module.exports = function (RED) {
                         }
 
                         //Broadcast to all sessions
-                        this.sendMsg("weather", {
+                        this.sendMsg(undefined, undefined, "weather", {
                             temp: out.main.temp,
                             iconUrl: out.weather[0].iconUrl
                         });
@@ -103,9 +103,10 @@ module.exports = function (RED) {
         ////////////////////
 
         //Send a message to all dashboreds
-        node.sendMsg = (id, payload) => {
+        node.sendMsg = (id, sessionId, payload) => {
             broadcastMessage(JSON.stringify({
                 id,
+                sessionId,
                 payload
             }));
         }

@@ -184,6 +184,18 @@ button:focus {
     display: none;
 }
 
+/** Message **/
+#message {
+    position: fixed;
+    top: 5px;
+    left: calc(20% - 5px);
+    width: 60%;
+    z-index: 10;
+    text-align: center;
+    padding: 10px 10px 20px 10px;
+    border-radius: 5px;
+}
+
 /** Password **/
 #password {
     padding-top: 5vh;
@@ -227,6 +239,12 @@ button:focus {
 }
 .bgGreen {
     background-color: #228B22;
+}
+.bgBlue {
+    background-color: rgb(64, 119, 221);
+}
+.bgYellow {
+    background-color: #FFD700;
 }
 .fgOrange {
     color: #FFD700;

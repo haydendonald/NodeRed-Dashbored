@@ -97,13 +97,66 @@ function hideShowElement(id, show, sec) {
  * @param {string} title The title of the message
  * @param {string} description The description of the message
  * @param {number} closeAfterSec How long until it's closed. False will not close the message, True will close the message
+ * @param {function} callback Will be called when the message is closed
  */
- function message(type, title, description, closeAfterSec) {
+function message(type, title, description, closeAfterSec, callback) {
     if (closeAfterSec === undefined) { closeAfterSec = 3; }
-    console.log(description);
-    //TODO
-}
 
+    //If close after sec is true close the message
+    if (closeAfterSec == true) {
+        hideShowElement("message", false);
+        if(callback){callback();}
+        return;
+    }
+
+    var div = document.getElementById("message");
+    var icon = "";
+    switch (type.toLowerCase()) {
+        case "info": {
+            icon = "fa fa-info-circle";
+            div.classList.add("bgBlue");
+            div.classList.remove("bgYellow");
+            div.classList.remove("bgRed");
+            div.classList.remove("bgGreen");
+            break;
+        }
+        case "warn": {
+            icon = "fa fa-exclamation-circle";
+            div.classList.remove("bgBlue");
+            div.classList.add("bgYellow");
+            div.classList.remove("bgRed");
+            div.classList.remove("bgGreen");
+            break;
+        }
+        case "error": {
+            icon = "fa fa-times-circle";
+            div.classList.remove("bgBlue");
+            div.classList.remove("bgYellow");
+            div.classList.add("bgRed");
+            div.classList.remove("bgGreen");
+            break;
+        }
+        case "success": {
+            icon = "fa fa-check-circle";
+            div.classList.remove("bgBlue");
+            div.classList.remove("bgYellow");
+            div.classList.remove("bgRed");
+            div.classList.add("bgGreen");
+            break;
+        }
+    }
+
+    div.innerHTML = `<h1><i class="${icon}"></i> ${title}</h1><p>${description}</p>`;
+    hideShowElement("message", true);
+
+    //If close after sec is not false close the message after a timeout
+    if (closeAfterSec != false) {
+        setTimeout(function () {
+            hideShowElement("message", false);
+            if(callback){callback();}
+        }, closeAfterSec * 1000);
+    }
+}
 
 /**
  * Add a function to be called when the dashbored becomes locked
@@ -275,7 +328,7 @@ function connect() {
 
         socket.addEventListener("message", function (data) {
             //Check for control signals
-            if(data.data == "reload"){setTimeout(function(){window.location.reload();}, 1000); return;}
+            if (data.data == "reload") { setTimeout(function () { window.location.reload(); }, 1000); return; }
 
             var msg = JSON.parse(data.data);
             print("debug", "Socket message received");

@@ -75,7 +75,11 @@ module.exports = function (RED) {
                     var widgetElement = elements[i];
                     if (!widget) {
                         RED.log.warn(`Widget ${elements[i].id} was not found`);
-                        elements[i].innerHTML = `<p style="background-color: red">Failed to generate widget</p>`;
+                        document.addScript(`
+                            addOnLoadFunction(function() {
+                                console.error("Failed to generate widget with id ${elements[i].id} as it was not found!");
+                            });
+                        `);
                         break;
                     }
                     var randomId = util.randString();

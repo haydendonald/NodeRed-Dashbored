@@ -88,7 +88,7 @@ module.exports = function (RED) {
                         }
 
                         //Broadcast to all sessions
-                        this.sendMsg(undefined, undefined, "weather", {
+                        this.sendMsg("weather", undefined, {
                             temp: out.main.temp,
                             iconUrl: out.weather[0].iconUrl
                         });

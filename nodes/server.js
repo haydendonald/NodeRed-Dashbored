@@ -151,6 +151,7 @@ module.exports = function (RED) {
 
         node.addGeneratedWidget = (id, obj) => {
             generatedWidgets[id] = obj;
+            console.log(Object.keys(generatedWidgets));
         }
 
         node.getWidgetTypes = () => {

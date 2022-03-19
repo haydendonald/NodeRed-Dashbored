@@ -152,7 +152,7 @@ module.exports = function (RED) {
 
                     //If the widget was not found see if we can generate it
                     if(!widget) {
-                        var widId = `${id}_${page.id}_${elements[i].id}`;
+                        var widId = `${id}_${page.getAttribute("name")}_${elements[i].id}`;
                         //See if it exists first
                         widget = server.getGeneratedWidget(widId);
                         if(!widget) {

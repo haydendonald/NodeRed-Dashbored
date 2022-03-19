@@ -23,6 +23,10 @@ module.exports = {
             //The ids MUST be node-config-input-<WIDGETNAME>-<CONFIGNAME> otherwise they may not be set
             configHTML: function () {
                 return `
+                    <div class="form-row">       
+                        <ol id="options"></ol>
+                    </div>
+
                     <!-- CSS Editor -->
                     <div class="form-row">
                         <label for="CSS">CSS</label>
@@ -34,6 +38,67 @@ module.exports = {
             configScript: {
                 //When the user opens the config panel get things ready
                 oneditprepare: `
+                    //Validate and add an item
+                    function validate() {
+                        var self = this
+                        this["buttonSelector-options"] = [];
+                        var optionsList = $("#options").editableList('items');
+                        optionsList.each(function (i) {
+                            var option = $(this);
+                            var curr = {};
+                            curr["label"] = option.find(".node-input-option-label").val();
+                            curr["value"] = option.find(".node-input-option-value").typedInput('value');
+                            curr["onColor"] = option.find(".node-input-option-onColor").val();
+                            curr["offColor"] = option.find(".node-input-option-offColor").val();
+                            self["buttonSelector-options"].push(curr);
+                        });
+                    }
+
+                    var optionsList = $("#options").css('min-height', '200px').editableList({
+                        header: $("<div>").css('padding-left', '32px').append($.parseHTML(
+                            "<div style='width:35%; display: inline-grid'><b>Label</b></div>" +
+                            "<div style='width:35%; display: inline-grid'><b>Value</b></div>" +
+                            "<div style='width:15%; display: inline-grid' class='node-input-option-color'><b>On Colour</b></div>" +
+                            "<div style='width:15%; display: inline-grid' class='node-input-option-color'><b>Off Colour</b></div>")),
+        
+                        addItem: function (container, i, option) {
+                            var row = $('<div/>').appendTo(container);
+                            var labelField = $('<input/>', { class: "node-input-option-label", type: "text" }).css({ "width": "35%", "margin-left": "5px", "margin-right": "5px" }).appendTo(row);
+                            labelField.val(option.label || "Option " + i);
+        
+                            var valueField = $('<input/>', { class: "node-input-option-value", type: "text" }).css({ "width": "35%", "margin-left": "5px", "margin-right": "5px" }).appendTo(row);
+                            valueField.typedInput({ types: ['str', 'num', 'bool'] });
+                            valueField.typedInput("type", option.valueType || "str");
+                            valueField.typedInput("value", option.value || "option_" + i);
+                            valueField.on('change', function (type, value) {
+                                validate();
+                            });
+        
+        
+                            var onColorField = $('<input/>', { class: "node-input-option-onColor", type: "color" }).css({ "width": "10%", "margin-left": "5px", "display": onColorField }).appendTo(row);
+                            onColorField.val(option.onColor || "#99ff99");
+        
+                            var offColorField = $('<input/>', { class: "node-input-option-offColor", type: "color" }).css({ "width": "10%", "margin-left": "5px", "display": offColorField }).appendTo(row);
+                            offColorField.val(option.offColor || "#ff3333");
+                            validate();
+        
+        
+                        },
+                        removeItem: function (data) {
+                            validate()
+                        },
+                        removable: true,
+                        sortable: true,
+        
+                    });
+        
+                    //Add existing options
+                    if (element["buttonSelector-options"]) {
+                        element["buttonSelector-options"].forEach(function (option, index) {
+                            optionsList.editableList('addItem', { label: option.label, value: option.value, onColor: option.onColor, offColor: option.offColor });
+                        });
+                    }
+
                     element.cssEditor = RED.editor.createEditor({
                         id: "CSS",
                         mode: "ace/mode/css",
@@ -42,8 +107,23 @@ module.exports = {
                 `,
                 //When the user clicks save on the editor set our values
                 oneditsave: `
+                    var self = this;
+                    var temp = [];
+                    var optionsList = $("#options").editableList('items');
+                    optionsList.each(function (i) {
+                        var option = $(this);
+                        var curr = {};
+                        curr["label"] = option.find(".node-input-option-label").val();
+                        curr["value"] = option.find(".node-input-option-value").typedInput('value');
+                        curr["onColor"] = option.find(".node-input-option-onColor").val();
+                        curr["offColor"] = option.find(".node-input-option-offColor").val();
+                        temp.push(curr);
+                    });
+
+                    element["buttonSelector-options"] = temp;
+
                     //Set the CSS value
-                    element["toggleButton-CSS"] = element.cssEditor.getValue();
+                    element["buttonSelector-CSS"] = element.cssEditor.getValue();
 
                     //Delete the CSS editor
                     element.cssEditor.destroy();
@@ -63,6 +143,27 @@ module.exports = {
             },
             //Default config
             defaultConfig: {
+                options: {
+                    value: [
+                        {
+                            "label": "Option 0",
+                            "value": "option_0",
+                            "onColor": "#99ff99",
+                            "offColor": "#ff3333"
+                        }
+                    ],
+                    validate: function (values) {
+                        if (values === undefined) { return false; }
+                        for (var i in values) {
+                            if (values[i].label === undefined) { return false; }
+                            if (values[i].value === undefined || values[i].value == "") { return false; }
+                            if (values[i].offColor === undefined || values[i].offColor == "") { return false; }
+                            if (values[i].onColor === undefined || values[i].onColor == "") { return false; }
+                        }
+                        return true;
+                    }
+                },
+
                 CSS: {
                     value: ``.replace(/^\s+|\s+$/gm, ''), required: true
                 }
@@ -72,12 +173,16 @@ module.exports = {
 
             //Default value(s)
             getDefaultValues: function () {
-                return {}
+                return {
+                    state: this.config.options[0].value
+                }
             },
 
             //Return the current values
             getValues: function () {
-                return {}
+                return {
+                    state: this.widget.getValue("state")
+                }
             },
 
             //Setup the widget
@@ -85,7 +190,8 @@ module.exports = {
                 this.widget = widget;
 
                 //Set the configuration
-                this.config.CSS = config["toggleButton-CSS"];
+                this.config.options = config["buttonSelector-options"];
+                this.config.CSS = config["buttonSelector-CSS"];
             },
 
             //When node red redeploys or closes
@@ -93,10 +199,17 @@ module.exports = {
 
             //When a message comes from the dashbored
             onMessage: function (msg) {
-                // if (msg.id == this.id) {
-                //     this.widget.setValue("state", msg.payload);
-                //     this.widget.sendStatusToFlow("set", msg.sessionId);
-                // }
+                if (msg.id.split("_")[0] == this.id) {
+                    var button = this.config.options[msg.id.split("_")[1]];
+                    if(button) {
+                        this.widget.setValue("state", button.value);
+                        this.widget.sendStatusToFlow("set", msg.sessionId);
+
+                        for(var i in this.config.options) {
+                            this.widget.sendToDashbored(this.id + "_" + i, msg.sessionId, button.value);
+                        }
+                    }
+                }
             },
 
             //When a message comes from a node red flow
@@ -130,52 +243,31 @@ module.exports = {
                     }
                     #widget {
                         background-color: red;
+                        margin-bottom: 0;
+                        margin-top: 0;
+                        height: 100%;
                     }
                 `;
 
+                //TODO pass password actions etc to the buttons
+
                 var ret = "";
-                for (var i = 0; i < 10; i++) {
-                    ret += this.util.generateTag(htmlId, "widget", "button" + i, "", `type="toggleButton" CSS="${buttonCSS}"`);
+                for (var i in this.config.options) {
+                    console.log(this.config.options[i])
+                    var button = this.config.options[i];
+                    ret += this.util.generateTag(this.id, "widget", i, "", `type="toggleButton" CSS="${buttonCSS}" text="${button.label}" onValue="${button.value}" offValue="off"`);
                 }
                 return ret;
-
-
-                // return `
-                //     ${this.util.generateTag(htmlId, "button", "button", this.config.text, `class="${this.util.generateCSSClass(htmlId, "button")} ${this.util.generateCSSClass(htmlId, (this.widget.getValue("state") == this.config.offValue ? "off" : "on"))}" state="${this.widget.getValue("state")}"`)}
-                // `;
             },
 
             //Generate the script that will be executed when the dashbored loads
             generateOnload: function (htmlId, lockedAccess, alwaysPassword, ask, askText) {
                 return "";
-                // return `
-                //     ${this.util.getElement(htmlId, "button")}.onclick = function(event) {
-                //         var yesAction = function() {
-                //             sendMsg("${this.id}", event.target.getAttribute("state") == "${this.config.onValue}" ? "${this.config.offValue}" : "${this.config.onValue}");
-                //         }
-                //         var noAction = function(){}
-
-                //         ${this.util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
-                //     }
-
-                //     ${this.util.getElement(htmlId, "button")}.setAttribute("state", "${this.widget.getValue("state")}");
-                // `;
             },
 
             //Generate the script that will be called when a message comes from NodeRed on the dashbored
             generateOnMsg: function (htmlId) {
                 return "";
-                // return `
-                //     ${this.util.getElement(htmlId, "button")}.setAttribute("state", msg.payload);
-                //     if(msg.payload == "${this.config.onValue}") {
-                //         ${this.util.getElement(htmlId, "button")}.classList.add("${this.util.generateCSSClass(htmlId, "on")}");
-                //         ${this.util.getElement(htmlId, "button")}.classList.remove("${this.util.generateCSSClass(htmlId, "off")}");
-                //     }
-                //     else {
-                //         ${this.util.getElement(htmlId, "button")}.classList.add("${this.util.generateCSSClass(htmlId, "off")}");
-                //         ${this.util.getElement(htmlId, "button")}.classList.remove("${this.util.generateCSSClass(htmlId, "on")}");
-                //     }
-                // `;
             },
 
             //Generate any extra scripts to add to the document

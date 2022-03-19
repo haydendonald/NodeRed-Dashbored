@@ -152,7 +152,8 @@ module.exports = function (RED) {
 
                     //If the widget was not found see if we can generate it
                     if(!widget) {
-                        var widId = `${id}_${page.getAttribute("name")}_${elements[i].id}`;
+                        var widId = elements[i].getAttribute("id");
+
                         //See if it exists first
                         widget = server.getGeneratedWidget(widId);
                         if(!widget) {
@@ -173,6 +174,7 @@ module.exports = function (RED) {
                             for(var j in widget.widgetType.defaultConfig) {
                                 var val = elements[i].getAttribute(j);
                                 if(val) {
+                                    elements[i].removeAttribute(j);
                                     widget.widgetType.config[j] = val;
                                 }
                             }

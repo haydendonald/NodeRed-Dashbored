@@ -102,7 +102,7 @@ module.exports = {
                     element.cssEditor = RED.editor.createEditor({
                         id: "CSS",
                         mode: "ace/mode/css",
-                        value: element["toggleButton-CSS"]
+                        value: element["buttonSelector-CSS"]
                     });
                 `,
                 //When the user clicks save on the editor set our values
@@ -165,7 +165,13 @@ module.exports = {
                 },
 
                 CSS: {
-                    value: ``.replace(/^\s+|\s+$/gm, ''), required: true
+                    value: `
+                        .button {
+                            width: calc(100% - 10px);
+                            height: calc(100% - 10px);
+                            margin: 5px;
+                        }
+                    `.replace(/^\s+|\s+$/gm, ''), required: true
                 }
             },
             //Current config
@@ -174,14 +180,14 @@ module.exports = {
             //Default value(s)
             getDefaultValues: function () {
                 return {
-                    state: this.config.options[0].value
+                    value: this.config.options[0].value
                 }
             },
 
             //Return the current values
             getValues: function () {
                 return {
-                    state: this.widget.getValue("state")
+                    value: this.widget.getValue("value")
                 }
             },
 
@@ -199,25 +205,18 @@ module.exports = {
 
             //When a message comes from the dashbored
             onMessage: function (msg) {
-                if (msg.id.split("_")[0] == this.id) {
-                    var button = this.config.options[msg.id.split("_")[1]];
-                    if(button) {
-                        this.widget.setValue("state", button.value);
-                        this.widget.sendStatusToFlow("set", msg.sessionId);
-
-                        for(var i in this.config.options) {
-                            this.widget.sendToDashbored(this.id + "_" + i, msg.sessionId, button.value);
-                        }
-                    }
+                if (msg.id == this.id) {
+                    this.widget.setValue("value", msg.payload);
+                    this.widget.sendStatusToFlow("set", msg.payload);
                 }
             },
 
             //When a message comes from a node red flow
             onFlowMessage: function (msg) {
-                // if (msg.payload && msg.payload.state) {
-                //     this.widget.setValue("state", msg.payload.state);
-                //     this.widget.sendToDashbored(this.id, msg.sessionId, msg.payload.state);
-                // }
+                if (msg.payload && msg.payload.value) {
+                    this.widget.setValue("value", msg.payload.value);
+                    this.widget.sendToDashbored(this.id, msg.sessionId, msg.payload.value);
+                }
             },
 
             //Generate the CSS for the widget
@@ -227,47 +226,43 @@ module.exports = {
 
             //Generate the HTML for the widget that will be inserted into the dashbored
             generateHTML: function (htmlId) {
-                var buttonCSS = `
-                    .on {
-                        background-color: #32CD32;
-                        color: black;
-                    }
-                    .off {
-                        background-color: #800000;
-                        color: black;
-                    }
-                    #button {
-                        width: calc(100% - 10px);
-                        height: calc(100% - 10px);
-                        margin: 5px;
-                    }
-                    #widget {
-                        background-color: red;
-                        margin-bottom: 0;
-                        margin-top: 0;
-                        height: 100%;
-                    }
-                `;
-
-                //TODO pass password actions etc to the buttons
-
                 var ret = "";
                 for (var i in this.config.options) {
-                    console.log(this.config.options[i])
                     var button = this.config.options[i];
-                    ret += this.util.generateTag(this.id, "widget", i, "", `type="toggleButton" CSS="${buttonCSS}" text="${button.label}" onValue="${button.value}" offValue="off"`);
+                    var color = button.value == this.widget.getValue("value") ? button.onColor : button.offColor;
+                    ret += this.util.generateTag(htmlId, "button", i, button.label, `class="${this.util.generateCSSClass(htmlId, "button")}" style="background-color: ${color}"`);
                 }
                 return ret;
             },
 
             //Generate the script that will be executed when the dashbored loads
             generateOnload: function (htmlId, lockedAccess, alwaysPassword, ask, askText) {
-                return "";
+                var ret = "";
+                for (var i in this.config.options) {
+                    var button = this.config.options[i];
+                    ret += `${this.util.getElement(htmlId, i)}.onclick = function(event) {
+                        var yesAction = function() {
+                            sendMsg("${this.id}", "${button.value}");
+                        }
+                        var noAction = function(){}
+
+                        ${this.util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
+                    }
+                    `
+                }
+                return ret;
             },
 
             //Generate the script that will be called when a message comes from NodeRed on the dashbored
             generateOnMsg: function (htmlId) {
-                return "";
+                var ret = "";
+                for (var i in this.config.options) {
+                    var button = this.config.options[i];
+                    ret += `
+                        ${this.util.getElement(htmlId, i)}.style.backgroundColor = (msg.payload == ${button.value}) ? "${button.onColor}" : "${button.offColor}";
+                    `;
+                }
+                return ret;
             },
 
             //Generate any extra scripts to add to the document

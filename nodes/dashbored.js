@@ -289,10 +289,14 @@ module.exports = function (RED) {
                     if (widget.generateScript) { html.querySelector("html").innerHTML += `<script id="${widget.id}" type="text/javascript">${widget.widgetType.generateScript(randomId)}</script>`; }
 
                     //Add the HTML
-                    var widgetHTML = widget.widgetType.generateHTML(randomId);
+                    var widgetHTML = htmlParse(widget.widgetType.generateHTML(randomId));
+
+                    //Add any widgets inside this widget
+                    addWidgetsToPage(document, widgetHTML, widgetIdsCSSDone);
+
                     elements[i].innerHTML = `
                         ${widget.title ? `${util.generateTag(randomId, "h1", "title", widget.title)}` : ""}
-                        ${widget.title ? `${util.generateTag(randomId, "div", "content", widgetHTML)}` : widgetHTML}
+                        ${widget.title ? `${util.generateTag(randomId, "div", "content", widgetHTML.outerHTML)}` : widgetHTML.outerHTML}
                     `;
                 }
             }

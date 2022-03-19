@@ -24,6 +24,10 @@
         <input type="text" id="node-config-input-title">
     </div>
     <div class="form-row">
+        <label for="node-config-input-setsState">Set the value locally</label>
+        <input type="checkbox" id="node-config-input-setsState">
+    </div>
+    <div class="form-row">
         <label for="node-config-input-restoreState">Restore State on Redeploy</label>
         <input type="checkbox" id="node-config-input-restoreState">
     </div>
@@ -64,8 +68,10 @@
                 required: false
             },
             restoreState: {
-                value: "true",
-                required: true
+                value: true
+            },
+            setsState: {
+                value: true
             }
         }
 

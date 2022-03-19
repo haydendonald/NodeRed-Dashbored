@@ -31,13 +31,16 @@ module.exports = function (RED, dashboredGeneration = undefined) {
         var nodeMsgFunctions = {};
         var server = !dashboredGeneration ? RED.nodes.getNode(config.server) : config.server;
         var name = config.name;
-        var restoreState = config.restoreState || true;
 
         this.widthMultiplier = parseInt(config.widthMultiplier) || 1;
         this.heightMultiplier = parseInt(config.heightMultiplier) || 1;
         this.title = config.title || "";
+        this.restoreState = config.restoreState || false;
+        this.setsState = config.setsState;
 
         var widType = server.getWidgetTypes()[config.widgetType];
+        if(!widType) {return;}
+
         this.widgetType = widType.create();
         this.widgetType.util = require("../util.js");
         this.widgetType.id = this.id;
@@ -94,7 +97,7 @@ module.exports = function (RED, dashboredGeneration = undefined) {
         //If the values don't agree or we're set not to restore values set the default values
         var defaultValues = this.widgetType.getDefaultValues();
         for (var i in defaultValues) {
-            if (!flowContext.get(this.id) || flowContext.get(this.id)[i] === undefined || restoreState != true) {
+            if (!flowContext.get(this.id) || flowContext.get(this.id)[i] === undefined || this.restoreState != true) {
                 //A value is unset set the defaults
                 flowContext.set(this.id, this.widgetType.getDefaultValues());
                 setTimeout(function () {

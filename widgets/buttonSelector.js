@@ -180,7 +180,7 @@ module.exports = {
             //Default value(s)
             getDefaultValues: function () {
                 return {
-                    value: this.config.options[0].value
+                    value: undefined
                 }
             },
 
@@ -206,8 +206,13 @@ module.exports = {
             //When a message comes from the dashbored
             onMessage: function (msg) {
                 if (msg.id == this.id) {
-                    this.widget.setValue("value", msg.payload);
                     this.widget.sendStatusToFlow("set", msg.payload);
+
+                    //If the set state is set, set the state
+                    if(this.widget.setsState) {
+                        this.widget.setValue("value", msg.payload);
+                        this.widget.sendToDashbored(this.id, msg.sessionId, msg.payload);
+                    }
                 }
             },
 
@@ -259,7 +264,7 @@ module.exports = {
                 for (var i in this.config.options) {
                     var button = this.config.options[i];
                     ret += `
-                        ${this.util.getElement(htmlId, i)}.style.backgroundColor = (msg.payload == ${button.value}) ? "${button.onColor}" : "${button.offColor}";
+                        ${this.util.getElement(htmlId, i)}.style.backgroundColor = (msg.payload == "${button.value}") ? "${button.onColor}" : "${button.offColor}";
                     `;
                 }
                 return ret;

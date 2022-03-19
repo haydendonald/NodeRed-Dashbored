@@ -1,20 +1,7 @@
 /* Pages section */
 #pages {
     position: absolute;
-    top: 80px;
     width: 100%;
-    height: calc(100% - 180px);
-}
-
-#pages.navSide {
-    height: 100%;
-    left: 100px;
-    top: 0;
-    width: calc(100% - 100px);
-}
-
-#pages.navTop {
-    top: 100px;
 }
 page {
     position: absolute;
@@ -34,15 +21,6 @@ page {
     text-align: left;
     position: absolute;
     width: 100%;
-    height: 80px;
-}
-
-#header.navSide {
-    display: none;
-}
-
-#header.navTop {
-    bottom: 0;
 }
 
 #header h1 {
@@ -92,10 +70,7 @@ page {
 #nav {
     position: fixed;
     z-index: 2;
-    bottom: 0;
-    left: 0;
     width: 100%;
-    height: 100px;
 }
 
 #nav p {
@@ -114,34 +89,6 @@ page {
 #nav #lockButton {
     width: 80px;
 }
-#nav.top #lockButton, #nav #lockButton {
-    position: absolute;
-    right: 0;
-    margin-right: 10px;
-}
-#nav.left #lockButton {
-    position: absolute;
-    bottom: 0;
-    margin-bottom: 10px;
-}
-
-#nav.left {
-    top: 0 !important;
-    width: 100px !important;
-    height: 100% !important;
-}
-
-#nav.left button {
-    height: 10% !important;
-    width: calc(100% - 20px) !important;
-    margin-left: 10px !important;
-    margin-top: 5px !important;
-}
-
-#nav.top {
-    top: 0 !important;
-}
-
 * {
     padding: 0;
     margin: 0;

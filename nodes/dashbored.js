@@ -22,9 +22,13 @@ module.exports = function (RED) {
         var navMode = config.navMode || "bottom";
         var password = config.password;
         var alwaysShowLockButton = config.alwaysShowLockButton;
+        var showHeader = true;
+        var showNav = true;
 
         var baseHeight = config.baseHeight || "150px";
         var baseWidth = config.baseWidth || "200px";
+        var headerHeight = "80px";
+        var navHeight = "100px";
 
         //Add a callback to listen to msg functions
         node.addNodeMsgFunction = function (fn) {
@@ -92,7 +96,7 @@ module.exports = function (RED) {
                         if (data.payload.password !== undefined) {
                             if (data.payload.password == password) {
                                 correct = true;
-                                if(data.sessionId == undefined) {
+                                if (data.sessionId == undefined) {
                                     locked = false;
                                 }
                             }
@@ -110,13 +114,13 @@ module.exports = function (RED) {
                         break;
                     }
                     case "lock": {
-                        if(data.sessionId == undefined) {
+                        if (data.sessionId == undefined) {
                             locked = true;
                         }
                         server.sendMsg(id, data.sessionId, {
                             type: "lock"
                         });
-                        sendMsgToFlow("lock",{
+                        sendMsgToFlow("lock", {
                             id: id,
                             sessionId: data.sessionId
                         });
@@ -346,34 +350,31 @@ module.exports = function (RED) {
             //Add the title
             document.head.innerHTML += `<title>${headerText}</title>`;
 
-            //Add the CSS from the dashbored
-            document.head.innerHTML += `<style>${CSS}</style>`;
-
             //Set the header
-            document.header.innerHTML += `
-                ${headerImage ? "<img src='" + headerImage + "' alt='dashbored logo'>" : ""}
-                ${headerText ? "<h1>" + headerText + "</h1>" : ""}
-            `;
+            if (showHeader) {
+                document.header.innerHTML += `
+                    ${headerImage ? "<img src='" + headerImage + "' alt='dashbored logo'>" : ""}
+                    ${headerText ? "<h1>" + headerText + "</h1>" : ""}
+                `;
+                document.html.querySelector("#clockWeather").innerHTML = `
+                    ${showClock == true ? "<h2 id='clock'>" + util.formatAMPM(new Date) + "</h2>" : ""}
+                    ${showWeather == true ? "<div id='weather'><img id='weatherImg'></img><h2 id='weatherTemp'></h2></div>" : ""}
+                `;
 
-            document.html.querySelector("#clockWeather").innerHTML = `
-                ${showClock == true ? "<h2 id='clock'>" + util.formatAMPM(new Date) + "</h2>" : ""}
-                ${showWeather == true ? "<div id='weather'><img id='weatherImg'></img><h2 id='weatherTemp'></h2></div>" : ""}
-            `;
+                //Set the listener for the clock updates
+                if (showClock == true) {
+                    document.addScript(`
+                        addOnLoadFunction(function(msg) {
+                            setInterval(function() {
+                                    document.getElementById("clock").innerHTML = formatAMPM(new Date());
+                                }, 1000);
+                            });
+                        `);
+                }
 
-            //Set the listener for the clock updates
-            if (showClock == true) {
-                document.addScript(`
-                    addOnLoadFunction(function(msg) {
-                        setInterval(function() {
-                                document.getElementById("clock").innerHTML = formatAMPM(new Date());
-                            }, 1000);
-                        });
-                    `);
-            }
-
-            //Set the listener for the weather updates
-            if (showWeather) {
-                document.addScript(`
+                //Set the listener for the weather updates
+                if (showWeather) {
+                    document.addScript(`
                     addOnMsgFunction(function(msg) {
                         if(msg.id == "weather") {
                             document.getElementById("weatherTemp").innerHTML = Math.round(msg.payload.temp) + "°";
@@ -381,27 +382,91 @@ module.exports = function (RED) {
                         }
                     });
                 `);
+                }
             }
+
+            //Generate the CSS
+
+            var generatedCSS = CSS;
 
             //Set the nav bar position
             switch (navMode) {
-                case "bottom":
-                    { break; }
-                case "top":
-                    {
-                        document.header.classList.add("navTop");
-                        document.pages.classList.add("navTop");
-                        document.nav.classList.add("top");
-                        break;
-                    }
-                case "left":
-                    {
-                        document.header.classList.add("navSide");
-                        document.pages.classList.add("navSide");
-                        document.nav.classList.add("left");
-                        break;
-                    }
+                case "bottom": {
+                    generatedCSS += `
+                        #pages {
+                            top: ${headerHeight};
+                            height: calc(100% - calc(${headerHeight} + ${navHeight}));
+                        }
+                        #header {
+                            height: ${headerHeight};
+                        }
+                        #nav {
+                            bottom: 0;
+                            left: 0;
+                            height: ${navHeight};
+                        }
+                        #nav #lockButton {
+                            position: absolute;
+                            right: 0;
+                            margin-right: 10px;
+                        }
+                    `;
+                    break;
+                }
+                case "top": {
+                    generatedCSS += `
+                        #pages {
+                            top: ${navHeight};
+                            height: calc(100% - calc(${headerHeight} + ${navHeight}));
+                        }
+                        #header {
+                            bottom: 0;
+                        }
+                        #nav {
+                            top: 0;
+                            height: ${navHeight};
+                        }
+                        #nav #lockButton {
+                            position: absolute;
+                            right: 0;
+                            margin-right: 10px;
+                        }
+                    `;
+                    break;
+                }
+                case "left": {
+                    generatedCSS += `
+                        #pages {
+                            top: 0;
+                            left: ${navHeight};
+                            height: 100%;
+                            width: calc(100% - ${navHeight});
+                        }
+                        #header {
+                            display: none;
+                        }
+                        #nav {
+                            top: 0;
+                            width: ${navHeight};
+                            height: 100%;
+                        }
+                        #nav button {
+                            height: 10%;
+                            width: calc(100% - 20px);
+                            margin-left: 10px;
+                            margin-top: 5px;
+                        }
+                        #nav #lockButton {
+                            position: absolute;
+                            bottom: 0;
+                            margin-bottom: 10px;
+                        }
+                    `;
+                    break;
+                }
             }
+            console.log(generatedCSS);
+            document.head.innerHTML += `<style>${generatedCSS}</style>`;
 
             //Generate the pages 
             addPagesToDashbored(document);

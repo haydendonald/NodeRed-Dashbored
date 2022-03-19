@@ -111,6 +111,19 @@ page {
     overflow: hidden;
     padding: 0;
 }
+#nav #lockButton {
+    width: 80px;
+}
+#nav.top #lockButton, #nav #lockButton {
+    position: absolute;
+    right: 0;
+    margin-right: 10px;
+}
+#nav.left #lockButton {
+    position: absolute;
+    bottom: 0;
+    margin-bottom: 10px;
+}
 
 #nav.left {
     top: 0 !important;

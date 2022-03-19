@@ -68,6 +68,10 @@
         <input type="checkbox" id="node-config-input-showWeather" placeholder="true">
     </div>
     <div class="form-row">
+        <label for="node-config-input-alwaysShowLockButton"><i class="icon-tag"></i> Show Lock Button</label>
+        <input type="checkbox" id="node-config-input-alwaysShowLockButton" placeholder="true">
+    </div>
+    <div class="form-row">
         <label for="node-config-input-navMode"><i class="icon-tag"></i> Navigation Bar Position</label>
         <input type="text" id="node-config-input-navMode" placeholder="right">
     </div>
@@ -110,12 +114,13 @@
                 required: false
             },
             showClock: {
-                value: "true",
-                required: false
+                value: true
             },
             showWeather: {
-                value: "true",
-                required: false
+                value: true
+            },
+            alwaysShowLockButton: {
+                value: false
             },
             navMode: {
                 value: "right",

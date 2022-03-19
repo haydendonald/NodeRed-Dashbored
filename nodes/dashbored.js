@@ -21,6 +21,7 @@ module.exports = function (RED) {
         var showWeather = config.showWeather == "true" || config.showWeather == true;
         var navMode = config.navMode || "bottom";
         var password = config.password;
+        var alwaysShowLockButton = config.alwaysShowLockButton;
 
         var baseHeight = config.baseHeight || "150px";
         var baseWidth = config.baseWidth || "200px";
@@ -414,6 +415,19 @@ module.exports = function (RED) {
                 var locked = ${locked};
 
                 addOnLoadFunction(function() {
+                    hideShowElement("lockButton", ${alwaysShowLockButton});
+                    document.getElementById("lockButton").innerHTML = "<i class='fa fa-${locked ? "unlock" : "lock"}'></i>";
+
+                    //Hide/show elements when the lock state changes
+                    addOnLockFunction(function () {
+                        ${alwaysShowLockButton ? "" : "hideShowElement('lockButton', true);"}
+                        document.getElementById("lockButton").innerHTML = "<i class='fa fa-unlock'></i>";
+                    });
+                    addOnUnlockFunction(function () {
+                        ${alwaysShowLockButton ? "" : "hideShowElement('lockButton', false);"}
+                        document.getElementById("lockButton").innerHTML = "<i class='fa fa-lock'></i>";
+                    });
+
                     setTimeout(function(){hideShowElement("loader", false, 0.5);}, 500);
                 });
                 var temp = document.getElementById("onLoadScripts");

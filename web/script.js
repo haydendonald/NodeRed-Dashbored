@@ -107,7 +107,7 @@ function message(type, title, description, closeAfterSec, callback) {
     //If close after sec is true close the message
     if (closeAfterSec == true) {
         hideShowElement("message", false);
-        if(callback){callback();}
+        if (callback) { callback(); }
         return;
     }
 
@@ -155,7 +155,7 @@ function message(type, title, description, closeAfterSec, callback) {
     if (closeAfterSec != false) {
         setTimeout(function () {
             hideShowElement("message", false);
-            if(callback){callback();}
+            if (callback) { callback(); }
         }, closeAfterSec * 1000);
     }
 }
@@ -421,5 +421,15 @@ window.onload = function () {
     //Execute all the onload functions
     for (var i = 0; i < onLoadFunctions.length; i++) {
         onLoadFunctions[i]();
+    }
+
+    //Unlock button actions
+    document.getElementById("lockButton").onclick = function () {
+        if (locked) {
+            unlockDashbored();
+        }
+        else {
+            lockDashbored();
+        }
     }
 }

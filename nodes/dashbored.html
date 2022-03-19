@@ -68,6 +68,18 @@
         <input type="checkbox" id="node-config-input-showWeather" placeholder="true">
     </div>
     <div class="form-row">
+        <label for="node-config-input-showHeader"><i class="icon-tag"></i> Show Header</label>
+        <input type="checkbox" id="node-config-input-showHeader" placeholder="true">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-showNav"><i class="icon-tag"></i> Show Navigation</label>
+        <input type="checkbox" id="node-config-input-showNav" placeholder="true">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-showWeather"><i class="icon-tag"></i> Show Weather</label>
+        <input type="checkbox" id="node-config-input-showWeather" placeholder="true">
+    </div>
+    <div class="form-row">
         <label for="node-config-input-alwaysShowLockButton"><i class="icon-tag"></i> Show Lock Button</label>
         <input type="checkbox" id="node-config-input-alwaysShowLockButton" placeholder="true">
     </div>
@@ -82,6 +94,14 @@
     <div class="form-row">
         <label for="node-config-input-baseHeight"><i class="icon-tag"></i> Widget Height</label>
         <input type="text" id="node-config-input-baseHeight" placeholder="150px">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-headerHeight"><i class="icon-tag"></i> Header Size</label>
+        <input type="text" id="node-config-input-headerHeight" placeholder="80px">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-navHeight"><i class="icon-tag"></i> Navigation Size</label>
+        <input type="text" id="node-config-input-navHeight" placeholder="100px">
     </div>
 </script>
 
@@ -119,6 +139,12 @@
             showWeather: {
                 value: true
             },
+            showHeader: {
+                value: true
+            },
+            showNav: {
+                value: true
+            },
             alwaysShowLockButton: {
                 value: false
             },
@@ -132,6 +158,14 @@
             },
             baseWidth: {
                 value: "200px",
+                required: true
+            },
+            headerHeight: {
+                value: "80px",
+                required: true
+            },
+            navHeight: {
+                value: "100px",
                 required: true
             },
 

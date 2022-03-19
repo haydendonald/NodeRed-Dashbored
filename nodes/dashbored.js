@@ -22,13 +22,13 @@ module.exports = function (RED) {
         var navMode = config.navMode || "bottom";
         var password = config.password;
         var alwaysShowLockButton = config.alwaysShowLockButton;
-        var showHeader = true;
-        var showNav = true;
+        var showHeader = config.showHeader;
+        var showNav = config.showNav;
 
         var baseHeight = config.baseHeight || "150px";
         var baseWidth = config.baseWidth || "200px";
-        var headerHeight = "80px";
-        var navHeight = "100px";
+        var headerHeight = showHeader ? config.headerHeight : "0px";
+        var navHeight = showNav ? config.navHeight : "0px";
 
         //Add a callback to listen to msg functions
         node.addNodeMsgFunction = function (fn) {
@@ -465,7 +465,23 @@ module.exports = function (RED) {
                     break;
                 }
             }
-            console.log(generatedCSS);
+
+            if (!showHeader) {
+                generatedCSS += `
+                    #header {
+                        display: none;
+                    }
+                `;
+            }
+
+            if (!showNav) {
+                generatedCSS += `
+                    #nav {
+                        display: none;
+                    }
+                `;
+            }
+
             document.head.innerHTML += `<style>${generatedCSS}</style>`;
 
             //Generate the pages 

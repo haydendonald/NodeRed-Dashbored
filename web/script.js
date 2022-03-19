@@ -67,7 +67,7 @@ function sendMsg(id, payload, callback) {
     }
     socket.send(JSON.stringify({
         id: id,
-        sessionId, sessionId,
+        sessionId: sessionId,
         payload: payload
     }));
 }
@@ -148,7 +148,7 @@ function message(type, title, description, closeAfterSec, callback) {
         }
     }
 
-    div.innerHTML = `<h1><i class="${icon}"></i> ${title}</h1><p>${description}</p>`;
+    div.innerHTML = "<h1><i class=" + icon + "></i> " + title + "</h1><p>" + description + "</p>";
     hideShowElement("message", true);
 
     //If close after sec is not false close the message after a timeout

@@ -1,24 +1,50 @@
-module.exports = function (RED) {
+module.exports = function (RED, dashboredGeneration = undefined) {
     function widget(config) {
-        RED.nodes.createNode(this, config);
+        //Set callbacks to nodered or if generated programmatically
+        if (!dashboredGeneration) {
+            RED.nodes.createNode(this, config);
+            var flowContext = this.context().global;
+        }
+        else {
+            this.id = config.id;
+
+            var contextStore = {};
+            flowContext = {
+                set: function (name, value) {
+                    contextStore[name] = value;
+                },
+                get: function (name) {
+                    return contextStore[name];
+                }
+            };
+
+            var ons = {};
+            this.on = function (evt, fn) {
+                ons[evt] = fn;
+            }
+            this.callOn = function (evt, value) {
+                ons[evt](value);
+            }
+        }
+
         var self = this;
         var nodeMsgFunctions = {};
-        var server = RED.nodes.getNode(config.server);
+        var server = !dashboredGeneration ? RED.nodes.getNode(config.server) : config.server;
         var name = config.name;
         var restoreState = config.restoreState || true;
-        var flowContext = this.context().global;
 
         this.widthMultiplier = parseInt(config.widthMultiplier) || 1;
         this.heightMultiplier = parseInt(config.heightMultiplier) || 1;
         this.title = config.title || "";
 
-        this.widgetType = server.getWidgetTypes()[config.widgetType].create();
+        var widType = server.getWidgetTypes()[config.widgetType];
+        this.widgetType = widType.create();
         this.widgetType.util = require("../util.js");
         this.widgetType.id = this.id;
         this.widgetType.type = config.widgetType;
-        this.widgetType.version = config.version;
-        this.widgetType.label = config.label;
-        this.widgetType.description = config.description;
+        this.widgetType.version = widType.version;
+        this.widgetType.label = widType.label;
+        this.widgetType.description = widType.description;
 
         //Send to the flow
         this.sendToFlow = function (msg, messageType, get = undefined, sessionId = undefined, nodeId = undefined) {
@@ -78,6 +104,18 @@ module.exports = function (RED) {
             }
         }
 
+        //Copy in the default config if it wasn't set
+        for (var i in this.widgetType.defaultConfig) {
+            if (!this.widgetType.config[i]) {
+                if(config[i]) {
+                    this.widgetType.config[i] = config[i];
+                }
+                else {
+                    this.widgetType.config[i] = this.widgetType.defaultConfig[i].value;
+                }
+            }
+        }
+
         //When an input is passed to the node in the flow
         this.input = (msg, nodeId) => {
             switch (msg.topic) {
@@ -93,12 +131,24 @@ module.exports = function (RED) {
             }
         }
 
-        //Add this widget to the server
-        server.addWidget(this.id, this.name, server.getWidgetTypes()[config.widgetType].label, server.getWidgetTypes()[config.widgetType].version);
-
         //On redeploy`
         this.on("close", function () { this.widgetType.onClose(); });
+
+        //Add the widget to the server
+        if (dashboredGeneration) {
+            server.addGeneratedWidget(this.id, this);
+        }
+        else {
+            //Add this widget to the server
+            server.addWidget(this.id, this.name, server.getWidgetTypes()[config.widgetType].label, server.getWidgetTypes()[config.widgetType].version);
+        }
     }
 
-    RED.nodes.registerType("dashbored-widget", widget);
+    //If it's node red creating it register it
+    if (!dashboredGeneration) {
+        RED.nodes.registerType("dashbored-widget", widget);
+    }
+    else {
+        return widget;
+    }
 }

@@ -6,6 +6,7 @@ module.exports = function (RED) {
     var webFolder = path.join(rootFolder, "web");
     var dashboards = {};
     var widgets = {};
+    var generatedWidgets = {};
 
     //Define the possible widget types
     const widgetTypes = function () {
@@ -46,13 +47,17 @@ module.exports = function (RED) {
             RED.log.debug("Got new websocket connection");
             ws.on("message", (data) => {
                 RED.log.debug(`Got websocket message [${data}]`);
+                var msg = JSON.parse(data);
 
                 //Send the message to the dashboards
                 for (var endpoint in dashboards) {
-                    RED.nodes.getNode(dashboards[endpoint].id).onMessage(JSON.parse(data));
+                    RED.nodes.getNode(dashboards[endpoint].id).onMessage(msg);
                 }
                 for (var id in widgets) {
-                    RED.nodes.getNode(id).widgetType.onMessage(JSON.parse(data));
+                    RED.nodes.getNode(id).widgetType.onMessage(msg);
+                }
+                for(var id in generatedWidgets) {
+                    generatedWidgets[id].widgetType.onMessage(msg);
                 }
             });
         });
@@ -116,6 +121,11 @@ module.exports = function (RED) {
             return widgets;
         }
 
+        //Return a generated widget
+        node.getGeneratedWidget = (id) => {
+            return generatedWidgets[id];
+        }
+
         //Get the weather
         node.getWeather = () => {
             getWeather();
@@ -137,6 +147,10 @@ module.exports = function (RED) {
         node.addWidget = (id, name, type, widgetTypeVersion) => {
             RED.log.info(`- Added widget ${name} (${id}) with type ${type}@${widgetTypeVersion}`);
             widgets[id] = name;
+        }
+
+        node.addGeneratedWidget = (id, obj) => {
+            generatedWidgets[id] = obj;
         }
 
         node.getWidgetTypes = () => {

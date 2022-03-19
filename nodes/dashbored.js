@@ -149,6 +149,36 @@ module.exports = function (RED) {
             for (var i = 0; i < elements.length; i++) {
                 if (elements[i].rawTagName == "widget") {
                     var widget = RED.nodes.getNode(elements[i].id);
+
+                    //If the widget was not found see if we can generate it
+                    if(!widget) {
+                        var widId = `${id}_${page.id}_${elements[i].id}`;
+                        //See if it exists first
+                        widget = server.getGeneratedWidget(widId);
+                        if(!widget) {
+                            //If we still don't have a widget we need to generate it
+                            require("./widget.js")(RED, true)({
+                                id: widId,
+                                server,
+                                name: elements[i].getAttribute("name") || "Generated widget",
+                                restoreState: elements[i].getAttribute("restoreState") || true,
+                                widthMultiplier: elements[i].getAttribute("widthMultiplier") || 1,
+                                heightMultiplier: elements[i].getAttribute("heightMultiplier") || 1,
+                                widgetType: elements[i].getAttribute("type"),
+                                title: elements[i].getAttribute("title")
+                            });
+                            widget = server.getGeneratedWidget(widId);
+
+                            //Copy in the config if set
+                            for(var j in widget.widgetType.defaultConfig) {
+                                var val = elements[i].getAttribute(j);
+                                if(val) {
+                                    widget.widgetType.config[j] = val;
+                                }
+                            }
+                        }
+                    }
+
                     var widgetElement = elements[i];
                     if (!widget) {
                         RED.log.warn(`Widget ${elements[i].id} was not found`);

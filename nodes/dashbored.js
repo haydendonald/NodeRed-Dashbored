@@ -357,8 +357,8 @@ module.exports = function (RED) {
                     ${headerText ? "<h1>" + headerText + "</h1>" : ""}
                 `;
                 document.html.querySelector("#clockWeather").innerHTML = `
-                    ${showClock == true ? "<h2 id='clock'>" + util.formatAMPM(new Date) + "</h2>" : ""}
-                    ${showWeather == true ? "<div id='weather'><img id='weatherImg'></img><h2 id='weatherTemp'></h2></div>" : ""}
+                    ${showClock == true ? "<h2 id='clock' style='float: right; margin-left: 20px'>" + util.formatAMPM(new Date) : "</h2>"}
+                    ${showWeather == true ? "<h2 id='weatherTemp' style='float: left'></h2>" : ""}
                 `;
 
                 //Set the listener for the clock updates
@@ -378,7 +378,6 @@ module.exports = function (RED) {
                     addOnMsgFunction(function(msg) {
                         if(msg.id == "weather") {
                             document.getElementById("weatherTemp").innerHTML = Math.round(msg.payload.temp) + "°";
-                            document.getElementById("weatherImg").setAttribute("src", msg.payload.iconUrl);
                         }
                     });
                 `);
@@ -388,6 +387,41 @@ module.exports = function (RED) {
             //Generate the CSS
 
             var generatedCSS = CSS;
+
+            //Header
+            if (showHeader) {
+                generatedCSS += `
+                    #header h1 {
+                        font-size: calc(${headerHeight} / 3);
+                        margin-top: calc(${headerHeight} / 4);
+                    }
+                    #header img {
+                        height: calc(${headerHeight} - 20px);
+                    }
+                    #clockWeather {
+                        height: ${headerHeight};
+                        margin-top: 10px;
+                    }
+                `;
+            }
+            else {
+                generatedCSS += `
+                    #header {
+                        display: none;
+                    }
+                `;
+            }
+
+            //Nav
+            if (showNav) {
+            }
+            else {
+                generatedCSS += `
+                    #nav {
+                        display: none;
+                    }
+                `;
+            }
 
             //Set the nav bar position
             switch (navMode) {
@@ -464,22 +498,6 @@ module.exports = function (RED) {
                     `;
                     break;
                 }
-            }
-
-            if (!showHeader) {
-                generatedCSS += `
-                    #header {
-                        display: none;
-                    }
-                `;
-            }
-
-            if (!showNav) {
-                generatedCSS += `
-                    #nav {
-                        display: none;
-                    }
-                `;
             }
 
             document.head.innerHTML += `<style>${generatedCSS}</style>`;

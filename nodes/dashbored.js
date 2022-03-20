@@ -146,12 +146,12 @@ module.exports = function (RED) {
         //Add the widgets to a page
         var addWidgetsToPage = (document, page, widgetIdsCSSDone) => {
             var elements = page.querySelectorAll("*");
+            server.getGeneratedWidget();
             for (var i = 0; i < elements.length; i++) {
                 if (elements[i].rawTagName == "widget") {
                     var widget = RED.nodes.getNode(elements[i].id);
 
                     //If the widget was not found see if we can generate it
-                    server.getGeneratedWidget();
                     if (!widget) {
                         var widId = elements[i].getAttribute("id");
 
@@ -182,11 +182,11 @@ module.exports = function (RED) {
                             }
                             else {
                                 //Copy in the config if set
-                                for (var j in widget.widgetType.defaultConfig) {
+                                for (var j in widget.defaultConfig) {
                                     var val = elements[i].getAttribute(j);
                                     if (val) {
                                         elements[i].removeAttribute(j);
-                                        widget.widgetType.config[j] = val;
+                                        widget.config[j] = val;
                                     }
                                 }
                             }
@@ -221,7 +221,7 @@ module.exports = function (RED) {
                     //Insert the onload script
                     document.addScript(`
                         addOnLoadFunction(function() {
-                            ${widget.widgetType.generateOnload(randomId, lockedAccess, alwaysPassword, ask, askText)}
+                            ${widget.generateOnload(randomId, lockedAccess, alwaysPassword, ask, askText)}
 
                             //Hide the element initially if required
                             if(locked) {
@@ -232,7 +232,7 @@ module.exports = function (RED) {
                         addOnMsgFunction(function(msg) {
                             //Check if the id is equal to this widget, if so execute the actions
                             if(msg.id == "${widget.id}") {
-                                ${widget.widgetType.generateOnMsg(randomId)}
+                                ${widget.generateOnMsg(randomId)}
                             }
                         })
                     `);
@@ -241,23 +241,23 @@ module.exports = function (RED) {
                     var CSS = function () {
                         var ret = `
                         #${randomId}_widget {`;
-                        var widthMultiplier = widget.widthMultiplier * widget.widgetType.widthMultiplier;
-                        var heightMultiplier = widget.heightMultiplier * widget.widgetType.heightMultiplier;
+                        var widthMultiplier = widget.widthMultiplier * widget.widthMultiplier;
+                        var heightMultiplier = widget.heightMultiplier * widget.heightMultiplier;
 
                         ret += `width: calc(${baseWidth} * ${widthMultiplier}) ;`;
                         ret += `height: calc(${baseHeight} * ${heightMultiplier});`;
 
-                        if (widget.widgetType.minWidth) {
-                            ret += `"min-width: ${widget.widgetType.minWidth};`;
+                        if (widget.minWidth) {
+                            ret += `"min-width: ${widget.minWidth};`;
                         }
-                        if (widget.widgetType.minHeight) {
-                            ret += `"min-height: ${widget.widgetType.minHeight};`;
+                        if (widget.minHeight) {
+                            ret += `"min-height: ${widget.minHeight};`;
                         }
-                        if (widget.widgetType.maxWidth) {
-                            ret += `max-width: ${widget.widgetType.maxWidth};`;
+                        if (widget.maxWidth) {
+                            ret += `max-width: ${widget.maxWidth};`;
                         }
-                        if (widget.widgetType.maxHeight) {
-                            ret += `max-height: ${widget.widgetType.maxHeight};`;
+                        if (widget.maxHeight) {
+                            ret += `max-height: ${widget.maxHeight};`;
                         }
 
                         ret += `
@@ -287,7 +287,7 @@ module.exports = function (RED) {
                     }();
 
                     //Go through the CSS and add the ids
-                    var classes = widget.widgetType.generateCSS().split("}");
+                    var classes = widget.generateCSS().split("}");
                     for (var j = 0; j < classes.length - 1; j++) {
                         var selectors = classes[j].split(" {");
                         selectors[0] = selectors[0].replace(/^\s+|\s+$/gm, '');
@@ -300,10 +300,10 @@ module.exports = function (RED) {
                     widgetElement.rawTagName = "div"; //Make it a div because a widget type doesn't get rendered
 
                     //Add any extra scripts
-                    if (widget.generateScript) { html.querySelector("html").innerHTML += `<script id="${widget.id}" type="text/javascript">${widget.widgetType.generateScript(randomId)}</script>`; }
+                    //if (widget.generateScript) { document.html.innerHTML += `<script id="${widget.id}" type="text/javascript">${widget.generateScript(randomId)}</script>`; }
 
                     //Add the HTML
-                    var widgetHTML = htmlParse(widget.widgetType.generateHTML(randomId));
+                    var widgetHTML = htmlParse(widget.generateHTML(randomId));
 
                     //Add any widgets inside this widget
                     addWidgetsToPage(document, widgetHTML, widgetIdsCSSDone);

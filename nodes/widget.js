@@ -32,6 +32,7 @@ module.exports = function (RED, dashboredGeneration = undefined) {
         var server = !dashboredGeneration ? RED.nodes.getNode(config.server) : config.server;
         var name = config.name;
 
+        this.util = require("../util.js");
         this.widthMultiplier = parseInt(config.widthMultiplier) || 1;
         this.heightMultiplier = parseInt(config.heightMultiplier) || 1;
         this.title = config.title || "";
@@ -39,15 +40,10 @@ module.exports = function (RED, dashboredGeneration = undefined) {
         this.setsState = config.setsState;
 
         var widType = server.getWidgetTypes()[config.widgetType];
-        if (!widType) { return; }
+        if (!widType) { RED.log.error(`Widget ${name} (${this.id}) has an invalid type ${config.widgetType}`); return; }
 
-        this.widgetType = widType.create();
-        this.widgetType.util = require("../util.js");
-        this.widgetType.id = this.id;
-        this.widgetType.type = config.widgetType;
-        this.widgetType.version = widType.version;
-        this.widgetType.label = widType.label;
-        this.widgetType.description = widType.description;
+        //Assign the widget type
+        Object.assign(this, widType.create());
 
         //Send to the flow
         this.sendToFlow = function (msg, messageType, get = undefined, sessionId = undefined, nodeId = undefined) {
@@ -68,6 +64,7 @@ module.exports = function (RED, dashboredGeneration = undefined) {
          */
         this.setValues = function (values) {
             var temp = flowContext.get(this.id);
+            if (!temp) { temp = {}; }
             for (var i in values) {
                 temp[i] = values[i];
             }
@@ -83,19 +80,19 @@ module.exports = function (RED, dashboredGeneration = undefined) {
 
         //Get a value
         this.getValue = function (name) {
-            if(!flowContext.get(this.id)){return undefined;}
+            if (!flowContext.get(this.id)) { return undefined; }
             return flowContext.get(this.id)[name];
         }
 
         //Request a value from the flow
         this.getFlowValue = function (names) {
             if (typeof names != "Array") { names = [names]; }
-            this.widgetType.sendToFlow(undefined, undefined, names)
+            this.sendToFlow(undefined, undefined, names)
         }
 
         //Send the current status to the flow
         this.sendStatusToFlow = function (type, sessionId, nodeId = undefined) {
-            this.sendToFlow(this.widgetType.getValues(), type, undefined, sessionId, nodeId);
+            this.sendToFlow(this.getValues(), type, undefined, sessionId, nodeId);
         }
 
         /**
@@ -105,7 +102,7 @@ module.exports = function (RED, dashboredGeneration = undefined) {
          * @param {string} nodeId  The node id
          */
         this.sendStatusChangesToFlow = function (sessionId, changes, nodeId = undefined) {
-            var temp = this.widgetType.getValues();
+            var temp = this.getValues();
             for (var i in changes) {
                 temp[i] = changes[i];
             }
@@ -117,35 +114,32 @@ module.exports = function (RED, dashboredGeneration = undefined) {
             nodeMsgFunctions[nodeId] = fn;
         };
 
-        if (!this.widgetType) { RED.log.error(`Widget ${name} (${this.id}) has an invalid type ${config.widgetType}`); }
-
-
         //Copy in the default config if it wasn't set
-        for (var i in this.widgetType.defaultConfig) {
-            if (!this.widgetType.config[i]) {
-                if (config[this.widgetType.type + "-" + i]) {
-                    this.widgetType.config[i] = config[this.widgetType.type + "-" + i];
+        for (var i in this.defaultConfig) {
+            if (!this.config[i]) {
+                if (config[this.type + "-" + i]) {
+                    this.config[i] = config[this.type + "-" + i];
                 }
                 else if (config[i]) {
-                    this.widgetType.config[i] = config[i];
+                    this.config[i] = config[i];
                 }
                 else {
-                    this.widgetType.config[i] = this.widgetType.defaultConfig[i].value;
+                    this.config[i] = this.defaultConfig[i].value;
                 }
             }
         }
 
         //Setup the widget
-        this.widgetType.setupWidget(this, config);
+        this.setupWidget(config);
 
         //If the values don't agree or we're set not to restore values set the default values
-        var defaultValues = this.widgetType.getDefaultValues();
+        var defaultValues = this.getDefaultValues();
         for (var i in defaultValues) {
             if (!flowContext.get(this.id) || flowContext.get(this.id)[i] === undefined || this.restoreState != true) {
                 //A value is unset set the defaults
-                flowContext.set(this.id, this.widgetType.getDefaultValues());
+                flowContext.set(this.id, this.getDefaultValues());
                 setTimeout(function () {
-                    self.sendToFlow(undefined, "get", Object.keys(self.widgetType.getDefaultValues())); //Request to the flow to get all values
+                    self.sendToFlow(undefined, "get", Object.keys(self.getDefaultValues())); //Request to the flow to get all values
                 }, 1000);
                 break;
             }
@@ -159,7 +153,7 @@ module.exports = function (RED, dashboredGeneration = undefined) {
                     break;
                 }
                 case "set": {
-                    this.widgetType.onFlowMessage(msg);
+                    this.onFlowMessage(msg);
                     this.sendStatusToFlow("set", undefined, nodeId);
                     break;
                 }
@@ -167,7 +161,7 @@ module.exports = function (RED, dashboredGeneration = undefined) {
         }
 
         //On redeploy`
-        this.on("close", function () { this.widgetType.onClose(); });
+        this.on("close", function () { this.onClose(); });
 
         //Add the widget to the server
         if (dashboredGeneration) {

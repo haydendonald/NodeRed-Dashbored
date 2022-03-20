@@ -17,7 +17,6 @@ module.exports = {
             minWeight: undefined,
             maxWidth: undefined,
             maxHeight: undefined,
-            widget: undefined, //Reference back to the widget node
 
             //Insert the HTML into the config on the NodeRed flow
             //The ids MUST be node-config-input-<WIDGETNAME>-<CONFIGNAME> otherwise they may not be set
@@ -193,13 +192,12 @@ module.exports = {
             //Return the current values
             getValues: function () {
                 return {
-                    value: this.widget.getValue("value")
+                    value: this.getValue("value")
                 }
             },
 
             //Setup the widget
-            setupWidget: function (widget, config) {
-                this.widget = widget;
+            setupWidget: function (config) {
             },
 
             //When node red redeploys or closes
@@ -208,11 +206,11 @@ module.exports = {
             //When a message comes from the dashbored
             onMessage: function (msg) {
                 if (msg.id == this.id) {
-                    this.widget.sendStatusChangesToFlow(msg.sessionId, {"value": msg.payload});
+                    this.sendStatusChangesToFlow(msg.sessionId, {"value": msg.payload});
 
-                    if(this.widget.setsState) {
-                        this.widget.setValue("value", msg.payload);
-                        this.widget.sendToDashbored(this.id, msg.sessionId, msg.payload);
+                    if(this.setsState) {
+                        this.setValue("value", msg.payload);
+                        this.sendToDashbored(this.id, msg.sessionId, msg.payload);
                     }
                 }
             },
@@ -220,8 +218,8 @@ module.exports = {
             //When a message comes from a node red flow
             onFlowMessage: function (msg) {
                 if (msg.payload && msg.payload.value) {
-                    this.widget.setValue("value", msg.payload.value);
-                    this.widget.sendToDashbored(this.id, msg.sessionId, msg.payload.value);
+                    this.setValue("value", msg.payload.value);
+                    this.sendToDashbored(this.id, msg.sessionId, msg.payload.value);
                 }
             },
 
@@ -235,7 +233,7 @@ module.exports = {
                 var ret = "";
                 for (var i in this.config.options) {
                     var button = this.config.options[i];
-                    var color = button.value == this.widget.getValue("value") ? button.onColor : button.offColor;
+                    var color = button.value == this.getValue("value") ? button.onColor : button.offColor;
                     ret += this.util.generateTag(htmlId, "button", i, button.label, `class="${this.util.generateCSSClass(htmlId, "button")}" style="background-color: ${color}"`);
                 }
                 return ret;

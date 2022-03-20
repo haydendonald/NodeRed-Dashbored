@@ -29,6 +29,7 @@
         "path": "^0.12.7",
         "ws": "^8.5.0",
         "node-html-parser": "^5.2.0",
-        "openweathermap": "^1.0.0"
+        "openweathermap": "^1.0.0",
+        "clone-deep": "^4.0.1"
     }
 }

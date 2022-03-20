@@ -55,10 +55,10 @@ module.exports = function (RED) {
                     RED.nodes.getNode(dashboards[endpoint].id).onMessage(msg);
                 }
                 for (var id in widgets) {
-                    RED.nodes.getNode(id).widgetType.onMessage(msg);
+                    RED.nodes.getNode(id).onMessage(msg);
                 }
                 for (var id in generatedWidgets) {
-                    generatedWidgets[id].widgetType.onMessage(msg);
+                    generatedWidgets[id].onMessage(msg);
                 }
             });
         });
@@ -124,9 +124,9 @@ module.exports = function (RED) {
 
         //Return a generated widget
         node.getGeneratedWidget = (id) => {
-            console.log(Object.keys(generatedWidgets));
             for(var i in generatedWidgets) {
-                console.log(`${generatedWidgets[i].id}:${i}`);
+                console.log(i);
+                console.log(generatedWidgets[i].widgetType);
             }
             return generatedWidgets[id];
         }
@@ -203,10 +203,10 @@ module.exports = function (RED) {
                 return {
                     id: widget.id,
                     label: widget.name,
-                    values: widget.widgetType.values,
-                    widgetType: widget.widgetType.type,
-                    configHTML: widget.widgetType.configHTML,
-                    configScript: widget.widgetType.configScript
+                    values: widget.values,
+                    widgetType: widget.type,
+                    configHTML: widget.configHTML,
+                    configScript: widget.configScript
                 }
             }
             var send = [];

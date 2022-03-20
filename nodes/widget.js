@@ -8,7 +8,7 @@ module.exports = function (RED, dashboredGeneration = undefined) {
         else {
             this.id = config.id;
 
-            var contextStore = {};
+            this.contextStore = {};
             flowContext = {
                 set: function (name, value) {
                     contextStore[name] = value;

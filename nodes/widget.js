@@ -7,16 +7,7 @@ module.exports = function (RED, dashboredGeneration = undefined) {
         }
         else {
             this.id = config.id;
-
-            this.contextStore = {};
-            flowContext = {
-                set: function (name, value) {
-                    contextStore[name] = value;
-                },
-                get: function (name) {
-                    return contextStore[name];
-                }
-            };
+            flowContext = config.server.context().global;
 
             var ons = {};
             this.on = function (evt, fn) {

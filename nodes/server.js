@@ -124,10 +124,6 @@ module.exports = function (RED) {
 
         //Return a generated widget
         node.getGeneratedWidget = (id) => {
-            for(var i in generatedWidgets) {
-                console.log(i);
-                console.log(generatedWidgets[i].widgetType);
-            }
             return generatedWidgets[id];
         }
 
@@ -156,12 +152,6 @@ module.exports = function (RED) {
 
         node.addGeneratedWidget = (id, obj) => {
             generatedWidgets[id] = obj;
-
-            //Restore it's values if set
-            var context = this.context().global.get(this.id);
-            if (context && obj.restoreState) {
-                generatedWidgets[id].contextStore[id] = context.generatedWidgets[id];
-            }
         }
 
         node.getWidgetTypes = () => {
@@ -173,14 +163,6 @@ module.exports = function (RED) {
             kickClients();
             wss.close();
             clearInterval(weatherInterval);
-
-            //Store our generated widgets value(s) to the flow context to grab again to restore
-            var temp = this.context().global.get(this.id) || {};
-            temp.generatedWidgets = {};
-            for (var i in generatedWidgets) {
-                temp.generatedWidgets[i] = generatedWidgets[i].contextStore[i];
-            }
-            this.context().global.set(this.id, temp);
         });
     }
 

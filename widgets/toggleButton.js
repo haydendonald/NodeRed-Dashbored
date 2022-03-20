@@ -85,11 +85,11 @@ module.exports = {
                     value: `
                     .on {
                         background-color: #32CD32;
-                        color: black;
+                        color: white;
                     }
                     .off {
-                        background-color: #800000;
-                        color: black;
+                        background-color: rgb(255, 51, 51);
+                        color: white;
                     }
                     #button {
                         width: calc(100% - 10px);

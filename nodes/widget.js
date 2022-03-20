@@ -83,6 +83,7 @@ module.exports = function (RED, dashboredGeneration = undefined) {
 
         //Get a value
         this.getValue = function (name) {
+            if(!flowContext.get(this.id)){return undefined;}
             return flowContext.get(this.id)[name];
         }
 

@@ -150,6 +150,12 @@ module.exports = {
                             "value": "option_0",
                             "onColor": "#32CD32",
                             "offColor": "#ff3333"
+                        },
+                        {
+                            "label": "Option 1",
+                            "value": "option_1",
+                            "onColor": "#32CD32",
+                            "offColor": "#ff3333"
                         }
                     ],
                     validate: function (values) {

@@ -118,6 +118,22 @@ module.exports = function (RED, dashboredGeneration = undefined) {
 
         if (!this.widgetType) { RED.log.error(`Widget ${name} (${this.id}) has an invalid type ${config.widgetType}`); }
 
+
+        //Copy in the default config if it wasn't set
+        for (var i in this.widgetType.defaultConfig) {
+            if (!this.widgetType.config[i]) {
+                if (config[this.widgetType.type + "-" + i]) {
+                    this.widgetType.config[i] = config[this.widgetType.type + "-" + i];
+                }
+                else if (config[i]) {
+                    this.widgetType.config[i] = config[i];
+                }
+                else {
+                    this.widgetType.config[i] = this.widgetType.defaultConfig[i].value;
+                }
+            }
+        }
+
         //Setup the widget
         this.widgetType.setupWidget(this, config);
 
@@ -131,18 +147,6 @@ module.exports = function (RED, dashboredGeneration = undefined) {
                     self.sendToFlow(undefined, "get", Object.keys(self.widgetType.getDefaultValues())); //Request to the flow to get all values
                 }, 1000);
                 break;
-            }
-        }
-
-        //Copy in the default config if it wasn't set
-        for (var i in this.widgetType.defaultConfig) {
-            if (!this.widgetType.config[i]) {
-                if (config[i]) {
-                    this.widgetType.config[i] = config[i];
-                }
-                else {
-                    this.widgetType.config[i] = this.widgetType.defaultConfig[i].value;
-                }
             }
         }
 

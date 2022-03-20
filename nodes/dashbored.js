@@ -151,31 +151,39 @@ module.exports = function (RED) {
                     var widget = RED.nodes.getNode(elements[i].id);
 
                     //If the widget was not found see if we can generate it
-                    if(!widget) {
+                    if (!widget) {
                         var widId = elements[i].getAttribute("id");
 
                         //See if it exists first
                         widget = server.getGeneratedWidget(widId);
-                        if(!widget) {
-                            //If we still don't have a widget we need to generate it
-                            require("./widget.js")(RED, true)({
-                                id: widId,
-                                server,
-                                name: elements[i].getAttribute("name") || "Generated widget",
-                                restoreState: elements[i].getAttribute("restoreState") || true,
-                                widthMultiplier: elements[i].getAttribute("widthMultiplier") || 1,
-                                heightMultiplier: elements[i].getAttribute("heightMultiplier") || 1,
-                                widgetType: elements[i].getAttribute("type"),
-                                title: elements[i].getAttribute("title")
-                            });
-                            widget = server.getGeneratedWidget(widId);
-
-                            //Copy in the config if set
-                            for(var j in widget.widgetType.defaultConfig) {
-                                var val = elements[i].getAttribute(j);
-                                if(val) {
-                                    elements[i].removeAttribute(j);
-                                    widget.widgetType.config[j] = val;
+                        if (!widget && elements[i].getAttribute("type") != undefined) {
+                            if (!elements[i].getAttribute("id")) { RED.log.error("A generated widget needs a unique id"); }
+                            else {
+                                //If we still don't have a widget we need to generate it
+                                require("./widget.js")(RED, true)({
+                                    id: widId,
+                                    server,
+                                    name: elements[i].getAttribute("name") || "Generated widget",
+                                    restoreState: elements[i].getAttribute("restoreState") || true,
+                                    setsState: elements[i].getAttribute("setsState") || true,
+                                    widthMultiplier: elements[i].getAttribute("widthMultiplier") || 1,
+                                    heightMultiplier: elements[i].getAttribute("heightMultiplier") || 1,
+                                    widgetType: elements[i].getAttribute("type"),
+                                    title: elements[i].getAttribute("title")
+                                });
+                                widget = server.getGeneratedWidget(widId);
+                            }
+                            if (!widget) {
+                                RED.log.error(`Failed to generate widget of type ${elements[i].getAttribute("type")}`);
+                            }
+                            else {
+                                //Copy in the config if set
+                                for (var j in widget.widgetType.defaultConfig) {
+                                    var val = elements[i].getAttribute(j);
+                                    if (val) {
+                                        elements[i].removeAttribute(j);
+                                        widget.widgetType.config[j] = val;
+                                    }
                                 }
                             }
                         }

@@ -122,12 +122,6 @@ module.exports = {
             //Setup the widget
             setupWidget: function (widget, config) {
                 this.widget = widget;
-
-                //Set the configuration
-                this.config.text = config["toggleButton-text"];
-                this.config.onValue = config["toggleButton-onValue"];
-                this.config.offValue = config["toggleButton-offValue"];
-                this.config.CSS = config["toggleButton-CSS"];
             },
 
             //When node red redeploys or closes

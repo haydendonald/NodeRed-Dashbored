@@ -148,7 +148,7 @@ module.exports = {
                         {
                             "label": "Option 0",
                             "value": "option_0",
-                            "onColor": "#99ff99",
+                            "onColor": "#32CD32",
                             "offColor": "#ff3333"
                         }
                     ],
@@ -194,10 +194,6 @@ module.exports = {
             //Setup the widget
             setupWidget: function (widget, config) {
                 this.widget = widget;
-
-                //Set the configuration
-                this.config.options = config["buttonSelector-options"];
-                this.config.CSS = config["buttonSelector-CSS"];
             },
 
             //When node red redeploys or closes

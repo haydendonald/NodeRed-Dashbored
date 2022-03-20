@@ -34,7 +34,8 @@ module.exports = function (RED, dashboredGeneration = undefined) {
         if (!widType) { RED.log.error(`Widget ${name} (${this.id}) has an invalid type ${config.widgetType}`); return; }
 
         //Assign the widget type
-        Object.assign(this, widType.create());
+        Object.assign(this, widType);
+        console.log(this);
 
         //Send to the flow
         this.sendToFlow = function (msg, messageType, get = undefined, sessionId = undefined, nodeId = undefined) {
@@ -107,16 +108,14 @@ module.exports = function (RED, dashboredGeneration = undefined) {
 
         //Copy in the default config if it wasn't set
         for (var i in this.defaultConfig) {
-            if (!this.config[i]) {
-                if (config[this.type + "-" + i]) {
-                    this.config[i] = config[this.type + "-" + i];
-                }
-                else if (config[i]) {
-                    this.config[i] = config[i];
-                }
-                else {
-                    this.config[i] = this.defaultConfig[i].value;
-                }
+            if (config[this.widgetType + "-" + i]) {
+                this.config[i] = config[this.widgetType + "-" + i];
+            }
+            else if (config[i]) {
+                this.config[i] = config[i];
+            }
+            else {
+                this.config[i] = this.defaultConfig[i].value;
             }
         }
 

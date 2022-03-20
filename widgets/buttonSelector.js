@@ -5,23 +5,21 @@
 */
 
 module.exports = {
-    type: "buttonSelector",
+    widgetType: "buttonSelector",
     version: "0.0.1",
     label: "Button Selector",
     description: "Generates buttons that select states",
-    create: function () {
-        return {
-            widthMultiplier: 1,
-            heightMultiplier: 1,
-            minWidth: undefined,
-            minWeight: undefined,
-            maxWidth: undefined,
-            maxHeight: undefined,
+    widthMultiplier: 1,
+    heightMultiplier: 1,
+    minWidth: undefined,
+    minWeight: undefined,
+    maxWidth: undefined,
+    maxHeight: undefined,
 
-            //Insert the HTML into the config on the NodeRed flow
-            //The ids MUST be node-config-input-<WIDGETNAME>-<CONFIGNAME> otherwise they may not be set
-            configHTML: function () {
-                return `
+    //Insert the HTML into the config on the NodeRed flow
+    //The ids MUST be node-config-input-<WIDGETNAME>-<CONFIGNAME> otherwise they may not be set
+    configHTML: function () {
+        return `
                     <div class="form-row">       
                         <ol id="options"></ol>
                     </div>
@@ -32,11 +30,11 @@ module.exports = {
                         <div style="height: 250px; min-height:150px;" class="node-text-editor" id="CSS"></div>
                     </div>
                 `;
-            }(),
-            //Scripts to call on the NodeRed config dashbored
-            configScript: {
-                //When the user opens the config panel get things ready
-                oneditprepare: `
+    }(),
+    //Scripts to call on the NodeRed config dashbored
+    configScript: {
+        //When the user opens the config panel get things ready
+        oneditprepare: `
                     //Validate and add an item
                     function validate() {
                         var self = this
@@ -104,8 +102,8 @@ module.exports = {
                         value: element["buttonSelector-CSS"]
                     });
                 `,
-                //When the user clicks save on the editor set our values
-                oneditsave: `
+        //When the user clicks save on the editor set our values
+        oneditsave: `
                     var self = this;
                     var temp = [];
                     var optionsList = $("#options").editableList('items');
@@ -128,123 +126,123 @@ module.exports = {
                     element.cssEditor.destroy();
                     delete element.cssEditor;
                 `,
-                //When the user cancels the edit dialog do some cleanup if required
-                oneditcancel: `
+        //When the user cancels the edit dialog do some cleanup if required
+        oneditcancel: `
                     //Delete the CSS editor
                     element.cssEditor.destroy();
                     delete element.cssEditor;
                 `,
-                //When the user clicks the "reset configuration" set the options to their defaults
-                reset: `
+        //When the user clicks the "reset configuration" set the options to their defaults
+        reset: `
                     element.cssEditor.setValue(defaultConfig.CSS.value);
                     element.cssEditor.clearSelection();
                 `
-            },
-            //Default config
-            defaultConfig: {
-                options: {
-                    value: [
-                        {
-                            "label": "Option 0",
-                            "value": "option_0",
-                            "onColor": "#32CD32",
-                            "offColor": "#ff3333"
-                        },
-                        {
-                            "label": "Option 1",
-                            "value": "option_1",
-                            "onColor": "#32CD32",
-                            "offColor": "#ff3333"
-                        }
-                    ],
-                    validate: function (values) {
-                        if (values === undefined) { return false; }
-                        for (var i in values) {
-                            if (values[i].label === undefined) { return false; }
-                            if (values[i].value === undefined || values[i].value == "") { return false; }
-                            if (values[i].offColor === undefined || values[i].offColor == "") { return false; }
-                            if (values[i].onColor === undefined || values[i].onColor == "") { return false; }
-                        }
-                        return true;
-                    }
+    },
+    //Default config
+    defaultConfig: {
+        options: {
+            value: [
+                {
+                    "label": "Option 0",
+                    "value": "option_0",
+                    "onColor": "#32CD32",
+                    "offColor": "#ff3333"
                 },
+                {
+                    "label": "Option 1",
+                    "value": "option_1",
+                    "onColor": "#32CD32",
+                    "offColor": "#ff3333"
+                }
+            ],
+            validate: function (values) {
+                if (values === undefined) { return false; }
+                for (var i in values) {
+                    if (values[i].label === undefined) { return false; }
+                    if (values[i].value === undefined || values[i].value == "") { return false; }
+                    if (values[i].offColor === undefined || values[i].offColor == "") { return false; }
+                    if (values[i].onColor === undefined || values[i].onColor == "") { return false; }
+                }
+                return true;
+            }
+        },
 
-                CSS: {
-                    value: `
+        CSS: {
+            value: `
                         .button {
                             width: calc(100% - 10px);
                             height: calc(100% - 10px);
                             margin: 5px;
                         }
                     `.replace(/^\s+|\s+$/gm, ''), required: true
-                }
-            },
-            //Current config
-            config: {},
+        }
+    },
+    //Current config
+    config: {},
 
-            //Default value(s)
-            getDefaultValues: function () {
-                return {
-                    value: undefined
-                }
-            },
+    //Default value(s)
+    getDefaultValues: function () {
+        return {
+            value: undefined
+        }
+    },
 
-            //Return the current values
-            getValues: function () {
-                return {
-                    value: this.getValue("value")
-                }
-            },
+    //Return the current values
+    getValues: function () {
+        return {
+            value: this.getValue("value")
+        }
+    },
 
-            //Setup the widget
-            setupWidget: function (config) {
-            },
+    //Setup the widget
+    setupWidget: function (config) {
+    },
 
-            //When node red redeploys or closes
-            onClose: function () { },
+    //When node red redeploys or closes
+    onClose: function () { },
 
-            //When a message comes from the dashbored
-            onMessage: function (msg) {
-                if (msg.id == this.id) {
-                    this.sendStatusChangesToFlow(msg.sessionId, {"value": msg.payload});
+    //When a message comes from the dashbored
+    onMessage: function (msg) {
+        if (msg.id == this.id) {
+            this.sendStatusChangesToFlow(msg.sessionId, { "value": msg.payload });
 
-                    if(this.setsState) {
-                        this.setValue("value", msg.payload);
-                        this.sendToDashbored(this.id, msg.sessionId, msg.payload);
-                    }
-                }
-            },
+            if (this.setsState) {
+                this.setValue("value", msg.payload);
+                this.sendToDashbored(this.id, msg.sessionId, msg.payload);
+            }
+        }
+    },
 
-            //When a message comes from a node red flow
-            onFlowMessage: function (msg) {
-                if (msg.payload && msg.payload.value) {
-                    this.setValue("value", msg.payload.value);
-                    this.sendToDashbored(this.id, msg.sessionId, msg.payload.value);
-                }
-            },
+    //When a message comes from a node red flow
+    onFlowMessage: function (msg) {
+        if (msg.payload && msg.payload.value) {
+            this.setValue("value", msg.payload.value);
+            this.sendToDashbored(this.id, msg.sessionId, msg.payload.value);
+        }
+    },
 
-            //Generate the CSS for the widget
-            generateCSS: function () {
-                return this.config.CSS;
-            },
+    //Generate the CSS for the widget
+    generateCSS: function () {
+        return this.config.CSS;
+    },
 
-            //Generate the HTML for the widget that will be inserted into the dashbored
-            generateHTML: function (htmlId) {
-                var ret = "";
-                for (var i in this.config.options) {
-                    var button = this.config.options[i];
-                    var color = button.value == this.getValue("value") ? button.onColor : button.offColor;
-                    ret += this.util.generateTag(htmlId, "button", i, button.label, `class="${this.util.generateCSSClass(htmlId, "button")}" style="background-color: ${color}"`);
-                }
-                return ret;
-            },
+    //Generate the HTML for the widget that will be inserted into the dashbored
+    generateHTML: function (htmlId) {
+        var ret = "";
+        for (var i in this.config.options) {
+            var button = this.config.options[i];
+            var color = button.value == this.getValue("value") ? button.onColor : button.offColor;
+            ret += this.util.generateTag(htmlId, "button", i, button.label, `class="${this.util.generateCSSClass(htmlId, "button")}" style="background-color: ${color}"`);
+        }
+        return ret;
+    },
 
-            //Generate the script that will be executed when the dashbored loads
-            generateOnload: function (htmlId, lockedAccess, alwaysPassword, ask, askText) {
-                var ret = "";
-                for (var i in this.config.options) {
-                    var button = this.config.options[i];
-                    ret += `${this.util.getElement(htmlId, i)}.onclick = function(event) {
+    //Generate the script that will be executed when the dashbored loads
+    generateOnload: function (htmlId, lockedAccess, alwaysPassword, ask, askText) {
+        var ret = "";
+        for (var i in this.config.options) {
+            var button = this.config.options[i];
+            ret += `${this.util.getElement(htmlId, i)}.onclick = function(event) {
                         var yesAction = function() {
                             sendMsg("${this.id}", "${button.value}");
                         }
@@ -253,24 +251,22 @@ module.exports = {
                         ${this.util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
                     }
                     `
-                }
-                return ret;
-            },
+        }
+        return ret;
+    },
 
-            //Generate the script that will be called when a message comes from NodeRed on the dashbored
-            generateOnMsg: function (htmlId) {
-                var ret = "";
-                for (var i in this.config.options) {
-                    var button = this.config.options[i];
-                    ret += `
+    //Generate the script that will be called when a message comes from NodeRed on the dashbored
+    generateOnMsg: function (htmlId) {
+        var ret = "";
+        for (var i in this.config.options) {
+            var button = this.config.options[i];
+            ret += `
                         ${this.util.getElement(htmlId, i)}.style.backgroundColor = (msg.payload == "${button.value}") ? "${button.onColor}" : "${button.offColor}";
                     `;
-                }
-                return ret;
-            },
-
-            //Generate any extra scripts to add to the document
-            generateScript: function () { },
         }
-    }
+        return ret;
+    },
+
+    //Generate any extra scripts to add to the document
+    generateScript: function () { },
 }

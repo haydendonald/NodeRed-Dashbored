@@ -17,8 +17,8 @@ module.exports = function (RED) {
         var ret = {};
         for (var i in requires) {
             var curr = requires[i];
-            RED.log.debug(`Added widget ${curr.type}@${curr.version} to the dashbored project`);
-            ret[curr.type] = curr;
+            RED.log.debug(`Added widget ${curr.widgetType}@${curr.version} to the dashbored project`);
+            ret[curr.widgetType] = curr;
         }
         return ret;
     }();
@@ -186,7 +186,7 @@ module.exports = function (RED) {
                     id: widget.id,
                     label: widget.name,
                     values: widget.values,
-                    widgetType: widget.type,
+                    widgetType: widget.widgetType,
                     configHTML: widget.configHTML,
                     configScript: widget.configScript
                 }
@@ -216,7 +216,7 @@ module.exports = function (RED) {
                 var createdType = type.create();
                 if (!type.doNotSendToEditor) {
                     send[i] = {
-                        widget: type.type,
+                        widget: type.widgetType,
                         name: type.label,
                         description: type.description,
                         configHTML: createdType.configHTML,

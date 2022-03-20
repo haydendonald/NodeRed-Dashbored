@@ -39,7 +39,7 @@ module.exports = function (RED, dashboredGeneration = undefined) {
         this.setsState = config.setsState;
 
         var widType = server.getWidgetTypes()[config.widgetType];
-        if(!widType) {return;}
+        if (!widType) { return; }
 
         this.widgetType = widType.create();
         this.widgetType.util = require("../util.js");
@@ -66,9 +66,9 @@ module.exports = function (RED, dashboredGeneration = undefined) {
          * Set values to memory
          * @param {Object} values The values to set in a key value object
          */
-        this.setValues = function(values) {
+        this.setValues = function (values) {
             var temp = flowContext.get(this.id);
-            for(var i in values) {
+            for (var i in values) {
                 temp[i] = values[i];
             }
             flowContext.set(this.id, temp);
@@ -103,9 +103,9 @@ module.exports = function (RED, dashboredGeneration = undefined) {
          * @param {object} changes The changes to expect in key value form
          * @param {string} nodeId  The node id
          */
-        this.sendStatusChangesToFlow = function(sessionId, changes, nodeId = undefined) {
+        this.sendStatusChangesToFlow = function (sessionId, changes, nodeId = undefined) {
             var temp = this.widgetType.getValues();
-            for(var i in changes) {
+            for (var i in changes) {
                 temp[i] = changes[i];
             }
             this.sendToFlow(temp, "set", undefined, sessionId, nodeId);
@@ -137,7 +137,7 @@ module.exports = function (RED, dashboredGeneration = undefined) {
         //Copy in the default config if it wasn't set
         for (var i in this.widgetType.defaultConfig) {
             if (!this.widgetType.config[i]) {
-                if(config[i]) {
+                if (config[i]) {
                     this.widgetType.config[i] = config[i];
                 }
                 else {
@@ -150,7 +150,7 @@ module.exports = function (RED, dashboredGeneration = undefined) {
         this.input = (msg, nodeId) => {
             switch (msg.topic) {
                 case "get": {
-                    this.sendToFlow(this.widgetType.getValues(), "get", undefined, nodeId);
+                    this.sendStatusToFlow("get", undefined, nodeId);
                     break;
                 }
                 case "set": {

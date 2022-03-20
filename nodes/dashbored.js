@@ -141,6 +141,14 @@ module.exports = function (RED) {
                     }
                 }
             }
+            else {
+                //Send the raw data
+                sendMsgToFlow("other", {
+                    id: id,
+                    sessionId: data.sessionId,
+                    data: data
+                });
+            }
         }
 
         //Add the widgets to a page

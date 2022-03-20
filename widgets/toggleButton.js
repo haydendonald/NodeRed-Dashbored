@@ -136,7 +136,7 @@ module.exports = {
             //When a message comes from the dashbored
             onMessage: function (msg) {
                 if (msg.id == this.id) {
-                    this.widget.sendStatusToFlow("set", msg.sessionId);
+                    this.widget.sendStatusChangesToFlow(msg.sessionId, {"state": msg.payload});
 
                     if(this.widget.setsState) {
                         this.widget.setValue("state", msg.payload);

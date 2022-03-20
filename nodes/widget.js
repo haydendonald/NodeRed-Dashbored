@@ -61,11 +61,24 @@ module.exports = function (RED, dashboredGeneration = undefined) {
             server.sendMsg(id, sessionId, payload);
         }
 
+        //Set values to memory
+        /**
+         * Set values to memory
+         * @param {Object} values The values to set in a key value object
+         */
+        this.setValues = function(values) {
+            var temp = flowContext.get(this.id);
+            for(var i in values) {
+                temp[i] = values[i];
+            }
+            flowContext.set(this.id, temp);
+        }
+
         //Set a value
         this.setValue = function (name, value) {
-            var temp = flowContext.get(this.id);
+            var temp = {};
             temp[name] = value;
-            flowContext.set(this.id, temp);
+            this.setValues(temp)
         }
 
         //Get a value
@@ -80,8 +93,22 @@ module.exports = function (RED, dashboredGeneration = undefined) {
         }
 
         //Send the current status to the flow
-        this.sendStatusToFlow = function (type, sessionId, nodeId) {
+        this.sendStatusToFlow = function (type, sessionId, nodeId = undefined) {
             this.sendToFlow(this.widgetType.getValues(), type, undefined, sessionId, nodeId);
+        }
+
+        /**
+         * Send a status update to the flow
+         * @param {string} sessionId The session id
+         * @param {object} changes The changes to expect in key value form
+         * @param {string} nodeId  The node id
+         */
+        this.sendStatusChangesToFlow = function(sessionId, changes, nodeId = undefined) {
+            var temp = this.widgetType.getValues();
+            for(var i in changes) {
+                temp[i] = changes[i];
+            }
+            this.sendToFlow(temp, "set", undefined, sessionId, nodeId);
         }
 
         //Add a callback for the sendToFlow function

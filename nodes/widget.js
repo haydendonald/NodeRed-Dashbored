@@ -171,7 +171,7 @@ module.exports = function (RED, dashboredGeneration = undefined) {
 
         //Add the widget to the server
         if (dashboredGeneration) {
-            server.addGeneratedWidget(this.id, this);
+            return this;
         }
         else {
             //Add this widget to the server

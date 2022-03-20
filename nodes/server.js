@@ -124,6 +124,10 @@ module.exports = function (RED) {
 
         //Return a generated widget
         node.getGeneratedWidget = (id) => {
+            console.log(Object.keys(generatedWidgets));
+            for(var i in generatedWidgets) {
+                console.log(`${generatedWidgets[i].id}:${i}`);
+            }
             return generatedWidgets[id];
         }
 

@@ -151,6 +151,7 @@ module.exports = function (RED) {
                     var widget = RED.nodes.getNode(elements[i].id);
 
                     //If the widget was not found see if we can generate it
+                    server.getGeneratedWidget();
                     if (!widget) {
                         var widId = elements[i].getAttribute("id");
 
@@ -160,7 +161,7 @@ module.exports = function (RED) {
                             if (!elements[i].getAttribute("id")) { RED.log.error("A generated widget needs a unique id"); }
                             else {
                                 //If we still don't have a widget we need to generate it
-                                require("./widget.js")(RED, true)({
+                                var config = {
                                     id: widId,
                                     server,
                                     name: elements[i].getAttribute("name") || "Generated widget",
@@ -170,7 +171,10 @@ module.exports = function (RED) {
                                     heightMultiplier: elements[i].getAttribute("heightMultiplier") || 1,
                                     widgetType: elements[i].getAttribute("type"),
                                     title: elements[i].getAttribute("title")
-                                });
+                                };
+                                var temp = {};
+                                Object.assign(temp, require("./widget.js")(RED, true)(config));
+                                server.addGeneratedWidget(temp.id, temp);
                                 widget = server.getGeneratedWidget(widId);
                             }
                             if (!widget) {

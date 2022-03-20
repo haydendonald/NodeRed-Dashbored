@@ -75,17 +75,15 @@ page {
 button {
     border: 1px solid transparent;
     border-radius: .75rem;
-    cursor: pointer;
     font-size: 1.125rem;
     font-weight: 600;
     line-height: 1.5rem;
     padding: .75rem 1.2rem;
     text-align: center;
     text-decoration: none #6B7280 solid;
-    transition-duration: .2s;
+    transition-duration: background-color 1s;
     transition-property: background-color, border-color, color, fill, stroke;
     transition-timing-function: cubic-bezier(.4, 0, 0.2, 1);
-    -webkit-user-select: none;
     touch-action: manipulation;
     width: auto;
 }

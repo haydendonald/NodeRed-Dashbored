@@ -27,7 +27,7 @@ function addOnMsgFunction(fn) {
 }
 
 //Print to the console
-function print(type, message) {
+function printConsole(type, message) {
     if (type.toUpperCase() == "debug" && !debug) { return; }
     console.log("[" + type.toUpperCase() + "] - " + message);
 }
@@ -51,7 +51,7 @@ function formatAMPM(date) {
  * @param {function} callback When a message is received on the socket this callback will be called with callback(id, success, msg) this MUST return true if successful otherwise the timeout will be called
  */
 function sendMsg(id, payload, callback) {
-    print("debug", "Sending msg for " + id + ": " + payload);
+    printConsole("debug", "Sending msg for " + id + ": " + payload);
     if (callback) {
         var index = socketCallbacks.length;
         socketCallbacks.push(
@@ -178,7 +178,7 @@ function addOnUnlockFunction(fn) {
  * Lock the dashbored
  */
 function lockDashbored() {
-    print("info", "Locking the dashbored");
+    printConsole("info", "Locking the dashbored");
     sendMsg(dashboredId, { type: "lock" });
 }
 /**
@@ -246,7 +246,7 @@ function askPassword(correctCallback, incorrectCallback, bypassPassword) {
             if (success) {
                 if (msg.payload.type == "password") {
                     if (msg.payload.correct == true) {
-                        print("debug", "Password correct");
+                        printConsole("debug", "Password correct");
                         if (correctCallback) { correctCallback(password); }
                         hideShowElement("passwordCorrect", true);
                         setTimeout(function () {
@@ -255,7 +255,7 @@ function askPassword(correctCallback, incorrectCallback, bypassPassword) {
                         }, 1000);
                     }
                     else {
-                        print("debug", "Password incorrect");
+                        printConsole("debug", "Password incorrect");
                         document.getElementById("currentPassword").innerHTML = "";
                         password = "";
                         if (incorrectCallback) { incorrectCallback(); }
@@ -299,21 +299,30 @@ function askAreYouSure(yesCallback, noCallback, description) {
 function showCurrentPage(newPageId) {
     if (newPageId) { currentPage = document.getElementById(newPageId); }
     var others = document.getElementsByTagName("page");
+    var buttons = document.getElementById("nav").getElementsByTagName("button");
     for (var i = 0; i < others.length; i++) {
         others[i].classList.add("hidden");
     }
     currentPage.classList.remove("hidden");
+    for(var i = 0; i < buttons.length; i++) {
+        if("page_" + buttons[i].getAttribute("id").split("_page_")[1] == newPageId) {
+            buttons[i].classList.add("active");
+        }
+        else {
+            buttons[i].classList.remove("active");
+        }
+    }
 }
 
 //Attempt to connect to the socket and setup the handlers
 var connectionInterval;
 function connect() {
     var attempt = function () {
-        print("debug", "Attempt connection to the socket");
+        printConsole("debug", "Attempt connection to the socket");
         if (socket) { socket = undefined; }
         socket = new WebSocket("ws://" + location.host.split(":")[0] + ":4235");
         socket.addEventListener("open", function (event) {
-            print("debug", "Socket open");
+            printConsole("debug", "Socket open");
             clearInterval(connectionInterval);
             connectionInterval = undefined;
 
@@ -333,7 +342,7 @@ function connect() {
             if (data.data == "reload") { setTimeout(function () { window.location.reload(); }, 1000); return; }
 
             var msg = JSON.parse(data.data);
-            print("debug", "Socket message received");
+            printConsole("debug", "Socket message received");
             if (debug) { console.log(msg); }
 
             //Send to onMsgCallbacks
@@ -356,7 +365,7 @@ function connect() {
             if ((msg.id == dashboredId || msg.id == undefined) && (msg.sessionId == sessionId || msg.sessionId == undefined)) {
                 switch (msg.payload.type) {
                     case "lock": {
-                        print("info", "Request to lock dashbored");
+                        printConsole("info", "Request to lock dashbored");
                         for (var i = 0; i < onLockFunctions.length; i++) {
                             onLockFunctions[i]();
                         }
@@ -369,7 +378,7 @@ function connect() {
                     }
                     case "unlock": {
                         if (msg.payload.unlock == true) {
-                            print("info", "Request to unlock dashbored");
+                            printConsole("info", "Request to unlock dashbored");
                             for (var i = 0; i < onUnlockFunctions.length; i++) {
                                 onUnlockFunctions[i]();
                             }
@@ -390,11 +399,11 @@ function connect() {
         });
 
         socket.addEventListener("error", function (error) {
-            print("error", "Socket error");
+            printConsole("error", "Socket error");
         });
 
         socket.addEventListener("close", function () {
-            print("debug", "Socket closed");
+            printConsole("debug", "Socket closed");
             socketWasClosed = true;
             message("error", "Disconnected From Server", "We are currently disconnected from the server! Attempting to get it back!", false);
             connect();
@@ -413,10 +422,13 @@ function connect() {
 ///////////////////////////////////////////////////////////
 
 window.onload = function () {
-    print("info", "Dashbored project by Hayden Donald\nhttps://github.com/haydendonald/NodeRed-Dashbored\nLet's Go!");
-    print("debug", "Triggering onload functions");
+    printConsole("info", "Dashbored project by Hayden Donald\nhttps://github.com/haydendonald/NodeRed-Dashbored\nLet's Go!");
+    printConsole("debug", "Triggering onload functions");
 
     connect();
+
+    //Open to the first non-locked page
+    
 
     //Execute all the onload functions
     for (var i = 0; i < onLoadFunctions.length; i++) {

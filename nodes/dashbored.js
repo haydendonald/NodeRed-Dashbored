@@ -347,7 +347,7 @@ module.exports = function (RED) {
                             }
 
                             //Set the first page to visible
-                            if(${firstPage}){currentPage = document.getElementById("${id}"); showCurrentPage();}
+                            if(${firstPage}){currentPage = document.getElementById("${id}"); showCurrentPage("${id}");}
                         });
                     `);
                 }

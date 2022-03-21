@@ -246,9 +246,11 @@ module.exports = {
             var button = this.config.options[i];
             ret += `${this.util.getElement(htmlId, i)}.onclick = function(event) {
                         var yesAction = function() {
-                            loadingAnimation(event.target.id, true);
+                            var waiting = true;
+                            setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
                             sendMsg("${this.id}", "${button.value}", function(id, sessionId, success, msg) {
                                 if(id == "${this.id}") {
+                                    watiing = false;
                                     loadingAnimation(event.target.id, false);
                                     if(!success) {
                                         failedToSend();

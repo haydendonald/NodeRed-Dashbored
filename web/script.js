@@ -10,7 +10,8 @@ var onLoadFunctions = [];
 var onMsgFunctions = [];
 var onLockFunctions = [];
 var onUnlockFunctions = [];
-var socketCallbacks = [];
+var messageCallbacks = {};
+// var waitingFor = {};
 var elementsHiddenWhileLocked = [];
 var currentPage;
 var socketWasClosed = false;
@@ -24,6 +25,11 @@ function addOnLoadFunction(fn) {
 //Add a function that will be called when a message is received on the websocket
 function addOnMsgFunction(fn) {
     onMsgFunctions.push(fn);
+}
+
+//Generates a random string
+function randString() {
+    return "r" + (Math.random() + 1).toString(36).substring(2);
 }
 
 //Print to the console
@@ -51,32 +57,63 @@ function formatAMPM(date) {
  * @param {function} callback When a message is received on the socket this callback will be called with callback(id, sessionId, success, msg) this MUST return true if successful otherwise the timeout will be called
  */
 function sendMsg(id, payload, callback) {
-    printConsole("debug", "Sending msg for " + id + ": " + payload);
-    if (callback) {
-        var index = socketCallbacks.length;
-        socketCallbacks.push(
-            {
-                timeout: setTimeout(function () {
-                    socketCallbacks = socketCallbacks.splice(index + 1, 1);
-                    callback(id, sessionId, false);
-                }, 3000),
-                id: id,
-                sessionId: sessionId,
-                fn: callback
-            });
+    var requestId = randString();
+    printConsole("debug", "Sending msg for " + id + "(" + requestId + "): " + payload);
+
+    var cb = function (obj, id, sessionId, success, msg) {
+        // console.log(obj);
+        // console.log(socketCallbacks);
+        // console.log(id);
+        // console.log(requestId);
+        // if (callback) { callback(id, sessionId, success, msg); }
+        // clearTimeout(socketCallbacks[id][requestId].timeout);
+        // socketCallbacks[id][requestId] = undefined;
     }
+
+    if (!messageCallbacks[id]) { messageCallbacks[id] = [] }
+
+    var randId = randString();
+    messageCallbacks[id].push({
+        timeout: setTimeout(function () {
+            if(callback){callback(id, sessionId, false);}
+            
+            //Mark for deletion
+            for(var i in messageCallbacks[id]) {
+                if(messageCallbacks[id][i].randId == randId) {
+                    messageCallbacks[id][i].timeout = undefined;
+                }
+            }
+        }, 3000),
+        id: id,
+        sessionId: sessionId,
+        randId: randId,
+        fn: function (obj, id, sessionId, success, msg) {
+            if (callback) { return callback(id, sessionId, success, msg); }
+            else {
+                return true;
+            }
+            // console.log(id);
+            // console.log(requestId);
+            // console.log(messageCallbacks[id][requestId]);
+            // clearTimeout(messageCallbacks[id][requestId].timeout);
+            //delete messageCallbacks[id][requestId];
+            console.log(obj);
+        }
+    });
+
     socket.send(JSON.stringify({
         id: id,
         sessionId: sessionId,
         payload: payload
     }));
+    //}
 }
 
 /**
  * Add the loading animation
  */
 function loadingAnimation(htmlId, active) {
-    if(active) {
+    if (active) {
         document.getElementById(htmlId).classList.add("loading");
     }
     else {
@@ -322,8 +359,8 @@ function showCurrentPage(newPageId) {
         others[i].classList.add("hidden");
     }
     currentPage.classList.remove("hidden");
-    for(var i = 0; i < buttons.length; i++) {
-        if("page_" + buttons[i].getAttribute("id").split("_page_")[1] == newPageId) {
+    for (var i = 0; i < buttons.length; i++) {
+        if ("page_" + buttons[i].getAttribute("id").split("_page_")[1] == newPageId) {
             buttons[i].classList.add("active");
         }
         else {
@@ -370,15 +407,20 @@ function connect() {
             }
 
             //Send to socket callbacks
-            var del = [];
-            for (var i = 0; i < socketCallbacks.length; i++) {
-                if (socketCallbacks[i].fn(msg.id, msg.sessionId, true, msg) === true) {
-                    clearTimeout(socketCallbacks[i].timeout);
-                    del.push(i);
+            for (var i in messageCallbacks) {
+                var del = [];
+                for (var j in messageCallbacks[i]) {
+                    if (messageCallbacks[i][j].timeout === undefined || messageCallbacks[i][j].fn(messageCallbacks[i][j], msg.id, msg.sessionId, true, msg) === true) {
+                        del.push(i);
+                    }
                 }
+
+                //Delete all the completed callbacks
+                for (var k = 0; k < del.length; k++) { messageCallbacks[i] = messageCallbacks[i].splice(del[k], 1); }
             }
-            //Delete all the completed callbacks
-            for (var i = 0; i < del.length; i++) { socketCallbacks = socketCallbacks.splice(del[i], 1); }
+
+            console.log(messageCallbacks);
+
 
             //If the message is for this dashbored handle it
             if ((msg.id == dashboredId || msg.id == undefined) && (msg.sessionId == sessionId || msg.sessionId == undefined)) {
@@ -447,7 +489,7 @@ window.onload = function () {
     connect();
 
     //Open to the first non-locked page
-    
+
 
     //Execute all the onload functions
     for (var i = 0; i < onLoadFunctions.length; i++) {

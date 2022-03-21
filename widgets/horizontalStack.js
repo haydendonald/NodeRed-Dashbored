@@ -20,9 +20,8 @@ module.exports = {
     //The ids MUST be node-config-input-<WIDGETNAME>-<CONFIGNAME> otherwise they may not be set
     generateConfigHTML: function () {
         return `
-            <div class="form-row">
-                <label for="node-input-horizontalStack-widgets"><i class="icon-bookmark"></i> Widgets</label>
-                <input type="text" id="node-input-horizontalStack-widgets">
+            <div class="form-row">       
+                <ol id="options"></ol>
             </div>
             <!-- CSS Editor -->
             <div class="form-row">
@@ -33,8 +32,6 @@ module.exports = {
     },
     //Scripts to call on the NodeRed config dashbored
     generateConfigScript: function () {
-        console.log(this.id);
-        var id = this.id;
         return {
             //When the user opens the config panel get things ready
             oneditprepare: `
@@ -48,14 +45,50 @@ module.exports = {
                 wids[widgets[i].id] = widgets[i];
             }
 
-            $("#node-input-horizontalStack-widgets").typedInput({
-                types: [{
-                    value: "widgets",
-                    multiple: "true",
-                    options: options
-                }]
+
+            //Validate and add an item
+            function validate() {
+                var self = this
+                this["horizontalStack-widgets"] = [];
+                var optionsList = $("#options").editableList("items");
+                optionsList.each(function (i) {
+                    var option = $(this);
+                    self["horizontalStack-widgets"].push(option.find(".node-input-option-widget").typedInput('value'));
+                });
+            }
+
+            var optionsList = $("#options").css('min-height', '200px').editableList({
+                header: $("<div>").css('padding-left', '32px').append($.parseHTML(
+                    "<div style='width:35%; display: inline-grid'><b>Widget</b></div>")),
+
+                addItem: function (container, i, option) {
+                    var row = $('<div/>').appendTo(container);
+                    var widgetField = $('<input/>', { class: "node-input-option-widget", type: "text" }).css({ "width": "35%", "margin-left": "5px", "margin-right": "5px" }).appendTo(row);
+
+                    widgetField.typedInput({
+                        types: [{
+                            value: i,
+                            options: options
+                        }]
+                    });
+                    widgetField.typedInput("value", element["horizontalStack-widgets"].split(",")[i]);
+                    validate();
+
+                },
+                removeItem: function (data) {
+                    validate()
+                },
+                removable: true,
+                sortable: true,
+
             });
-            $("#node-input-horizontalStack-widgets").typedInput("value", element["horizontalStack-widgets"]);
+
+            //Add existing options
+            if (element["horizontalStack-widgets"]) {
+                element["horizontalStack-widgets"].split(",").forEach(function (option, index) {
+                    optionsList.editableList("addItem", { widget: option});
+                });
+            }
 
             element.cssEditor = RED.editor.createEditor({
                 id: "CSS",
@@ -65,7 +98,13 @@ module.exports = {
         `,
             //When the user clicks save on the editor set our values
             oneditsave: `
-                    element["horizontalStack-widgets"] = $("#node-input-horizontalStack-widgets").typedInput("value");
+                    var temp = [];
+                    var optionsList = $("#options").editableList("items");
+                    optionsList.each(function (i) {
+                        var option = $(this);
+                        temp.push(option.find(".node-input-option-widget").typedInput("value"));
+                    });
+                    element["horizontalStack-widgets"] = temp.join();
 
                     //Set the CSS value
                     element["buttonSelector-CSS"] = element.cssEditor.getValue();
@@ -95,11 +134,6 @@ module.exports = {
         },
         CSS: {
             value: `
-                        .button {
-                            width: calc(100% - 10px);
-                            height: calc(100% - 10px);
-                            margin: 5px;
-                        }
                     `.replace(/^\s+|\s+$/gm, ''), required: true
         }
     },
@@ -146,7 +180,7 @@ module.exports = {
     generateHTML: function (htmlId) {
         var ret = "";
         var widgetIds = this.config.widgets.split(",");
-        for(var i in widgetIds) {
+        for (var i in widgetIds) {
             ret += `
             <widget id="${widgetIds[i]}" style="float: left"></widget>
             `;

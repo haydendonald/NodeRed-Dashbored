@@ -169,16 +169,12 @@
             //The default HTML for the dashbored
             HTML: {
                 value: `
-                <page name="Example Page">
-                    <h1>This is an example page!</h1>
-                    <p>Type any HTML here to have it display on the page</p>
-                    <hr>
-                    <p>You can add widgets with the following</p>
-                    <code><widget id="4c385a0.f7d2ba8"></widget></code>
-                    <p>See an example by putting your cursor here and adding a widget in the dashbored editor!</p>
+                <page name="Example 1" icon="fa-home">
+                <widget id="example-button1" type="toggleButton" text="Toggle Button" title="Toggle Button"></widget>  
+                <widget id="example-buttonSelector" type="buttonSelector" title="Button Selector"></widget> 
                 </page>
-                <page name="Example Page 2">
-                    <h1>This is another example page!</h1>
+                <page name="Locked Page" icon="fa-lock" always-password="yes">
+                    <h1>This is a locked page :O</h1>
                 </page>
                 `.replace(/^\s+|\s+$/gm, ''),
                 required: true
@@ -187,34 +183,7 @@
             //The default CSS for the dashbored
             CSS: {
                 value: `
-                /* Global styling */
-                * {
-                font-family: "Inter var", ui-sans-serif, system-ui, -apple-system, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-                }#header, #nav {
-                background-color: #252525;
-                }html, #pages, page, #password, #ask, #loader {
-                background-color: #121212;
-                color: white;
-                }.bgRed {
-                background-color: #DC143C;
-                }
-                .bgGreen {
-                background-color: #228B22;
-                }
-                .bgBlue {
-                background-color: rgb(64, 119, 221);
-                }
-                .bgYellow {
-                background-color: #FFD700;
-                }/* Buttons */
-                button {
-                background-color: #434343;
-                color: white;
-                }
-                button.active {
-                    background-color: white;
-                    color: black;
-                }
+                /* You can add custom CSS styling here, see https://github.com/haydendonald/NodeRed-Dashbored/wiki/Dashbored#css-classes */
                 `.replace(/^\s+|\s+$/gm, ''),
                 required: true
             }

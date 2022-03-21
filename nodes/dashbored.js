@@ -278,8 +278,7 @@ module.exports = function (RED) {
                         if (widget.title) {
                             ret += `
                             #${randomId}_title {
-                                font-size: 1.5em;
-                                height: 30px;
+                                font-size: 1.2em;
                                 margin-top: 10px;
                                 margin-bottom: 10px;
                                 text-align: center;
@@ -339,6 +338,7 @@ module.exports = function (RED) {
                 var alwaysPassword = page.getAttribute("always-password") || "no";
                 var id = "page_" + util.randString();
                 page.setAttribute("id", id);
+                page.classList.add("background");
 
                 //Add page to navigation
                 if (navigationVisibility != "no") {

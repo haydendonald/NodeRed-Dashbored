@@ -1,8 +1,49 @@
+* {
+    font-family: "Inter var", ui-sans-serif, system-ui, -apple-system, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+#header, #nav {
+    background-color: #252525;
+}
+
+.background {
+    background-color: #121212;
+    color: white;
+}
+
+.bgRed {
+    background-color: #DC143C;
+}
+
+.bgGreen {
+    background-color: #228B22;
+}
+
+.bgBlue {
+    background-color: rgb(64, 119, 221);
+}
+
+.bgYellow {
+    background-color: #FFD700;
+}
+
+/* Buttons */
+button {
+    background-color: #434343;
+    color: white;
+}
+
+button.active {
+    background-color: white;
+    color: black;
+}
+
 /* Pages section */
 #pages {
     position: absolute;
     width: 100%;
 }
+
 page {
     position: absolute;
     top: 0;
@@ -10,6 +51,7 @@ page {
     width: 100%;
     height: 100%;
 }
+
 #locked {
     text-align: center;
     padding: 50px;
@@ -64,9 +106,11 @@ page {
     overflow: hidden;
     padding: 0;
 }
+
 #nav #lockButton {
     width: 80px;
 }
+
 * {
     padding: 0;
     margin: 0;
@@ -120,16 +164,19 @@ button:focus {
     z-index: 20;
     text-align: center;
 }
+
 #buttonPad {
     margin-left: calc(50% - 108px);
     margin-top: 3vh;
 }
+
 #buttonPad button {
     width: 70px;
     height: 70px;
     margin: 2px;
     padding: 0;
 }
+
 #checkPassword, #closePassword {
     margin: 10px;
     margin-top: 3vh;
@@ -137,10 +184,12 @@ button:focus {
     height: 70px;
     padding: 0;
 }
+
 #currentPassword {
     font-size: 2em;
     height: 15px;
 }
+
 #passwordCorrect, #passwordIncorrect {
     position: absolute;
     top: 20px;
@@ -158,9 +207,11 @@ button:focus {
     z-index: 20;
     text-align: center;
 }
+
 #areYouSureDesc {
     margin-top: 10px;
 }
+
 #yesButton, #noButton {
     margin-top: 50px;
     width: 200px;
@@ -173,10 +224,12 @@ button:focus {
     button {
         padding: 2vw 3vw;
     }
+
     .mobile-hidden {
         display: none;
     }
 }
+
 /** Loader **/
 
 #loader {
@@ -194,35 +247,40 @@ button:focus {
     position: relative;
     width: 80px;
     height: 80px;
-  }
-  .lds-facebook div {
+}
+
+.lds-facebook div {
     display: inline-block;
     position: absolute;
     left: 8px;
     width: 16px;
     background: #fff;
     animation: lds-facebook 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
-  }
-  .lds-facebook div:nth-child(1) {
+}
+
+.lds-facebook div:nth-child(1) {
     left: 8px;
     animation-delay: -0.24s;
-  }
-  .lds-facebook div:nth-child(2) {
+}
+
+.lds-facebook div:nth-child(2) {
     left: 32px;
     animation-delay: -0.12s;
-  }
-  .lds-facebook div:nth-child(3) {
+}
+
+.lds-facebook div:nth-child(3) {
     left: 56px;
     animation-delay: 0;
-  }
-  @keyframes lds-facebook {
+}
+
+@keyframes lds-facebook {
     0% {
-      top: 8px;
-      height: 64px;
+        top: 8px;
+        height: 64px;
     }
+
     50%, 100% {
-      top: 24px;
-      height: 32px;
+        top: 24px;
+        height: 32px;
     }
-  }
-  
+}

@@ -249,11 +249,11 @@ module.exports = function (RED) {
                     var CSS = function () {
                         var ret = `
                         #${randomId}_widget {`
-
-                        if (!widget.noHeight) {
+                        
+                        if(!widget.noHeight) {
                             ret += `height: calc(${baseHeight} * ${widget.heightMultiplier});`;
                         }
-                        if (!widget.noWidth) {
+                        if(!widget.noWidth) {
                             ret += `width: calc(${baseWidth} * ${widget.widthMultiplier}) ;`;
                         }
                         if (widget.minWidth) {

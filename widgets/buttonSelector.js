@@ -173,7 +173,6 @@ module.exports = {
             value: `
                         .button {
                             width: calc(100% - 10px);
-                            height: calc(100% - 10px);
                             margin: 5px;
                         }
                     `.replace(/^\s+|\s+$/gm, ''), required: true
@@ -198,6 +197,7 @@ module.exports = {
 
     //Setup the widget
     setupWidget: function (config) {
+        this.heightMultiplier = this.config.options.length;
     },
 
     //When node red redeploys or closes
@@ -234,7 +234,7 @@ module.exports = {
         for (var i in this.config.options) {
             var button = this.config.options[i];
             var color = button.value == this.getValue("value") ? button.onColor : button.offColor;
-            ret += this.util.generateTag(htmlId, "button", i, button.label, `class="${this.util.generateCSSClass(htmlId, "button")}" style="background-color: ${color}"`);
+            ret += this.util.generateTag(htmlId, "button", i, button.label, `class="${this.util.generateCSSClass(htmlId, "button")}" style="background-color: ${color}; height: calc(calc(100% / ${this.config.options.length}) - 10px)"`);
         }
         return ret;
     },

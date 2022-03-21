@@ -341,6 +341,7 @@ function connect() {
         socket = new WebSocket("ws://" + location.host.split(":")[0] + ":4235");
         socket.addEventListener("open", function (event) {
             printConsole("debug", "Socket open");
+            hideShowElement("loader", false, 0.5);
             clearInterval(connectionInterval);
             connectionInterval = undefined;
 

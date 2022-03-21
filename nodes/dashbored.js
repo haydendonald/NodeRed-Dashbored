@@ -582,8 +582,6 @@ module.exports = function (RED) {
                         ${alwaysShowLockButton ? "" : "hideShowElement('lockButton', false);"}
                         document.getElementById("lockButton").innerHTML = "<i class='fa fa-lock'></i>";
                     });
-
-                    setTimeout(function(){hideShowElement("loader", false, 0.5);}, 500);
                 });
                 var temp = document.getElementById("onLoadScripts");
                 temp.parentNode.removeChild(temp);

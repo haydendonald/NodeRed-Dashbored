@@ -244,7 +244,16 @@ module.exports = {
             var button = this.config.options[i];
             ret += `${this.util.getElement(htmlId, i)}.onclick = function(event) {
                         var yesAction = function() {
-                            sendMsg("${this.id}", "${button.value}");
+                            loadingAnimation(event.target.id, true);
+                            sendMsg("${this.id}", "${button.value}", function(id, sessionId, success, msg) {
+                                if(id == "${this.id}") {
+                                    loadingAnimation(event.target.id, false);
+                                    if(!success) {
+                                        failedToSend();
+                                    }
+                                    return true;
+                                }
+                            });
                         }
                         var noAction = function(){}
 

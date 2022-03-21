@@ -160,7 +160,17 @@ module.exports = {
         return `
                     ${this.util.getElement(htmlId, "button")}.onclick = function(event) {
                         var yesAction = function() {
-                            sendMsg("${this.id}", event.target.getAttribute("state") == "${this.config.onValue}" ? "${this.config.offValue}" : "${this.config.onValue}");
+                            loadingAnimation(event.target.id, true);
+                            sendMsg("${this.id}", event.target.getAttribute("state") == "${this.config.onValue}" ? "${this.config.offValue}" : "${this.config.onValue}", function(id, sessionId, success, msg) {
+                                if(id == "${this.id}") {
+                                    loadingAnimation(event.target.id, false);
+                                    if(!success) {
+                                        failedToSend();
+                                    }
+                                    return true;
+                                }
+                            });
+                            
                         }
                         var noAction = function(){}
 

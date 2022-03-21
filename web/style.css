@@ -27,6 +27,21 @@
     background-color: #FFD700;
 }
 
+.loading {
+    animation: glowing 1000ms infinite;
+}
+
+@keyframes glowing {
+    0% {
+        background-color: white;
+    }
+
+    50% {
+        background-color: rgb(70, 70, 70);
+    }
+
+}
+
 /* Buttons */
 button {
     background-color: #434343;

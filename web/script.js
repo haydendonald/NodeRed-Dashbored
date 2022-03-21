@@ -48,7 +48,7 @@ function formatAMPM(date) {
  * Send a message to NodeRed over the websocket
  * @param {string} id The node or event id 
  * @param {object} payload The payload to send
- * @param {function} callback When a message is received on the socket this callback will be called with callback(id, success, msg) this MUST return true if successful otherwise the timeout will be called
+ * @param {function} callback When a message is received on the socket this callback will be called with callback(id, sessionId, success, msg) this MUST return true if successful otherwise the timeout will be called
  */
 function sendMsg(id, payload, callback) {
     printConsole("debug", "Sending msg for " + id + ": " + payload);
@@ -58,8 +58,8 @@ function sendMsg(id, payload, callback) {
             {
                 timeout: setTimeout(function () {
                     socketCallbacks = socketCallbacks.splice(index + 1, 1);
-                    callback(id, false);
-                }, 1000),
+                    callback(id, sessionId, false);
+                }, 3000),
                 id: id,
                 sessionId: sessionId,
                 fn: callback
@@ -72,6 +72,17 @@ function sendMsg(id, payload, callback) {
     }));
 }
 
+/**
+ * Add the loading animation
+ */
+function loadingAnimation(htmlId, active) {
+    if(active) {
+        document.getElementById(htmlId).classList.add("loading");
+    }
+    else {
+        document.getElementById(htmlId).classList.remove("loading");
+    }
+}
 
 /**
  * Show or show an element
@@ -158,6 +169,13 @@ function message(type, title, description, closeAfterSec, callback) {
             if (callback) { callback(); }
         }, closeAfterSec * 1000);
     }
+}
+
+/**
+ * Display a message showing a problem happened while sending a message to the server
+ */
+function failedToSend() {
+    message("warn", "Whoops!", "Something happened while performing that request, please try again later");
 }
 
 /**
@@ -353,7 +371,7 @@ function connect() {
             //Send to socket callbacks
             var del = [];
             for (var i = 0; i < socketCallbacks.length; i++) {
-                if (socketCallbacks[i].fn(socketCallbacks[i].id, true, msg) === true) {
+                if (socketCallbacks[i].fn(msg.id, msg.sessionId, true, msg) === true) {
                     clearTimeout(socketCallbacks[i].timeout);
                     del.push(i);
                 }

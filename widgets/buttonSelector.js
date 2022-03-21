@@ -73,7 +73,7 @@ module.exports = {
         
         
                             var onColorField = $('<input/>', { class: "node-input-option-onColor", type: "color" }).css({ "width": "10%", "margin-left": "5px", "display": onColorField }).appendTo(row);
-                            onColorField.val(option.onColor || "#99ff99");
+                            onColorField.val(option.onColor || "#32CD32");
         
                             var offColorField = $('<input/>', { class: "node-input-option-offColor", type: "color" }).css({ "width": "10%", "margin-left": "5px", "display": offColorField }).appendTo(row);
                             offColorField.val(option.offColor || "#ff3333");

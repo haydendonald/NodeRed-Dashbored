@@ -17,7 +17,7 @@ module.exports = {
 
     //Insert the HTML into the config on the NodeRed flow
     //The ids MUST be node-config-input-<WIDGETNAME>-<CONFIGNAME> otherwise they may not be set
-    configHTML: function () {
+    generateConfigHTML: function () {
         return `
                     <div class="form-row">
                         <label for="config-input-toggleButton-text">Text</label>
@@ -38,19 +38,20 @@ module.exports = {
                         <div style="height: 250px; min-height:150px;" class="node-text-editor" id="CSS"></div>
                     </div>
                 `;
-    }(),
+    },
     //Scripts to call on the NodeRed config dashbored
-    configScript: {
-        //When the user opens the config panel get things ready
-        oneditprepare: `
+    generateConfigScript: function () {
+        return {
+            //When the user opens the config panel get things ready
+            oneditprepare: `
                     element.cssEditor = RED.editor.createEditor({
                         id: "CSS",
                         mode: "ace/mode/css",
                         value: element["toggleButton-CSS"]
                     });
                 `,
-        //When the user clicks save on the editor set our values
-        oneditsave: `
+                //When the user clicks save on the editor set our values
+                oneditsave: `
                     //Set the CSS value
                     element["toggleButton-CSS"] = element.cssEditor.getValue();
 
@@ -58,20 +59,21 @@ module.exports = {
                     element.cssEditor.destroy();
                     delete element.cssEditor;
                 `,
-        //When the user cancels the edit dialog do some cleanup if required
-        oneditcancel: `
+                    //When the user cancels the edit dialog do some cleanup if required
+                    oneditcancel: `
                     //Delete the CSS editor
                     element.cssEditor.destroy();
                     delete element.cssEditor;
                 `,
-        //When the user clicks the "reset configuration" set the options to their defaults
-        reset: `
+                        //When the user clicks the "reset configuration" set the options to their defaults
+                        reset: `
                     $("#node-config-input-toggleButton-text").val(defaultConfig.text.value);
                     $("#node-config-input-toggleButton-onValue").val(defaultConfig.onValue.value);
                     $("#node-config-input-toggleButton-offValue").val(defaultConfig.offValue.value);
                     element.cssEditor.setValue(defaultConfig.CSS.value);
                     element.cssEditor.clearSelection();
                 `
+        }
     },
     //Default config
     defaultConfig: {

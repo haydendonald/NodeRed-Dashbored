@@ -6,5 +6,6 @@
 //Add widget requires here to include the widget
 module.exports = [
     require("../widgets/toggleButton.js"),
-    require("../widgets/buttonSelector.js")
+    require("../widgets/buttonSelector.js"),
+    require("../widgets/horizontalStack.js")
 ]

@@ -104,13 +104,21 @@
 
                 //Grab the widget
                 try {
-                    var widget = await $.ajax({
+                    var widgets = await $.ajax({
                         type: "GET",
                         url: "./dashboredAPI",
-                        data: "widgets=" + this.id
+                        data: "widgets"
                     });
                 } catch (e) { }
 
+                var widget;
+                for(var i in widgets) {
+                    if(widgets[i].id == this.id) {
+                        widget = widgets[i];
+                        break;
+                    }
+                }
+                
                 //Set the widget type selector
                 var types = [];
                 for (var i in widgetTypes) {

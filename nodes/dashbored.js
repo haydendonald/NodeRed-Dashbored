@@ -248,13 +248,14 @@ module.exports = function (RED) {
                     //Generate and add the CSS
                     var CSS = function () {
                         var ret = `
-                        #${randomId}_widget {`;
-                        var widthMultiplier = widget.widthMultiplier * widget.widthMultiplier;
-                        var heightMultiplier = widget.heightMultiplier * widget.heightMultiplier;
+                        #${randomId}_widget {`
 
-                        ret += `width: calc(${baseWidth} * ${widthMultiplier}) ;`;
-                        ret += `height: calc(${baseHeight} * ${heightMultiplier});`;
-
+                        if (!widget.noHeight) {
+                            ret += `height: calc(${baseHeight} * ${widget.heightMultiplier});`;
+                        }
+                        if (!widget.noWidth) {
+                            ret += `width: calc(${baseWidth} * ${widget.widthMultiplier}) ;`;
+                        }
                         if (widget.minWidth) {
                             ret += `"min-width: ${widget.minWidth};`;
                         }
@@ -270,7 +271,6 @@ module.exports = function (RED) {
 
                         ret += `
                             float: left;
-                            margin: 10px;
                             border-radius: 10px;
                         }`;
 

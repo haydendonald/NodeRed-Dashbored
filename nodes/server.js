@@ -187,8 +187,8 @@ module.exports = function (RED) {
                     label: widget.name,
                     values: widget.values,
                     widgetType: widget.widgetType,
-                    configHTML: widget.configHTML,
-                    configScript: widget.configScript
+                    configHTML: widget.generateConfigHTML(),
+                    configScript: widget.generateConfigScript()
                 }
             }
             var send = [];
@@ -218,8 +218,8 @@ module.exports = function (RED) {
                         widget: type.widgetType,
                         name: type.label,
                         description: type.description,
-                        configHTML: type.configHTML,
-                        configScript: type.configScript,
+                        configHTML: type.generateConfigHTML(),
+                        configScript: type.generateConfigScript(),
                         config: type.config,
                         defaultConfig: type.defaultConfig
                     };

@@ -6,7 +6,7 @@
 
 module.exports = {
     widgetType: "buttonSelector",
-    version: "0.0.1",
+    version: "1.0.0",
     label: "Button Selector",
     description: "Generates buttons that select states",
     widthMultiplier: 1,
@@ -18,7 +18,7 @@ module.exports = {
 
     //Insert the HTML into the config on the NodeRed flow
     //The ids MUST be node-config-input-<WIDGETNAME>-<CONFIGNAME> otherwise they may not be set
-    configHTML: function () {
+    generateConfigHTML: function () {
         return `
                     <div class="form-row">       
                         <ol id="options"></ol>
@@ -30,11 +30,12 @@ module.exports = {
                         <div style="height: 250px; min-height:150px;" class="node-text-editor" id="CSS"></div>
                     </div>
                 `;
-    }(),
+    },
     //Scripts to call on the NodeRed config dashbored
-    configScript: {
-        //When the user opens the config panel get things ready
-        oneditprepare: `
+    generateConfigScript: function () {
+        return {
+            //When the user opens the config panel get things ready
+            oneditprepare: `
                     //Validate and add an item
                     function validate() {
                         var self = this
@@ -102,8 +103,8 @@ module.exports = {
                         value: element["buttonSelector-CSS"]
                     });
                 `,
-        //When the user clicks save on the editor set our values
-        oneditsave: `
+            //When the user clicks save on the editor set our values
+            oneditsave: `
                     var self = this;
                     var temp = [];
                     var optionsList = $("#options").editableList('items');
@@ -126,17 +127,18 @@ module.exports = {
                     element.cssEditor.destroy();
                     delete element.cssEditor;
                 `,
-        //When the user cancels the edit dialog do some cleanup if required
-        oneditcancel: `
+            //When the user cancels the edit dialog do some cleanup if required
+            oneditcancel: `
                     //Delete the CSS editor
                     element.cssEditor.destroy();
                     delete element.cssEditor;
                 `,
-        //When the user clicks the "reset configuration" set the options to their defaults
-        reset: `
+            //When the user clicks the "reset configuration" set the options to their defaults
+            reset: `
                     element.cssEditor.setValue(defaultConfig.CSS.value);
                     element.cssEditor.clearSelection();
                 `
+        }
     },
     //Default config
     defaultConfig: {

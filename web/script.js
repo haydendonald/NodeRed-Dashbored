@@ -207,7 +207,7 @@ function unlockDashbored() {
         sendMsg(dashboredId, {
             type: "unlock",
             password: password
-        }, function (id, success, msg) {
+        }, function (id, sessionId, success, msg) {
             return true;
         });
     });
@@ -259,7 +259,7 @@ function askPassword(correctCallback, incorrectCallback, bypassPassword) {
         sendMsg(dashboredId, {
             type: "password",
             password: password
-        }, function (id, success, msg) {
+        }, function (id, sessionId, success, msg) {
             if (id != dashboredId) { return; }
             if (success) {
                 if (msg.payload.type == "password") {

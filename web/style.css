@@ -57,6 +57,7 @@ button.active {
 #pages {
     position: absolute;
     width: 100%;
+    overflow: auto;
 }
 
 page {

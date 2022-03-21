@@ -285,7 +285,7 @@ module.exports = function (RED) {
                             }
                             #${randomId}_content {
                                 width: 100%;
-                                height: calc(100% - 50px);
+                                height: calc(100% - calc(1.2em + 25px));
                             }
                             `
                         }

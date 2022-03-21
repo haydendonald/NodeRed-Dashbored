@@ -1,14 +1,14 @@
 /**
- * Horizontal Stack Widget for Dashbored
- * Stacks many widgets horizontally
+ * Vertical Stack Widget for Dashbored
+ * Stacks many widgets vertically
  * https://github.com/haydendonald/NodeRed-Dashbored
 */
 
 module.exports = {
-    widgetType: "horizontalStack",
+    widgetType: "verticalStack",
     version: "1.0.0",
-    label: "Horizontal Stack",
-    description: "Stacks many widgets horizontally",
+    label: "Vertical Stack",
+    description: "Stacks many widgets vertically",
     widthMultiplier: 1,
     heightMultiplier: 1,
     minWidth: undefined,
@@ -49,11 +49,11 @@ module.exports = {
             //Validate and add an item
             function validate() {
                 var self = this
-                this["horizontalStack-widgets"] = [];
+                this["verticalStack-widgets"] = [];
                 var optionsList = $("#options").editableList("items");
                 optionsList.each(function (i) {
                     var option = $(this);
-                    self["horizontalStack-widgets"].push(option.find(".node-input-option-widget").typedInput('value'));
+                    self["verticalStack-widgets"].push(option.find(".node-input-option-widget").typedInput('value'));
                 });
             }
 
@@ -71,8 +71,8 @@ module.exports = {
                             options: options
                         }]
                     });
-                    if(element["horizontalStack-widgets"]) {
-                        widgetField.typedInput("value", element["horizontalStack-widgets"].split(",")[i]);
+                    if(element["verticalStack-widgets"]) {
+                        widgetField.typedInput("value", element["verticalStack-widgets"].split(",")[i]);
                     }
                     validate();
 
@@ -86,8 +86,8 @@ module.exports = {
             });
 
             //Add existing options
-            if (element["horizontalStack-widgets"]) {
-                element["horizontalStack-widgets"].split(",").forEach(function (option, index) {
+            if (element["verticalStack-widgets"]) {
+                element["verticalStack-widgets"].split(",").forEach(function (option, index) {
                     optionsList.editableList("addItem", { widget: option});
                 });
             }
@@ -106,7 +106,7 @@ module.exports = {
                         var option = $(this);
                         temp.push(option.find(".node-input-option-widget").typedInput("value"));
                     });
-                    element["horizontalStack-widgets"] = temp.join();
+                    element["verticalStack-widgets"] = temp.join();
 
                     //Set the CSS value
                     element["buttonSelector-CSS"] = element.cssEditor.getValue();
@@ -158,8 +158,7 @@ module.exports = {
 
     //Setup the widget
     setupWidget: function (config) {
-        this.widthMultiplier = this.config.widgets.split(",").length;
-        this.noHeight = true;
+        this.heightMultiplier = this.config.widgets.split(",").length;
     },
 
     //When node red redeploys or closes
@@ -184,7 +183,7 @@ module.exports = {
         var widgetIds = this.config.widgets.split(",");
         for (var i in widgetIds) {
             ret += `
-            <widget id="${widgetIds[i]}" style="float: left"></widget>
+            <widget id="${widgetIds[i]}"></widget>
             `;
         }
         return ret;

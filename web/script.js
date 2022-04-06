@@ -54,59 +54,32 @@ function formatAMPM(date) {
  * Send a message to NodeRed over the websocket
  * @param {string} id The node or event id 
  * @param {object} payload The payload to send
- * @param {function} callback When a message is received on the socket this callback will be called with callback(id, sessionId, success, msg) this MUST return true if successful otherwise the timeout will be called
+ * @param {function} callback When a message is received on the socket this callback will be called with callback(id, sessionId, success, msg)
  */
-function sendMsg(id, payload, callback) {
-    var requestId = randString();
-    printConsole("debug", "Sending msg for " + id + "(" + requestId + "): " + payload);
+function sendMsg(htmlId, id, payload, callback) {
+    //Add our callbacks and send the message if it's not already in the buffer
+    if (!messageCallbacks[id]) { messageCallbacks[id] = {} }
+    if(messageCallbacks[id][htmlId] != undefined){return;}
+    printConsole("debug", "Sending msg for " + id + " (" + htmlId + "): " + payload);
 
-    var cb = function (obj, id, sessionId, success, msg) {
-        // console.log(obj);
-        // console.log(socketCallbacks);
-        // console.log(id);
-        // console.log(requestId);
-        // if (callback) { callback(id, sessionId, success, msg); }
-        // clearTimeout(socketCallbacks[id][requestId].timeout);
-        // socketCallbacks[id][requestId] = undefined;
-    }
-
-    if (!messageCallbacks[id]) { messageCallbacks[id] = [] }
-
-    var randId = randString();
-    messageCallbacks[id].push({
-        timeout: setTimeout(function () {
-            if(callback){callback(id, sessionId, false);}
-            
-            //Mark for deletion
-            for(var i in messageCallbacks[id]) {
-                if(messageCallbacks[id][i].randId == randId) {
-                    messageCallbacks[id][i].timeout = undefined;
-                }
-            }
+    messageCallbacks[id][htmlId] = {
+        timeout: setTimeout(function() {
+            messageCallbacks[id][htmlId].callback(false);
         }, 3000),
-        id: id,
-        sessionId: sessionId,
-        randId: randId,
-        fn: function (obj, id, sessionId, success, msg) {
-            if (callback) { return callback(id, sessionId, success, msg); }
-            else {
-                return true;
+        callback: function(success, msg) {
+            clearTimeout(messageCallbacks[id][htmlId].timeout);
+            delete messageCallbacks[id][htmlId];
+            if(callback) {
+                callback(id, sessionId, success, msg);
             }
-            // console.log(id);
-            // console.log(requestId);
-            // console.log(messageCallbacks[id][requestId]);
-            // clearTimeout(messageCallbacks[id][requestId].timeout);
-            //delete messageCallbacks[id][requestId];
-            console.log(obj);
         }
-    });
+    };
 
     socket.send(JSON.stringify({
         id: id,
         sessionId: sessionId,
         payload: payload
     }));
-    //}
 }
 
 /**
@@ -408,19 +381,10 @@ function connect() {
 
             //Send to socket callbacks
             for (var i in messageCallbacks) {
-                var del = [];
                 for (var j in messageCallbacks[i]) {
-                    if (messageCallbacks[i][j].timeout === undefined || messageCallbacks[i][j].fn(messageCallbacks[i][j], msg.id, msg.sessionId, true, msg) === true) {
-                        del.push(i);
-                    }
+                    messageCallbacks[i][j].callback(msg.id, msg.sessionId, true, msg);
                 }
-
-                //Delete all the completed callbacks
-                for (var k = 0; k < del.length; k++) { messageCallbacks[i] = messageCallbacks[i].splice(del[k], 1); }
             }
-
-            console.log(messageCallbacks);
-
 
             //If the message is for this dashbored handle it
             if ((msg.id == dashboredId || msg.id == undefined) && (msg.sessionId == sessionId || msg.sessionId == undefined)) {

@@ -164,14 +164,13 @@ module.exports = {
                         var yesAction = function() {
                             var waiting = true;
                             setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
-                            sendMsg("${this.id}", event.target.getAttribute("state") == "${this.config.onValue}" ? "${this.config.offValue}" : "${this.config.onValue}", function(id, sessionId, success, msg) {
+                            sendMsg("${htmlId}", "${this.id}", event.target.getAttribute("state") == "${this.config.onValue}" ? "${this.config.offValue}" : "${this.config.onValue}", function(id, sessionId, success, msg) {
                                 if(id == "${this.id}") {
                                     waiting = false;
                                     loadingAnimation(event.target.id, false);
                                     if(!success) {
                                         failedToSend();
                                     }
-                                    return true;
                                 }
                             });
                             

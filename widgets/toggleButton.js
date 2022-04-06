@@ -87,8 +87,8 @@ module.exports = {
                         color: white;
                     }
                     .off {
-                        background-color: rgb(255, 51, 51);
-                        color: white;
+                        background-color: #f2f2f2;
+                        color: black;
                     }
                     #button {
                         width: calc(100% - 10px);

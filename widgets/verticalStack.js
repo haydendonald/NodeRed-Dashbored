@@ -15,6 +15,8 @@ module.exports = {
     minWeight: undefined,
     maxWidth: undefined,
     maxHeight: undefined,
+    noHeight: true,
+    noWidth: true,
 
     //Insert the HTML into the config on the NodeRed flow
     //The ids MUST be node-config-input-<WIDGETNAME>-<CONFIGNAME> otherwise they may not be set
@@ -183,7 +185,7 @@ module.exports = {
         var widgetIds = this.config.widgets.split(",");
         for (var i in widgetIds) {
             ret += `
-            <widget id="${widgetIds[i]}"></widget>
+            <widget id="${widgetIds[i]}" style="float: none"></widget>
             `;
         }
         return ret;

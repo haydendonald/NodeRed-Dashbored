@@ -285,7 +285,7 @@ module.exports = function (RED) {
                             }
                             #${randomId}_content {
                                 width: 100%;
-                                height: calc(100% - calc(1.2em + 25px));
+                                height: calc(100% - (25px + 1.2em));
                             }
                             `
                         }
@@ -485,7 +485,7 @@ module.exports = function (RED) {
                     generatedCSS += `
                         #pages {
                             top: ${headerHeight};
-                            height: calc(100% - calc(${headerHeight} + ${navHeight}));
+                            height: calc(100% - ${headerHeight} + ${navHeight});
                         }
                         #header {
                             height: ${headerHeight};
@@ -507,7 +507,7 @@ module.exports = function (RED) {
                     generatedCSS += `
                         #pages {
                             top: ${navHeight};
-                            height: calc(100% - calc(${headerHeight} + ${navHeight}));
+                            height: calc(100% - (${headerHeight} + ${navHeight}));
                         }
                         #header {
                             bottom: 0;

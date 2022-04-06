@@ -77,7 +77,7 @@ module.exports = {
                             onColorField.val(option.onColor || "#32CD32");
         
                             var offColorField = $('<input/>', { class: "node-input-option-offColor", type: "color" }).css({ "width": "10%", "margin-left": "5px", "display": offColorField }).appendTo(row);
-                            offColorField.val(option.offColor || "#ff3333");
+                            offColorField.val(option.offColor || "#f2f2f2");
                             validate();
         
         

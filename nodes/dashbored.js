@@ -485,7 +485,7 @@ module.exports = function (RED) {
                     generatedCSS += `
                         #pages {
                             top: ${headerHeight};
-                            height: calc(100% - ${headerHeight} + ${navHeight});
+                            height: calc(100% - (${headerHeight} + ${navHeight}));
                         }
                         #header {
                             height: ${headerHeight};

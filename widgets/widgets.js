@@ -8,5 +8,6 @@ module.exports = [
     require("../widgets/toggleButton.js"),
     require("../widgets/buttonSelector.js"),
     require("../widgets/horizontalStack.js"),
-    require("../widgets/verticalStack.js")
+    require("../widgets/verticalStack.js"),
+    require("../widgets/volume.js")
 ]

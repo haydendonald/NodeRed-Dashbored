@@ -207,14 +207,14 @@ function addOnUnlockFunction(fn) {
  */
 function lockDashbored() {
     printConsole("info", "Locking the dashbored");
-    sendMsg(dashboredId, { type: "lock" });
+    sendMsg(randString(), dashboredId, { type: "lock" });
 }
 /**
  * Attempt to unlock the dashbored using a password
  */
 function unlockDashbored() {
     askPassword(function (password) {
-        sendMsg(dashboredId, {
+        sendMsg(randString(), dashboredId, {
             type: "unlock",
             password: password
         }, function (id, sessionId, success, msg) {
@@ -266,12 +266,14 @@ function askPassword(correctCallback, incorrectCallback, bypassPassword) {
     //When the user clicks the OK button check the password and execute actions
     document.getElementById("checkPassword").onclick = function () {
         //Check if the password is correct
-        sendMsg(dashboredId, {
+        sendMsg(randString(), dashboredId, {
             type: "password",
             password: password
         }, function (id, sessionId, success, msg) {
             if (id != dashboredId) { return; }
             if (success) {
+                console.log("ME");
+                console.log(msg);
                 if (msg.payload.type == "password") {
                     if (msg.payload.correct == true) {
                         printConsole("debug", "Password correct");
@@ -361,7 +363,7 @@ function connect() {
             }
 
             //Request the weather
-            sendMsg(dashboredId, {
+            sendMsg(randString(), dashboredId, {
                 type: "weather"
             });
         });

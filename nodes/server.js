@@ -85,21 +85,22 @@ module.exports = function (RED) {
         var getWeather = () => {
             if (weatherLat != "" && weatherLong != "" && weatherUnit != "" && weatherAppId != "") {
                 try {
-                    RED.log.debug("WEATHER DISABLED DUE TO CRASH WHEN THERE IS NO NETWORK");
-                    // RED.log.debug("Attempt to get weather information");
-                    // var weather = require("openweathermap");
-                    // weather.now({ lat: weatherLat, lon: weatherLong, units: weatherUnit, appid: weatherAppId }, (error, out) => {
-                    //     if (error || out.cod != 200) {
-                    //         RED.log.error("Failed to get weather information");
-                    //         return;
-                    //     }
+                    RED.log.debug("Attempt to get weather information");
+                    var weather = require("openweathermap");
+                    try {
+                        weather.now({ lat: weatherLat, lon: weatherLong, units: weatherUnit, appid: weatherAppId }, (error, out) => {
+                            if (error || out.cod != 200) {
+                                RED.log.error("Failed to get weather information");
+                                return;
+                            }
 
-                    //     //Broadcast to all sessions
-                    //     this.sendMsg("weather", undefined, {
-                    //         temp: out.main.temp,
-                    //         iconUrl: out.weather[0].iconUrl
-                    //     });
-                    // });
+                            //Broadcast to all sessions
+                            this.sendMsg("weather", undefined, {
+                                temp: out.main.temp,
+                                iconUrl: out.weather[0].iconUrl
+                            });
+                        });
+                    } catch (e) { }
                 } catch (e) { }
             }
         }

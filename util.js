@@ -65,7 +65,16 @@ module.exports = {
         return strTime;
     },
 
-    //Generate the widget action with locked, areYouSure functionality
+    /**
+     * Generate the widget action with locked, areYouSure functionality
+     * @param {string} lockedAccess The locked access value
+     * @param {string} alwaysPassword The always password value
+     * @param {string} ask Should the ask dialog be shown
+     * @param {string} askText What text should the ask dialog show
+     * @param {string} actionYes The script to execute if the action is yes
+     * @param {string} actionNo The script to execute if the action is no
+     * @returns The script
+     */
     generateWidgetAction: (lockedAccess, alwaysPassword, ask, askText, actionYes, actionNo) => {
         return `
         //Check if the user is sure

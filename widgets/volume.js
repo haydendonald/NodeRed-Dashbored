@@ -81,6 +81,9 @@ module.exports = {
                 .button {
                     display: block;
                 }
+                #widget {
+                    background-color: red;
+                }
                 `.replace(/^\s+|\s+$/gm, ''), required: false
         }
     },

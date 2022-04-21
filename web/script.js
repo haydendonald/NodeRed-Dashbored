@@ -272,8 +272,6 @@ function askPassword(correctCallback, incorrectCallback, bypassPassword) {
         }, function (id, sessionId, success, msg) {
             if (id != dashboredId) { return; }
             if (success) {
-                console.log("ME");
-                console.log(msg);
                 if (msg.payload.type == "password") {
                     if (msg.payload.correct == true) {
                         printConsole("debug", "Password correct");
@@ -384,7 +382,7 @@ function connect() {
             //Send to socket callbacks
             for (var i in messageCallbacks) {
                 for (var j in messageCallbacks[i]) {
-                    messageCallbacks[i][j].callback(msg.id, msg.sessionId, true, msg);
+                    messageCallbacks[i][j].callback(true, msg);
                 }
             }
 

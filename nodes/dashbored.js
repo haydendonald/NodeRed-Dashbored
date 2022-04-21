@@ -433,7 +433,7 @@ module.exports = function (RED) {
                     document.addScript(`
                     addOnMsgFunction(function(msg) {
                         if(msg.id == "weather") {
-                            document.getElementById("weatherTemp").innerHTML = Math.round(msg.payload.temp) + "°";
+                            document.getElementById("weatherTemp").innerHTML = Math.round(msg.payload.main.temp) + "°";
                         }
                     });
                 `);

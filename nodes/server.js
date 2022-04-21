@@ -83,25 +83,28 @@ module.exports = function (RED) {
 
         //Setup the weather if set
         var getWeather = () => {
+            var self = this;
             if (weatherLat != "" && weatherLong != "" && weatherUnit != "" && weatherAppId != "") {
-                try {
-                    RED.log.debug("Attempt to get weather information");
-                    var weather = require("openweathermap");
-                    try {
-                        weather.now({ lat: weatherLat, lon: weatherLong, units: weatherUnit, appid: weatherAppId }, (error, out) => {
-                            if (error || out.cod != 200) {
-                                RED.log.error("Failed to get weather information");
-                                return;
-                            }
 
+                RED.log.debug("Attempt to get weather information");
+                try {
+                    var weather = require("openweather-apis");
+                    weather.setCoordinate(weatherLat, weatherLong);
+                    weather.setUnits(weatherUnit);
+                    weather.setAPPID(weatherAppId);
+                    weather.getAllWeather(function (err, out) {
+                        if (err) {
+                            RED.log.error("Failed to get weather information: " + err);
+                        }
+                        else {
                             //Broadcast to all sessions
-                            this.sendMsg("weather", undefined, {
-                                temp: out.main.temp,
-                                iconUrl: out.weather[0].iconUrl
-                            });
-                        });
-                    } catch (e) { }
-                } catch (e) { }
+                            self.sendMsg("weather", undefined, out);
+                        }
+                    });
+                }
+                catch (e) {
+                    RED.log.error("Failed to get weather information: " + e);
+                }
             }
         }
 

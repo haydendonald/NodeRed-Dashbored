@@ -10,6 +10,8 @@ This allows for a selection of a value using a simple button layout
 This sends out a payload containing the current `value`
 
 ## CSS
+* `.on`: Styling to add when a button is "on"
+* `.off`: Styling to add when a button is "off
 * `#widget`: Apply styling to the widget container
 * `#title`: Apply styling to the title
 * `#content`: Apply styling to the content under the title

@@ -176,6 +176,8 @@ module.exports = {
                             width: calc(100% - 10px);
                             margin: 5px;
                         }
+                        .on {}
+                        .off {}
                     `.replace(/^\s+|\s+$/gm, ''), required: true
         }
     },
@@ -234,8 +236,9 @@ module.exports = {
         var ret = "";
         for (var i in this.config.options) {
             var button = this.config.options[i];
-            var color = button.value == this.getValue("value") ? button.onColor : button.offColor;
-            ret += util.generateTag(htmlId, "button", i, button.label, `class="${util.generateCSSClass(htmlId, "button")}" style="background-color: ${color}; height: calc((100% / ${this.config.options.length}) - 10px)"`);
+            var on = button.value == this.getValue("value");
+            var color = button.value == on ? button.onColor : button.offColor;
+            ret += util.generateTag(htmlId, "button", i, button.label, `class="${util.generateCSSClass(htmlId, "button")} ${util.generateCSSClass(htmlId, on ? "on" : "off")}" style="background-color: ${color}; height: calc((100% / ${this.config.options.length}) - 10px)"`);
         }
         return ret;
     },
@@ -275,6 +278,8 @@ module.exports = {
             var button = this.config.options[i];
             ret += `
                         ${util.getElement(htmlId, i)}.style.backgroundColor = (msg.payload == "${button.value}") ? "${button.onColor}" : "${button.offColor}";
+                        ${util.getElement(htmlId, i)}.classList.add((msg.payload == "${button.value}") ? "${util.generateCSSClass(htmlId, "on")}" : "${util.generateCSSClass(htmlId, "off")}");
+                        ${util.getElement(htmlId, i)}.classList.remove((msg.payload == "${button.value}") ? "${util.generateCSSClass(htmlId, "off")}" : "${util.generateCSSClass(htmlId, "on")}");
                     `;
         }
         return ret;

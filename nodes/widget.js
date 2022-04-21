@@ -23,7 +23,7 @@ module.exports = function (RED, dashboredGeneration = undefined) {
         var server = !dashboredGeneration ? RED.nodes.getNode(config.server) : config.server;
         var name = config.name;
 
-        this.util = require("../util.js");
+        // this.util = require("../util.js");
         this.widthMultiplier = parseInt(config.widthMultiplier) || 1;
         this.heightMultiplier = parseInt(config.heightMultiplier) || 1;
         this.title = config.title || "";

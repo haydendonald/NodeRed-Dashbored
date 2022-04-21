@@ -4,6 +4,7 @@
  * https://github.com/haydendonald/NodeRed-Dashbored
 */
 
+var util = require("../util.js");
 module.exports = {
     widgetType: "buttonSelector",
     version: "1.0.0",
@@ -234,7 +235,7 @@ module.exports = {
         for (var i in this.config.options) {
             var button = this.config.options[i];
             var color = button.value == this.getValue("value") ? button.onColor : button.offColor;
-            ret += this.util.generateTag(htmlId, "button", i, button.label, `class="${this.util.generateCSSClass(htmlId, "button")}" style="background-color: ${color}; height: calc((100% / ${this.config.options.length}) - 10px)"`);
+            ret += util.generateTag(htmlId, "button", i, button.label, `class="${util.generateCSSClass(htmlId, "button")}" style="background-color: ${color}; height: calc((100% / ${this.config.options.length}) - 10px)"`);
         }
         return ret;
     },
@@ -244,7 +245,7 @@ module.exports = {
         var ret = "";
         for (var i in this.config.options) {
             var button = this.config.options[i];
-            ret += `${this.util.getElement(htmlId, i)}.onclick = function(event) {
+            ret += `${util.getElement(htmlId, i)}.onclick = function(event) {
                         var yesAction = function() {
                             var waiting = true;
                             setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
@@ -260,7 +261,7 @@ module.exports = {
                         }
                         var noAction = function(){}
 
-                        ${this.util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
+                        ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
                     }
                     `
         }
@@ -273,7 +274,7 @@ module.exports = {
         for (var i in this.config.options) {
             var button = this.config.options[i];
             ret += `
-                        ${this.util.getElement(htmlId, i)}.style.backgroundColor = (msg.payload == "${button.value}") ? "${button.onColor}" : "${button.offColor}";
+                        ${util.getElement(htmlId, i)}.style.backgroundColor = (msg.payload == "${button.value}") ? "${button.onColor}" : "${button.offColor}";
                     `;
         }
         return ret;

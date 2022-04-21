@@ -3,6 +3,7 @@
  * https://github.com/haydendonald/NodeRed-Dashbored
 */
 
+var util = require("../util.js");
 module.exports = {
     widgetType: "toggleButton",
     version: "1.0.0",
@@ -153,14 +154,14 @@ module.exports = {
     //Generate the HTML for the widget that will be inserted into the dashbored
     generateHTML: function (htmlId) {
         return `
-                    ${this.util.generateTag(htmlId, "button", "button", this.config.text, `class="${this.util.generateCSSClass(htmlId, "button")} ${this.util.generateCSSClass(htmlId, (this.getValue("state") == this.config.offValue ? "off" : "on"))}" state="${this.getValue("state")}"`)}
+                    ${util.generateTag(htmlId, "button", "button", this.config.text, `class="${util.generateCSSClass(htmlId, "button")} ${util.generateCSSClass(htmlId, (this.getValue("state") == this.config.offValue ? "off" : "on"))}" state="${this.getValue("state")}"`)}
                 `;
     },
 
     //Generate the script that will be executed when the dashbored loads
     generateOnload: function (htmlId, lockedAccess, alwaysPassword, ask, askText) {
         return `
-                    ${this.util.getElement(htmlId, "button")}.onclick = function(event) {
+                    ${util.getElement(htmlId, "button")}.onclick = function(event) {
                         var yesAction = function() {
                             var waiting = true;
                             setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
@@ -177,24 +178,24 @@ module.exports = {
                         }
                         var noAction = function(){}
 
-                        ${this.util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
+                        ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
                     }
 
-                    ${this.util.getElement(htmlId, "button")}.setAttribute("state", "${this.getValue("state")}");
+                    ${util.getElement(htmlId, "button")}.setAttribute("state", "${this.getValue("state")}");
                 `;
     },
 
     //Generate the script that will be called when a message comes from NodeRed on the dashbored
     generateOnMsg: function (htmlId) {
         return `
-                    ${this.util.getElement(htmlId, "button")}.setAttribute("state", msg.payload);
+                    ${util.getElement(htmlId, "button")}.setAttribute("state", msg.payload);
                     if(msg.payload == "${this.config.onValue}") {
-                        ${this.util.getElement(htmlId, "button")}.classList.add("${this.util.generateCSSClass(htmlId, "on")}");
-                        ${this.util.getElement(htmlId, "button")}.classList.remove("${this.util.generateCSSClass(htmlId, "off")}");
+                        ${util.getElement(htmlId, "button")}.classList.add("${util.generateCSSClass(htmlId, "on")}");
+                        ${util.getElement(htmlId, "button")}.classList.remove("${util.generateCSSClass(htmlId, "off")}");
                     }
                     else {
-                        ${this.util.getElement(htmlId, "button")}.classList.add("${this.util.generateCSSClass(htmlId, "off")}");
-                        ${this.util.getElement(htmlId, "button")}.classList.remove("${this.util.generateCSSClass(htmlId, "on")}");
+                        ${util.getElement(htmlId, "button")}.classList.add("${util.generateCSSClass(htmlId, "off")}");
+                        ${util.getElement(htmlId, "button")}.classList.remove("${util.generateCSSClass(htmlId, "on")}");
                     }
                 `;
     },

@@ -15,6 +15,11 @@ A more customizable dashboard for NodeRed, not to be confused with the [NodeRed 
 Coming soon!! 
 
 # Supported Widgets
+## [Action Button](/doc/widgetTypes/actionButton.md)
+Is a simple button that performs an action.
+
+![Action Button](./img/widgets/actionButton.png)
+
 ## [Toggle Button](/doc/widgetTypes/toggleButton.md)
 Switches between two states. Useful for on/off applications.
 

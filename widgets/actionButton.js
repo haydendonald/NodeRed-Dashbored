@@ -24,6 +24,14 @@ module.exports = {
                         <label for="config-input-actionButton-text">Text</label>
                         <input type="text" id="node-config-input-actionButton-text" placeholder="Text">
                     </div>
+                    <div class="form-row">
+                        <label for="config-input-actionButton-color">Color</label>
+                        <input type="color" id="node-config-input-actionButton-color" placeholder="Color">
+                    </div>
+                    <div class="form-row">
+                        <label for="config-input-actionButton-flashColor">Flash Color</label>
+                        <input type="color" id="node-config-input-actionButton-flashColor" placeholder="Color">
+                    </div>
 
                     <!-- CSS Editor -->
                     <div class="form-row">
@@ -43,8 +51,8 @@ module.exports = {
                         value: element["actionButton-CSS"]
                     });
                 `,
-                //When the user clicks save on the editor set our values
-                oneditsave: `
+            //When the user clicks save on the editor set our values
+            oneditsave: `
                     //Set the CSS value
                     element["actionButton-CSS"] = element.cssEditor.getValue();
 
@@ -52,15 +60,17 @@ module.exports = {
                     element.cssEditor.destroy();
                     delete element.cssEditor;
                 `,
-                    //When the user cancels the edit dialog do some cleanup if required
-                    oneditcancel: `
+            //When the user cancels the edit dialog do some cleanup if required
+            oneditcancel: `
                     //Delete the CSS editor
                     element.cssEditor.destroy();
                     delete element.cssEditor;
                 `,
-                        //When the user clicks the "reset configuration" set the options to their defaults
-                        reset: `
+            //When the user clicks the "reset configuration" set the options to their defaults
+            reset: `
                     $("#node-config-input-actionButton-text").val(defaultConfig.text.value);
+                    $("#node-config-input-actionButton-color").val(defaultConfig.color.value);
+                    $("#node-config-input-actionButton-flashColor").val(defaultConfig.flashColor.value);
                     element.cssEditor.setValue(defaultConfig.CSS.value);
                     element.cssEditor.clearSelection();
                 `
@@ -69,12 +79,15 @@ module.exports = {
     //Default config
     defaultConfig: {
         text: { value: "Action Button", required: true },
+        color: { value: "#434343", required: true },
+        flashColor: { value: "#f2f2f2", required: true },
         CSS: {
             value: `
                     #button {
                         width: calc(100% - 10px);
                         height: calc(100% - 10px);
                         margin: 5px;
+                        transition: background-color 0.1s ease;
                     }
                 `.replace(/^\s+|\s+$/gm, ''), required: true
         }
@@ -84,16 +97,12 @@ module.exports = {
 
     //Default value(s)
     getDefaultValues: function () {
-        return {
-            state: this.config.offValue
-        }
+        return {}
     },
 
     //Return the current values
     getValues: function () {
-        return {
-            state: this.getValue("state")
-        }
+        return {}
     },
 
     //Setup the widget
@@ -126,8 +135,8 @@ module.exports = {
     //Generate the HTML for the widget that will be inserted into the dashbored
     generateHTML: function (htmlId) {
         return `
-                    ${util.generateTag(htmlId, "button", "button", this.config.text, `class="${util.generateCSSClass(htmlId, "button")} ${util.generateCSSClass(htmlId, (this.getValue("state") == this.config.offValue ? "off" : "on"))}" state="${this.getValue("state")}"`)}
-                `;
+        ${util.generateTag(htmlId, "button", "button", this.config.text, `style = "background-color: ${this.config.color}"`)}
+        `;
     },
 
     //Generate the script that will be executed when the dashbored loads
@@ -135,19 +144,18 @@ module.exports = {
         return `
                     ${util.getElement(htmlId, "button")}.onclick = function(event) {
                         var yesAction = function() {
-                            var waiting = true;
-                            setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
-                            sendMsg("${htmlId}", "${this.id}", "", function(id, sessionId, success, msg) {
-                                if(id == "${this.id}") {
-                                    waiting = false;
-                                    loadingAnimation(event.target.id, false);
-                                    if(!success) {
-                                        failedToSend();
-                                    }
-                                }
-                            });
-                            
+                            //Flash the button
+                            ${util.getElement(htmlId, "button")}.style.backgroundColor = "${this.config.flashColor}";
+                            ${util.getElement(htmlId, "button")}.classList.add("${util.generateCSSClass(htmlId, "flashColor")}");
+                            setTimeout(function() {
+                                ${util.getElement(htmlId, "button")}.style.backgroundColor = "${this.config.color}";
+                                ${util.getElement(htmlId, "button")}.classList.remove("${util.generateCSSClass(htmlId, "flashColor")}");
+                            }, 200);
+
+                            //Send the message
+                            sendMsg("${htmlId}", "${this.id}", "");
                         }
+
                         var noAction = function(){}
 
                         ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}

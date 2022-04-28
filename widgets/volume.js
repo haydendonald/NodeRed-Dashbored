@@ -66,7 +66,7 @@ module.exports = {
             value: `
                 #volumeLevelContainer {
                     background-color: green;
-                    width: 20%;
+                    width: 60%;
                     height: 100%;
                     float: left;
                 }
@@ -77,12 +77,19 @@ module.exports = {
                 }
                 #buttonContainer {
                     float: left;
+                    width: 30%;
+                    height: 60%;
                 }
                 .button {
                     display: block;
+                    width: 100%;
+                    height: 50%;
                 }
                 #widget {
                     background-color: red;
+                }
+                #muteButton {
+                    width: 30%;
                 }
                 `.replace(/^\s+|\s+$/gm, ''), required: false
         }
@@ -108,6 +115,9 @@ module.exports = {
 
     //Setup the widget
     setupWidget: function (config) {
+        //DEVELOPMENT
+        this.config.CSS = this.defaultConfig.CSS.value;
+
     },
 
     //When node red redeploys or closes
@@ -153,7 +163,7 @@ module.exports = {
         return `
         ${util.generateTag(htmlId, "div", "volumeLevelContainer", volumeLevel, "")}
         ${util.generateTag(htmlId, "div", "buttonContainer", buttons, "")}
-        ${util.generateTag(htmlId, "button", "mute", "Mute", "")}
+        ${util.generateTag(htmlId, "button", "muteButton", "Mute", "")}
 
         
         

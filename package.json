@@ -5,11 +5,18 @@
     "main": "",
     "repository": {
         "type": "git",
-        "url": "git@github.com:haydendonald/nodeRed-dashbored.git"
+        "url": "git@github.com:haydendonald/nodered-dashbored.git"
     },
     "license": "Apache-2.0",
     "keywords": [
-        "node-red"
+        "node-red",
+        "dashbored",
+        "dashboard",
+        "ui",
+        "website",
+        "web-ui",
+        "control",
+        "touch"
     ],
     "node-red": {
         "nodes": {
@@ -22,9 +29,9 @@
     },
     "author": "Hayden Donald",
     "bugs": {
-        "url": "https://github.com/haydendonald/nodeRed-dashbored/issues"
+        "url": "https://github.com/haydendonald/nodered-dashbored/issues"
     },
-    "homepage": "https://github.com/haydendonald/nodeRed-dashbored#readme",
+    "homepage": "https://github.com/haydendonald/nodered-dashbored#readme",
     "dependencies": {
         "path": "^0.12.7",
         "ws": "^8.5.0",

@@ -124,9 +124,6 @@ module.exports = {
 
     //Setup the widget
     setupWidget: function (config) {
-        //DEVELOPMENT
-        this.config.CSS = this.defaultConfig.CSS.value;
-
     },
 
     //When node red redeploys or closes
@@ -137,7 +134,11 @@ module.exports = {
         if (msg.id == this.id) {
             var vals = this.getValues();
             if (msg.payload.muted != undefined) { vals["muted"] = msg.payload.muted; }
-            if (msg.payload.volume != undefined) { vals["volume"] = msg.payload.volume; }
+            if (msg.payload.volume != undefined) {
+                vals["volume"] = msg.payload.volume;
+                if(vals["volume"] >= 100){vals["volume"] = 100;}
+                if(vals["volume"] <= 0){vals["volume"] = 0;}
+            }
             this.sendStatusChangesToFlow(msg.sessionId, vals);
 
             //Set the internal state if set
@@ -151,10 +152,10 @@ module.exports = {
     //When a message comes from a node red flow
     onFlowMessage: function (msg) {
         if (msg.payload) {
-            if (msg.payload.volume) {
+            if (msg.payload.volume != undefined) {
                 this.setValue("volume", msg.payload.volume);
             }
-            if (msg.payload.muted) {
+            if (msg.payload.muted != undefined) {
                 this.setValue("muted", msg.payload.muted);
             }
             this.sendToDashbored(this.id, msg.sessionId, this.getValues());
@@ -214,6 +215,45 @@ module.exports = {
 
     //Generate the script that will be executed when the dashbored loads
     generateOnload: function (htmlId, lockedAccess, alwaysPassword, ask, askText) {
+        //When the user clicks the volume up button
+        var volPlusAction = `
+        var yesAction = function() {
+            var waiting = true;
+            setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
+            sendMsg("${htmlId}", "${this.id}", {volume: parseInt(${util.getElement(htmlId, "widget")}.getAttribute("volume")) + 1}, function(id, sessionId, success, msg) {
+                if(id == "${this.id}") {
+                    waiting = false;
+                    loadingAnimation(event.target.id, false);
+                    if(!success) {
+                        failedToSend();
+                    }
+                }
+            });
+        }
+        var noAction = function() {}
+        ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")} 
+        `;
+
+        //When the user clicks the volume down button
+        var volMinusAction = `
+        var yesAction = function() {
+            var waiting = true;
+            setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
+            sendMsg("${htmlId}", "${this.id}", {volume: parseInt(${util.getElement(htmlId, "widget")}.getAttribute("volume")) - 1}, function(id, sessionId, success, msg) {
+                if(id == "${this.id}") {
+                    waiting = false;
+                    loadingAnimation(event.target.id, false);
+                    
+                    if(!success) {
+                        failedToSend();
+                    }
+                }
+            });
+        }
+        var noAction = function() {}
+        ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
+        `;
+
         //When the mute button is pressed
         var muteAction = `
             var yesAction = function() {
@@ -235,6 +275,8 @@ module.exports = {
         `;
 
         return `
+        ${util.getElement(htmlId, "plus")}.onclick = function(event) {${volPlusAction}};
+        ${util.getElement(htmlId, "minus")}.onclick = function(event) {${volMinusAction}};
         ${util.getElement(htmlId, "muteButton")}.onclick = function(event) {${muteAction}};
         ${util.getElement(htmlId, "widget")}.setAttribute("muted", ${this.getValue("muted")});
         ${util.getElement(htmlId, "widget")}.setAttribute("volume", ${this.getValue("volume")});
@@ -253,7 +295,7 @@ module.exports = {
                 var muted = msg.payload.muted;
                 ${this.showMute(htmlId)}
             }
-            if(msg.payload.volume) {
+            if(msg.payload.volume != undefined) {
                 ${util.getElement(htmlId, "widget")}.setAttribute("volume", msg.payload.volume);
                 var volume = msg.payload.volume;
                 ${this.showVolume(htmlId)}

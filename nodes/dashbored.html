@@ -24,7 +24,7 @@
         <button type="button" class="red-ui-button" id="node-input-widgets-add"><i class="fa fa-clipboard" aria-hidden="true"></i></button>
     </div>
 
-    <p><a href="https://fontawesome.com/v4/icons/" target="_blank">Font Awesome Icons</a></p>
+    <p><a href="https://fontawesome.com/icons" target="_blank">Font Awesome Icons</a></p>
     <p><a href="https://github.com/haydendonald/NodeRed-Dashbored/wiki/Dashbored" target="_blank">See the wiki for more options</a></p>
 
     <!-- HTML Editor -->
@@ -54,7 +54,7 @@
     </div>
     <div class="form-row">
         <label for="node-config-input-headerImage"><i class="icon-tag"></i> Header Image</label>
-        <input type="text" id="node-config-input-headerImage" placeholder="red/images/node-red.svg">
+        <input type="text" id="node-config-input-headerImage">
     </div>
     <div class="form-row">
         <label for="node-config-input-headerText"><i class="icon-tag"></i> Header Title</label>
@@ -123,7 +123,7 @@
                 required: false
             },
             headerImage: {
-                value: "red/images/node-red.svg",
+                value: "",
                 required: false
             },
             headerText: {
@@ -195,7 +195,7 @@
             //Do a call to the server and request the widgets in memory
             var widgets = await $.ajax({
                 type: "GET",
-                url: "./dashboredAPI",
+                url: "/dashboredAPI",
                 data: "widgets"
             });
             var options = [];

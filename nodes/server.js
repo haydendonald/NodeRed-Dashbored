@@ -148,6 +148,35 @@ module.exports = function (RED) {
                 name
             };
             RED.log.info(`- Added Dashbored [${name}] at /${endpoint}`);
+            RED.httpNode.get("/" + endpoint, (req, res) => {
+                RED.log.debug("Got request for dashbored " + dashboards[endpoint].name);
+    
+                //Handle the request
+                if (req.method != "GET") {
+                    res.type("text/plain");
+                    res.status(500);
+                    res.send("500 - Internal Server Error");
+                }
+                else {
+                    var file = req.url.split(`/${endpoint}/`)[1];
+                    if (!file || file == "index.html") {
+                        fs.readFile(path.join(webFolder, "index.html"), "utf-8", (error, data) => {
+                            if (error) {
+                                RED.log.error("Failed to load HTML: " + error);
+                                res.type("text/plain");
+                                res.status(500);
+                                res.send("Internal Server Error");
+                            }
+                            else {
+                                RED.nodes.getNode(dashboards[endpoint].id).handleHTTP(data, req, res);
+                            }
+                        });
+                    } else {
+                        //If not index send the file if it exists
+                        res.sendFile(file, { root: webFolder });
+                    }
+                }
+            });
         }
 
         node.addWidget = (id, name, type, widgetTypeVersion) => {
@@ -172,9 +201,15 @@ module.exports = function (RED) {
     }
 
     //Setup the HTTP server
-    RED.httpNode.get("/script.js", (req, res) => { res.sendFile("script.js", { root: webFolder }); });
-    RED.httpNode.get("/style.css", (req, res) => { res.sendFile("style.css", { root: webFolder }); });
-    RED.httpNode.get("/temp.css", (req, res) => { res.sendFile("temp.css", { root: webFolder }); });
+    RED.httpNode.get("/dashbored/script.js", (req, res) => { res.sendFile("script.js", { root: webFolder }); });
+    RED.httpNode.get("/dashbored/style.css", (req, res) => { res.sendFile("style.css", { root: webFolder }); });
+    RED.httpNode.get("/dashbored/temp.css", (req, res) => { res.sendFile("temp.css", { root: webFolder }); });
+    RED.httpNode.get("/dashbored/css/*", (req, res) => {
+        res.sendFile("node_modules/fontawesome-free/css/" + req.url.split("/css/")[1], { root: rootFolder }); 
+    });
+    RED.httpNode.get("/dashbored/webfonts/*", (req, res) => {
+        res.sendFile("node_modules/fontawesome-free/webfonts/" + req.url.split("/webfonts/")[1], { root: rootFolder }); 
+    });
 
     //Send the widget ids for the node red editor to populate (if theres a better way i'd like to know...)
     RED.httpNode.get("/dashboredgetallnodeids", (req, res) => {
@@ -183,9 +218,10 @@ module.exports = function (RED) {
         res.send(send);
     });
 
+    //Dashbored API for node red editor
     RED.httpNode.get("/dashboredAPI", (req, res) => {
-        if (!req.query) { return; }
-        if (req.query.widgets !== undefined) {
+        if (!req.query) { RED.log.error("Invalid query passed to the dashbored API url"); }
+        else if (req.query.widgets !== undefined) {
             var generate = function (widget) {
                 return {
                     id: widget.id,
@@ -214,7 +250,7 @@ module.exports = function (RED) {
             }
             res.send(send);
         }
-        if (req.query.widgetTypes !== undefined) {
+        else if (req.query.widgetTypes !== undefined) {
             var send = {};
             for (var i in widgetTypes) {
                 var type = widgetTypes[i];
@@ -232,40 +268,8 @@ module.exports = function (RED) {
             }
             res.send(send);
         }
-    });
-
-    RED.httpNode.get("/*", (req, res) => {
-        for (var endpoint in dashboards) {
-            if ("/" + endpoint == req.url) {
-                RED.log.debug("Got request for dashbored " + dashboards[endpoint].name);
-
-                //Handle the request
-                if (req.method != "GET") {
-                    res.type("text/plain");
-                    res.status(500);
-                    res.send("500 - Internal Server Error");
-                }
-                else {
-                    var file = req.url.split(`/${endpoint}/`)[1];
-                    if (!file || file == "index.html") {
-                        fs.readFile(path.join(webFolder, "index.html"), "utf-8", (error, data) => {
-                            if (error) {
-                                RED.log.error("Failed to load HTML: " + error);
-                                res.type("text/plain");
-                                res.status(500);
-                                res.send("Internal Server Error");
-                            }
-                            else {
-                                RED.nodes.getNode(dashboards[endpoint].id).handleHTTP(data, req, res);
-                            }
-                        });
-                    } else {
-                        //If not index send the file if it exists
-                        res.sendFile(file, { root: webFolder });
-                    }
-                }
-                break;
-            }
+        else {
+            RED.log.error("Misunderstood query passed to the dashbored API url");
         }
     });
 

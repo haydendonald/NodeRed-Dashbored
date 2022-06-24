@@ -1,6 +1,6 @@
 {
     "name": "node-red-contrib-dashbored",
-    "version": "0.1.1",
+    "version": "0.2.0",
     "description": "A more customizable dashboard for NodeRed",
     "main": "",
     "repository": {
@@ -37,6 +37,7 @@
         "ws": "^8.5.0",
         "node-html-parser": "^5.2.0",
         "openweather-apis": "^4.4.2",
-        "clone-deep": "^4.0.1"
+        "clone-deep": "^4.0.1",
+        "fontawesome-free": "^1.0.4"
     }
 }

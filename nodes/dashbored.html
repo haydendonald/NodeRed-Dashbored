@@ -192,10 +192,12 @@
             return (this.name || "Dashbored");
         },
         oneditprepare: async function () {
+            console.log(this);
+
             //Do a call to the server and request the widgets in memory
             var widgets = await $.ajax({
                 type: "GET",
-                url: "/dashboredAPI",
+                url: RED.settings.httpNodeRoot + "dashboredAPI",
                 data: "widgets"
             });
             var options = [];
@@ -232,7 +234,12 @@
             $("#node-input-page-add").click(() => {
                 var name = $("#node-input-pageName").val();
                 var icon = $("#node-input-pageIcon").val();
-                navigator.clipboard.writeText(`<page name="${name}" icon="${icon}"></page>`);
+                if(window.isSecureContext) {
+                    navigator.clipboard.writeText(`<page name="${name}" icon="${icon}"></page>`);
+                }
+                else {
+                    prompt(`Sorry copying without HTTPs is not allowed, copy it from here`, `<page name="${name}" icon="${icon}"></page>`);
+                }
             });
 
             //Copy the selected widgets to the clipboard
@@ -243,7 +250,12 @@
                     console.log(selected[i]);
                     clipboard += `<widget name="${wids[selected[i]].label}" id="${wids[selected[i]].id}"></widget>`;
                 }
-                navigator.clipboard.writeText(clipboard);
+                if(window.isSecureContext) {
+                    navigator.clipboard.writeText(clipboard);
+                }
+                else {
+                    prompt(`Sorry copying without HTTPs is not allowed, copy it from here`, `${clipboard}`);
+                }
             });
 
             //Setup the editors

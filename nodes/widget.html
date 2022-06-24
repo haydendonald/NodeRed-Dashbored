@@ -79,7 +79,7 @@
         try {
             var widgetTypes = await $.ajax({
                 type: "GET",
-                url: "/dashboredAPI",
+                url: RED.settings.httpNodeRoot + "dashboredAPI",
                 data: "widgetTypes"
             });
         }
@@ -106,7 +106,7 @@
                 try {
                     var widgets = await $.ajax({
                         type: "GET",
-                        url: "/dashboredAPI",
+                        url: RED.settings.httpNodeRoot + "dashboredAPI",
                         data: "widgets"
                     });
                 } catch (e) { }

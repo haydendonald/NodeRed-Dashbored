@@ -4,6 +4,7 @@ module.exports = function (RED) {
     const WebSocket = require("ws");
     var rootFolder = path.join(__dirname, "..");
     var webFolder = path.join(rootFolder, "web");
+    var fontAwesomeFolder = path.join(require.resolve('fontawesome-free'), "..");
     var dashboards = {};
     var widgets = {};
     var generatedWidgets = {};
@@ -39,6 +40,7 @@ module.exports = function (RED) {
         RED.log.info("-------- Dashbored Let's Start! --------");
         RED.log.info(`Root Folder: ${rootFolder}`);
         RED.log.info(`Web Folder: ${webFolder}`);
+        RED.log.info(`Font Awesome: ${fontAwesomeFolder}`);
         RED.log.info(`Weather Location -> Latitude: ${weatherLat}, Longitude: ${weatherLong}`);
         RED.log.info(`Weather Unit: ${weatherUnit}`);
 
@@ -205,10 +207,10 @@ module.exports = function (RED) {
     RED.httpNode.get("/dashbored/style.css", (req, res) => { res.sendFile("style.css", { root: webFolder }); });
     RED.httpNode.get("/dashbored/temp.css", (req, res) => { res.sendFile("temp.css", { root: webFolder }); });
     RED.httpNode.get("/dashbored/css/*", (req, res) => {
-        res.sendFile("node_modules/fontawesome-free/css/" + req.url.split("/css/")[1], { root: rootFolder }); 
+        res.sendFile("/css/" + req.url.split("/css/")[1], { root: fontAwesomeFolder }); 
     });
     RED.httpNode.get("/dashbored/webfonts/*", (req, res) => {
-        res.sendFile("node_modules/fontawesome-free/webfonts/" + req.url.split("/webfonts/")[1], { root: rootFolder }); 
+        res.sendFile("/webfonts/" + req.url.split("/webfonts/")[1], { root: fontAwesomeFolder }); 
     });
 
     //Send the widget ids for the node red editor to populate (if theres a better way i'd like to know...)

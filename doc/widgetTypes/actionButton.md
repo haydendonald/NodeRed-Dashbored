@@ -1,5 +1,5 @@
 # Action Button
-![actionButton](/img/widgets/actionButton.png)
+![](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/widgets/actionButton.png)
 
 Is a simple button that when pressed can perform an action.
 
@@ -9,7 +9,23 @@ Is a simple button that when pressed can perform an action.
 * `Flash Color`: The color to "flash" when the button is clicked
 
 ## Messages
-This sends a payload containing no values
+### Input
+Sending a payload will "click" the button
+```
+{
+    "topic": "set",
+    "payload": {}
+}
+```
+
+### Output
+This sends a payload containing no values when clicked
+```
+{
+    "topic": "set",
+    "payload": {}
+}
+```
 
 ## CSS
 * `.flashColor`: The CSS class applied when the button is to flash (overrides the flash color)

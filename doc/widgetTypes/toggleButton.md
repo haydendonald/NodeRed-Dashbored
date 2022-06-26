@@ -1,5 +1,5 @@
 # Toggle Button
-![toggleButton](/img/widgets/toggleButton.png)
+![](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/widgets/toggleButton.png)
 
 Switches between two states. Useful for on/off applications.
 
@@ -9,7 +9,27 @@ Switches between two states. Useful for on/off applications.
 * `Off Value`: The value where the state of the button is "off"
 
 ## Messages
-This sends out a payload containing the current `state` which can be one of the on or off values
+### Input
+Sending a payload will set the state
+```
+{
+    "topic": "set",
+    "payload": {
+        "state": <state>
+    }
+}
+```
+
+### Output
+This sends a payload containing the state
+```
+{
+    "topic": "set",
+    "payload": {
+        "state": <state>
+    }
+}
+```
 
 ## CSS
 * `.on`: The class added to the button when it's "on"

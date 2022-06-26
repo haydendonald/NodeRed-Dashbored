@@ -1,5 +1,5 @@
 # Horizontal Stack
-![](/img/widgets/horStack.png)
+![](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/widgets/horStack.png)
 
 Stacks many other widgets horizontally
 

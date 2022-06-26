@@ -1,5 +1,5 @@
 # Vertical Stack
-![](/img/widgets/vertStack.png)
+![](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/widgets/vertStack.png)
 
 Stacks many other widgets vertically
 

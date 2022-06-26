@@ -1,5 +1,5 @@
 # Button Selector
-![](/img/widgets/buttonSelector.png)
+![](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/widgets/buttonSelector.png)
 
 This allows for a selection of a value using a simple button layout
 
@@ -7,7 +7,28 @@ This allows for a selection of a value using a simple button layout
 * `Options`: Add the buttons that can be pressed by the user
 
 ## Messages
-This sends out a payload containing the current `value`
+
+### Input
+Sending a payload will set the value
+```
+{
+    "topic": "set",
+    "payload": {
+        "value": <value>
+    }
+}
+```
+
+### Output
+This sends a payload containing the value selected
+```
+{
+    "topic": "set",
+    "payload": {
+        "value": <value>
+    }
+}
+```
 
 ## CSS
 * `.on`: Styling to add when a button is "on"

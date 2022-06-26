@@ -20,6 +20,7 @@ module.exports = {
     //The ids MUST be node-config-input-<WIDGETNAME>-<CONFIGNAME> otherwise they may not be set
     generateConfigHTML: function () {
         return `
+                    <p><a href="https://github.com/haydendonald/NodeRed-Dashbored/blob/main/doc/widgetTypes/volume.md" target="_blank">See the wiki for more information</a></p>
                     <!-- CSS Editor -->
                     <div class="form-row">
                         <label for="CSS">CSS</label>

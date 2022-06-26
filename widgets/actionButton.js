@@ -20,6 +20,7 @@ module.exports = {
     //The ids MUST be node-config-input-<WIDGETNAME>-<CONFIGNAME> otherwise they may not be set
     generateConfigHTML: function () {
         return `
+                    <p><a href="https://github.com/haydendonald/NodeRed-Dashbored/blob/main/doc/widgetTypes/actionButton.md" target="_blank">See the wiki for more information</a></p>
                     <div class="form-row">
                         <label for="config-input-actionButton-text">Text</label>
                         <input type="text" id="node-config-input-actionButton-text" placeholder="Text">

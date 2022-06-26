@@ -21,6 +21,7 @@ module.exports = {
     //The ids MUST be node-config-input-<WIDGETNAME>-<CONFIGNAME> otherwise they may not be set
     generateConfigHTML: function () {
         return `
+                    <p><a href="https://github.com/haydendonald/NodeRed-Dashbored/blob/main/doc/widgetTypes/buttonSelector.md" target="_blank">See the wiki for more information</a></p>
                     <div class="form-row">       
                         <ol id="options"></ol>
                     </div>

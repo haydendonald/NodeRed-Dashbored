@@ -16,7 +16,7 @@ Sending a payload will set the volume
     "topic": "set",
     "payload": {
         "volume": <0-100%>,
-        "muted": <true/false>
+        "muted": <mutedValue / unmutedValue>
     }
 }
 ```
@@ -28,7 +28,7 @@ This sends a payload containing the state
     "topic": "set",
     "payload": {
         "volume": <0-100%>,
-        "muted": <true/false>
+        "muted": <mutedValue / unmutedValue>
     }
 }
 ```

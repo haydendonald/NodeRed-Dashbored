@@ -23,8 +23,6 @@ module.exports = function (RED, dashboredGeneration = undefined) {
         var server = !dashboredGeneration ? RED.nodes.getNode(config.server) : config.server;
         var name = config.name;
 
-        this.widthMultiplier = parseInt(config.widthMultiplier) || 1;
-        this.heightMultiplier = parseInt(config.heightMultiplier) || 1;
         this.title = config.title || "";
         this.restoreState = config.restoreState || false;
         this.setsState = config.setsState;
@@ -42,6 +40,10 @@ module.exports = function (RED, dashboredGeneration = undefined) {
                 this[i] = widType[i];
             }
         }
+
+        //Set our height/width multipliers
+        this.widthMultiplier = (parseFloat(config.widthMultiplier) || 1) * this.widthMultiplier;
+        this.heightMultiplier = (parseFloat(config.heightMultiplier) || 1) * this.heightMultiplier;
 
         //Send to the flow
         this.sendToFlow = function (msg, messageType, get = undefined, sessionId = undefined, nodeId = undefined) {

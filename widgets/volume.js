@@ -6,7 +6,7 @@
 var util = require("../util.js");
 module.exports = {
     widgetType: "volume",
-    version: "0.0.1",
+    version: "0.0.2",
     label: "Volume",
     description: "Displays a volume control",
     widthMultiplier: 1,
@@ -21,6 +21,14 @@ module.exports = {
     generateConfigHTML: function () {
         return `
                     <p><a href="https://github.com/haydendonald/NodeRed-Dashbored/blob/main/doc/widgetTypes/volume.md" target="_blank">See the wiki for more information</a></p>
+                    <div class="form-row">
+                        <label for="config-input-volume-mutedValue">Muted Value</label>
+                        <input type="text" id="node-config-input-volume-mutedValue" placeholder="Muted Value">
+                    </div>
+                    <div class="form-row">
+                        <label for="config-input-volume-unmutedValue">Unmuted Value</label>
+                        <input type="text" id="node-config-input-volume-unmutedValue" placeholder="Unmuted Value">
+                    </div>
                     <!-- CSS Editor -->
                     <div class="form-row">
                         <label for="CSS">CSS</label>
@@ -58,11 +66,15 @@ module.exports = {
             reset: `
                     element.cssEditor.setValue(defaultConfig.CSS.value);
                     element.cssEditor.clearSelection();
+                    $("#node-config-input-volume-mutedValue").val(defaultConfig.mutedValue);
+                    $("#node-config-input-volume-unmutedValue").val(defaultConfig.unmutedValue);
                 `
         }
     },
     //Default config
     defaultConfig: {
+        mutedValue: { value: "on", required: true },
+        unmutedValue: { value: "off", required: true },
         CSS: {
             value: `
                 #volumeLevelContainer {
@@ -111,7 +123,7 @@ module.exports = {
     getDefaultValues: function () {
         return {
             volume: 50, //Volume %
-            muted: true
+            muted: this.config.mutedValue
         }
     },
 
@@ -259,9 +271,9 @@ module.exports = {
         var muteAction = `
             var yesAction = function() {
                 var waiting = true;
-                var currentlyMuted = ${util.getElement(htmlId, "widget")}.getAttribute("muted") == "true";
+                var currentlyMuted = ${util.getElement(htmlId, "widget")}.getAttribute("muted") == "${this.config.mutedValue}";
                 setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
-                sendMsg("${htmlId}", "${this.id}", {muted: !currentlyMuted}, function(id, sessionId, success, msg) {
+                sendMsg("${htmlId}", "${this.id}", {muted: (currentlyMuted ? "${this.config.unmutedValue}" : "${this.config.mutedValue}")}, function(id, sessionId, success, msg) {
                     if(id == "${this.id}") {
                         waiting = false;
                         loadingAnimation(event.target.id, false);
@@ -279,11 +291,11 @@ module.exports = {
         ${util.getElement(htmlId, "plus")}.onclick = function(event) {${volPlusAction}};
         ${util.getElement(htmlId, "minus")}.onclick = function(event) {${volMinusAction}};
         ${util.getElement(htmlId, "muteButton")}.onclick = function(event) {${muteAction}};
-        ${util.getElement(htmlId, "widget")}.setAttribute("muted", ${this.getValue("muted")});
+        ${util.getElement(htmlId, "widget")}.setAttribute("muted", "${this.getValue("muted")}");
         ${util.getElement(htmlId, "widget")}.setAttribute("volume", ${this.getValue("volume")});
 
         //Set the default UI
-        ${this.showMute(htmlId, this.getValue("muted"))}
+        ${this.showMute(htmlId, this.getValue("muted") == `${this.config.mutedValue}`)}
         ${this.showVolume(htmlId, this.getValue("volume"))}
         `;
     },
@@ -293,7 +305,7 @@ module.exports = {
         return `
             if(msg.payload.muted != undefined) {
                 ${util.getElement(htmlId, "widget")}.setAttribute("muted", msg.payload.muted);
-                var muted = msg.payload.muted;
+                var muted = msg.payload.muted == "${this.config.mutedValue}";
                 ${this.showMute(htmlId)}
             }
             if(msg.payload.volume != undefined) {

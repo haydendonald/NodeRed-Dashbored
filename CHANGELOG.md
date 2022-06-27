@@ -9,3 +9,6 @@
 * Fixed a bug with httpEndpoint set
 * Fixed a bug with nodeEndpoint set
 * Fixed a bug where the clipboard cannot be copied to without HTTPs (It is not allowed without HTTPs)
+## - 0.2.2
+* Fixed a few issues with the volume widget
+* Fixed a bug where the width and height multipliers were not being set

@@ -12,7 +12,7 @@ A more customizable dashboard for NodeRed, not to be confused with the [NodeRed 
 * A "Are you sure" dialog
 
 # Installation
-Coming soon!! 
+Simply search for `node-red-contrib-dashbored` in the pallet manager or install using `npm install node-red-contrib-dashbored`
 
 # Supported Widgets
 ## [Action Button](https://github.com/haydendonald/NodeRed-Dashbored/blob/main/doc/widgetTypes/actionButton.md)

@@ -124,9 +124,15 @@ module.exports = {
                     element.cssEditor.destroy();
                     delete element.cssEditor;
                 `,
-            //When the user clicks the "reset configuration" set the options to their defaults
-            reset: `
-                    element.cssEditor.setValue(defaultConfig.CSS.value);
+            //When the user clicks the "copy configuration" button update the values shown
+            update: `
+            var optionsList = $("#options");
+            optionsList.editableList("empty");
+            var split = settings.widgets.value.split(",");
+            for(var i in split) {
+                optionsList.editableList('addItem', { widget: split[i]});
+            }
+                    element.cssEditor.setValue(settings.CSS.value);
                     element.cssEditor.clearSelection();
                 `
         }

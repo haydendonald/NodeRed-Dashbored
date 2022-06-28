@@ -67,12 +67,12 @@ module.exports = {
                     element.cssEditor.destroy();
                     delete element.cssEditor;
                 `,
-                        //When the user clicks the "reset configuration" set the options to their defaults
-                        reset: `
-                    $("#node-config-input-toggleButton-text").val(defaultConfig.text.value);
-                    $("#node-config-input-toggleButton-onValue").val(defaultConfig.onValue.value);
-                    $("#node-config-input-toggleButton-offValue").val(defaultConfig.offValue.value);
-                    element.cssEditor.setValue(defaultConfig.CSS.value);
+                        //When the user clicks the "copy configuration" button update the values shown
+                        update: `
+                    $("#node-config-input-toggleButton-text").val(settings.text.value);
+                    $("#node-config-input-toggleButton-onValue").val(settings.onValue.value);
+                    $("#node-config-input-toggleButton-offValue").val(settings.offValue.value);
+                    element.cssEditor.setValue(settings.CSS.value);
                     element.cssEditor.clearSelection();
                 `
         }

@@ -10,7 +10,7 @@ module.exports = {
     label: "Volume",
     description: "Displays a volume control",
     widthMultiplier: 1,
-    heightMultiplier: 2,
+    heightMultiplier: 3,
     minWidth: undefined,
     minWeight: undefined,
     maxWidth: undefined,
@@ -62,12 +62,12 @@ module.exports = {
                     element.cssEditor.destroy();
                     delete element.cssEditor;
                 `,
-            //When the user clicks the "reset configuration" set the options to their defaults
-            reset: `
-                    element.cssEditor.setValue(defaultConfig.CSS.value);
+            //When the user clicks the "copy configuration" button update the values shown
+            update: `
+                    element.cssEditor.setValue(settings.CSS.value);
                     element.cssEditor.clearSelection();
-                    $("#node-config-input-volume-mutedValue").val(defaultConfig.mutedValue);
-                    $("#node-config-input-volume-unmutedValue").val(defaultConfig.unmutedValue);
+                    $("#node-config-input-volume-mutedValue").val(settings.mutedValue.value);
+                    $("#node-config-input-volume-unmutedValue").val(settings.unmutedValue.value);
                 `
         }
     },

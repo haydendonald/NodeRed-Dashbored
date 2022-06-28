@@ -231,7 +231,8 @@ module.exports = function (RED) {
                     values: widget.values,
                     widgetType: widget.widgetType,
                     configHTML: widget.generateConfigHTML(),
-                    configScript: widget.generateConfigScript()
+                    configScript: widget.generateConfigScript(),
+                    settings: widget.config
                 }
             }
             var send = [];

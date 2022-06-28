@@ -36,7 +36,11 @@
     <div class="form-row" id="widget-type-populate-area">
         <p style="color: red">Please deploy to create the widget and populate the settings here</p>
     </div>
-    <button id="reset">Reset Configuration</button>
+    <div class="form-row">
+        <label for="copyFrom">Copy from:</label>
+        <input type="text" id="copyFrom">
+    </div>
+    <button id="reset">Copy Configuration</button>
 </script>
 
 <script type="text/javascript">
@@ -112,13 +116,22 @@
                 } catch (e) { }
 
                 var widget;
-                for(var i in widgets) {
-                    if(widgets[i].id == this.id) {
+                var widgetOfSameType = [];
+                for (var i in widgets) {
+                    if (widgets[i].id == this.id) {
                         widget = widgets[i];
                         break;
                     }
                 }
-                
+                if (widget && widget.widgetType) {
+                    for (var i in widgets) {
+                        if (widgets[i].widgetType == widget.widgetType) {
+                            widgetOfSameType.push(widgets[i]);
+                        }
+                    }
+                }
+
+
                 //Set the widget type selector
                 var types = [];
                 for (var i in widgetTypes) {
@@ -130,6 +143,25 @@
                 $("#node-config-input-widgetType").typedInput({
                     types: [{
                         value: "widgetType",
+                        options: types
+                    }]
+                });
+
+                //Add the widgets of same type to be copied from
+                var types = [];
+                for (var i in widgetOfSameType) {
+                    types.push({
+                        label: widgetOfSameType[i].label,
+                        value: i
+                    });
+                }
+                types.push({
+                    label: "Reset",
+                    value: "reset"
+                });
+                $("#copyFrom").typedInput({
+                    types: [{
+                        value: "copyFrom",
                         options: types
                     }]
                 });
@@ -154,8 +186,21 @@
 
                 $("#reset").on("click", function () {
                     var element = self;
-                    var defaultConfig = currentWidgetType.defaultConfig;
-                    if (currentWidgetType.configScript.reset) { eval(currentWidgetType.configScript.reset); }
+                    if ($("#copyFrom").val() == "reset") {
+                        if (currentWidgetType.configScript.update) {
+                            window.eval.call(window, `(function (element, settings) {${currentWidgetType.configScript.update}})`)(element, currentWidgetType.defaultConfig);
+                        }
+                    }
+                    else {
+                        var copy = widgetOfSameType[$("#copyFrom").val()];
+                        if (copy && copy.settings) {
+                            var temp = {};
+                            for (var i in copy.settings) {
+                                temp[i] = { value: copy.settings[i] }
+                            }
+                            window.eval.call(window, `(function (element, settings) {${currentWidgetType.configScript.update}})`)(element, temp);
+                        }
+                    }
                 });
 
                 //https://nodered.org/docs/api/ui/typedInput/#methods

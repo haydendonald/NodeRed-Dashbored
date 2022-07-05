@@ -15,3 +15,5 @@
 ## - 0.2.4
 * More changes to the volume widget
 * Added the ability to copy settings from another widget
+## - 0.2.5
+* Added an increment value to the volume widget

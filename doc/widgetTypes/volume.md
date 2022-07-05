@@ -6,7 +6,9 @@
 Allows for a volume channel to be controlled
 
 ## Properties
-None.
+* `Muted Value`: The muted state
+* `Unmuted Value`: The unmuted state
+* `Increment`: The value to add/minus when plus/minus is clicked
 
 ## Messages
 ### Input

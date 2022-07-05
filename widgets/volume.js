@@ -6,7 +6,7 @@
 var util = require("../util.js");
 module.exports = {
     widgetType: "volume",
-    version: "0.0.2",
+    version: "0.0.3",
     label: "Volume",
     description: "Displays a volume control",
     widthMultiplier: 1,
@@ -28,6 +28,10 @@ module.exports = {
                     <div class="form-row">
                         <label for="config-input-volume-unmutedValue">Unmuted Value</label>
                         <input type="text" id="node-config-input-volume-unmutedValue" placeholder="Unmuted Value">
+                    </div>
+                    <div class="form-row">
+                        <label for="config-input-volume-increment">Increment</label>
+                        <input type="number" id="node-config-input-volume-increment" placeholder="Increment">
                     </div>
                     <!-- CSS Editor -->
                     <div class="form-row">
@@ -68,6 +72,7 @@ module.exports = {
                     element.cssEditor.clearSelection();
                     $("#node-config-input-volume-mutedValue").val(settings.mutedValue.value);
                     $("#node-config-input-volume-unmutedValue").val(settings.unmutedValue.value);
+                    $("#node-config-input-volume-increment").val(settings.increment.value);
                 `
         }
     },
@@ -75,6 +80,7 @@ module.exports = {
     defaultConfig: {
         mutedValue: { value: "on", required: true },
         unmutedValue: { value: "off", required: true },
+        increment: { value: 1, required: true },
         CSS: {
             value: `
                 #volumeLevelContainer {
@@ -233,7 +239,7 @@ module.exports = {
         var yesAction = function() {
             var waiting = true;
             setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
-            sendMsg("${htmlId}", "${this.id}", {volume: parseInt(${util.getElement(htmlId, "widget")}.getAttribute("volume")) + 1}, function(id, sessionId, success, msg) {
+            sendMsg("${htmlId}", "${this.id}", {volume: parseInt(${util.getElement(htmlId, "widget")}.getAttribute("volume")) + ${this.config.increment}}, function(id, sessionId, success, msg) {
                 if(id == "${this.id}") {
                     waiting = false;
                     loadingAnimation(event.target.id, false);
@@ -252,7 +258,7 @@ module.exports = {
         var yesAction = function() {
             var waiting = true;
             setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
-            sendMsg("${htmlId}", "${this.id}", {volume: parseInt(${util.getElement(htmlId, "widget")}.getAttribute("volume")) - 1}, function(id, sessionId, success, msg) {
+            sendMsg("${htmlId}", "${this.id}", {volume: parseInt(${util.getElement(htmlId, "widget")}.getAttribute("volume")) - ${this.config.increment}}, function(id, sessionId, success, msg) {
                 if(id == "${this.id}") {
                     waiting = false;
                     loadingAnimation(event.target.id, false);

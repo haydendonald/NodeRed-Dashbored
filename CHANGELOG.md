@@ -22,3 +22,5 @@
 ## - 0.2.7
 * Added the ability to override the title, widthMultiplier, and heightMultiplier of widgets using the dashbored HTML
 * Fixed a crash with a generated widget with invalid type being generated
+## - 0.2.8
+* Fixed a bug where widgets setup would not be called correctly for generated widgets

@@ -217,6 +217,9 @@ module.exports = function (RED) {
                     var alwaysPassword = widgetElement.getAttribute("always-password") || "no";
                     var ask = widgetElement.getAttribute("ask") || "no";
                     var askText = widgetElement.getAttribute("ask-text") || "";
+                    var title = widgetElement.getAttribute("title") || widget.title;
+                    var widthMultiplier = parseFloat(widgetElement.getAttribute("widthMultiplier") || widget.widthMultiplier);
+                    var heightMultiplier = parseFloat(widgetElement.getAttribute("heightMultiplier") || widget.heightMultiplier);
 
                     //Hide the widget when locked
                     if (lockedAccess == "no") {
@@ -251,10 +254,10 @@ module.exports = function (RED) {
                         #${randomId}_widget {`
                         
                         if(!widget.noHeight) {
-                            ret += `height: calc(${baseHeight} * ${widget.heightMultiplier});`;
+                            ret += `height: calc(${baseHeight} * ${heightMultiplier});`;
                         }
                         if(!widget.noWidth) {
-                            ret += `width: calc(${baseWidth} * ${widget.widthMultiplier}) ;`;
+                            ret += `width: calc(${baseWidth} * ${widthMultiplier}) ;`;
                         }
                         if (widget.minWidth) {
                             ret += `"min-width: ${widget.minWidth};`;
@@ -275,7 +278,7 @@ module.exports = function (RED) {
                         }`;
 
                         //If there is a title update the CSS
-                        if (widget.title) {
+                        if (title) {
                             ret += `
                             #${randomId}_title {
                                 font-size: 1.2em;
@@ -316,8 +319,8 @@ module.exports = function (RED) {
                     addWidgetsToPage(document, widgetHTML, widgetIdsCSSDone);
 
                     elements[i].innerHTML = `
-                        ${widget.title ? `${util.generateTag(randomId, "h1", "title", widget.title)}` : ""}
-                        ${widget.title ? `${util.generateTag(randomId, "div", "content", widgetHTML.outerHTML)}` : widgetHTML.outerHTML}
+                        ${title ? `${util.generateTag(randomId, "h1", "title", title)}` : ""}
+                        ${title ? `${util.generateTag(randomId, "div", "content", widgetHTML.outerHTML)}` : widgetHTML.outerHTML}
                     `;
                 }
             }

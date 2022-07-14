@@ -44,7 +44,6 @@ where (* = required):
 * `restoreState`: The name of the widget (only used by generation of a temporary widget)
 * `setsState`: The name of the widget (only used by generation of a temporary widget)
 
-
 ### Page
 Is a page within a dashbored with a button on the navigation bar which contains widgets and other elements.
 

@@ -180,10 +180,17 @@ module.exports = function (RED) {
                                     widgetType: elements[i].getAttribute("type"),
                                     title: elements[i].getAttribute("title")
                                 };
-                                var temp = {};
-                                Object.assign(temp, require("./widget.js")(RED, true)(config));
-                                server.addGeneratedWidget(temp.id, temp);
-                                widget = server.getGeneratedWidget(widId);
+
+                                //Check if type exists
+                                if(server.getWidgetTypes()[config.widgetType]) {
+                                    var temp = {};
+                                    Object.assign(temp, require("./widget.js")(RED, true)(config));
+                                    server.addGeneratedWidget(temp.id, temp);
+                                    widget = server.getGeneratedWidget(widId);
+                                }
+                                else {
+                                    RED.log.error(`Failed to generate widget of type ${elements[i].getAttribute("type")}, the type is invalid`);
+                                }
                             }
                             if (!widget) {
                                 RED.log.error(`Failed to generate widget of type ${elements[i].getAttribute("type")}`);

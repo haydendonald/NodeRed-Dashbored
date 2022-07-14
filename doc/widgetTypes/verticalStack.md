@@ -4,7 +4,7 @@
 Stacks many other widgets vertically
 
 ## Properties
-* `Widgets`: The selection of widgets to display in their order
+* `Widgets`: The selection of widgets to display in their order. For a generated widget many widgets can be added using a `,` for example `widgets=id1,id2`
 
 ## Messages
 None.

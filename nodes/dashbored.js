@@ -204,6 +204,7 @@ module.exports = function (RED) {
                                         widget.config[j] = val;
                                     }
                                 }
+                                widget.setupWidget(widget.config);
                             }
                         }
                     }

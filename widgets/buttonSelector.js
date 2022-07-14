@@ -245,7 +245,7 @@ module.exports = {
         for (var i in this.config.options) {
             var button = this.config.options[i];
             var on = button.value == this.getValue("value");
-            var color = button.value == on ? button.onColor : button.offColor;
+            var color = on ? button.onColor : button.offColor;
             ret += util.generateTag(htmlId, "button", i, button.label, `class="${util.generateCSSClass(htmlId, "button")} ${util.generateCSSClass(htmlId, on ? "on" : "off")}" style="background-color: ${color}; height: calc((100% / ${this.config.options.length}) - 10px)"`);
         }
         return ret;

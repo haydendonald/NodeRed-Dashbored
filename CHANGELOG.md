@@ -17,3 +17,5 @@
 * Added the ability to copy settings from another widget
 ## - 0.2.5
 * Added an increment value to the volume widget
+## - 0.2.6
+* Fixed a bug where the button selector would not set it's background colour correctly on first load in

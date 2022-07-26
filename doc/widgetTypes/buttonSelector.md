@@ -26,6 +26,7 @@ This sends a payload containing the value selected
     "topic": "set",
     "payload": {
         "value": <value>
+        "previousValue": <value>
     }
 }
 ```

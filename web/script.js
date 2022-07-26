@@ -311,15 +311,32 @@ function askPassword(correctCallback, incorrectCallback, bypassPassword) {
 
 //Ask if the user is sure
 function askAreYouSure(yesCallback, noCallback, description) {
+    //Set countdown
+    var count = 10;
+    document.getElementById("askCountdown").innerHTML = "Will automatically press no in 10 seconds";
+    var int = setInterval(function() {
+        if(count <= 0) {
+            hideShowElement("ask", false);
+            clearInterval(int);
+            if (noCallback) { noCallback(); }
+        }
+        else {
+            document.getElementById("askCountdown").innerHTML = "Will automatically press no in " + --count + " seconds";
+        }
+    }, 1000);
+
     document.getElementById("areYouSureDesc").innerHTML = description;
     document.getElementById("yesButton").onclick = function () {
         hideShowElement("ask", false);
+        clearInterval(int);
         if (yesCallback) { yesCallback(); }
     }
     document.getElementById("noButton").onclick = function () {
         hideShowElement("ask", false);
+        clearInterval(int);
         if (noCallback) { noCallback(); }
     }
+
     hideShowElement("ask", true);
 }
 

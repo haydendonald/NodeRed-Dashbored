@@ -31,6 +31,8 @@ This sends a payload containing the state
     "payload": {
         "volume": <0-100%>,
         "muted": <mutedValue / unmutedValue>
+        "previousVolume": <0-100%>
+        "previousMuted": <mutedValue / unmutedValue>
     }
 }
 ```

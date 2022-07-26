@@ -24,3 +24,6 @@
 * Fixed a crash with a generated widget with invalid type being generated
 ## - 0.2.8
 * Fixed a bug where widgets setup would not be called correctly for generated widgets
+## - 0.3.0
+* Changed the are you sure dialog to look a bit better and have a count down for the no answer
+* Added a previous value parameter to widgets when they send out a new value

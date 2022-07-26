@@ -152,13 +152,17 @@ module.exports = {
     onMessage: function (msg) {
         if (msg.id == this.id) {
             var vals = this.getValues();
+            var temp;
             if (msg.payload.muted != undefined) { vals["muted"] = msg.payload.muted; }
             if (msg.payload.volume != undefined) {
                 vals["volume"] = msg.payload.volume;
                 if(vals["volume"] >= 100){vals["volume"] = 100;}
                 if(vals["volume"] <= 0){vals["volume"] = 0;}
             }
-            this.sendStatusChangesToFlow(msg.sessionId, vals);
+            var temp = vals;
+            temp["previousVolume"] = this.getValues()["volume"];
+            temp["previousMuted"] = this.getValues()["muted"];
+            this.sendStatusChangesToFlow(msg.sessionId, temp);
 
             //Set the internal state if set
             if (this.setsState) {

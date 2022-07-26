@@ -216,22 +216,32 @@ button:focus {
 
 /** Are you sure dialog */
 #ask {
-    padding-top: 5vh;
+    padding-top: 3vw;
     position: absolute;
     width: 100%;
-    height: calc(100% - 5vh);
+    height: calc(100% - 3vw);
     z-index: 20;
     text-align: center;
 }
 
+#ask h1 {
+    font-size: 3vw;
+}
+
+#ask p {
+    font-size: 2vw;
+}
+
 #areYouSureDesc {
-    margin-top: 10px;
+    margin-bottom: 4vw;
 }
 
 #yesButton, #noButton {
-    margin-top: 50px;
-    width: 200px;
-    height: 100px;
+    margin-top: 2vw;
+    font-size: 3vw;
+    width: 30vw;
+    height: 15vw;
+    margin-right: 1vw;
 }
 
 /** Mobile **/

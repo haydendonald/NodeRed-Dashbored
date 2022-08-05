@@ -6,7 +6,7 @@
 
 module.exports = {
     widgetType: "verticalStack",
-    version: "1.0.0",
+    version: "1.0.1",
     label: "Vertical Stack",
     description: "Stacks many widgets vertically",
     widthMultiplier: 1,
@@ -192,7 +192,7 @@ module.exports = {
         var widgetIds = this.config.widgets.split(",");
         for (var i in widgetIds) {
             ret += `
-            <widget id="${widgetIds[i]}" style="float: none"></widget>
+            <widget id="${widgetIds[i]}" locked-access="${this.lockedAccess}" always-password="${this.alwaysPassword}" ask="${this.ask}" ask-text="${this.askText}" style="float: none"></widget>
             `;
         }
         return ret;
@@ -200,6 +200,10 @@ module.exports = {
 
     //Generate the script that will be executed when the dashbored loads
     generateOnload: function (htmlId, lockedAccess, alwaysPassword, ask, askText) {
+        this.lockedAccess = lockedAccess;
+        this.alwaysPassword = alwaysPassword;
+        this.ask = ask;
+        this.askText = askText;
         return "";
     },
 

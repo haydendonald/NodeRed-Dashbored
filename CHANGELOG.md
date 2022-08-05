@@ -27,3 +27,5 @@
 ## - 0.3.0
 * Changed the are you sure dialog to look a bit better and have a count down for the no answer
 * Added a previous value parameter to widgets when they send out a new value
+## - 0.3.1
+* Fixed a bug where the horizontal/vertical stack would not pass additional properties like ask and lock

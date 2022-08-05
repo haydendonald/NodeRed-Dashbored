@@ -6,7 +6,7 @@
 
 module.exports = {
     widgetType: "horizontalStack",
-    version: "1.0.0",
+    version: "1.0.1",
     label: "Horizontal Stack",
     description: "Stacks many widgets horizontally",
     widthMultiplier: 1,
@@ -189,9 +189,12 @@ module.exports = {
     generateHTML: function (htmlId) {
         var ret = "";
         var widgetIds = this.config.widgets.split(",");
+
+        console.log(this);
+
         for (var i in widgetIds) {
             ret += `
-            <widget id="${widgetIds[i]}" style="float: left"></widget>
+            <widget id="${widgetIds[i]}" locked-access="${this.lockedAccess}" always-password="${this.alwaysPassword}" ask="${this.ask}" ask-text="${this.askText}" style="float: left"></widget>
             `;
         }
         return ret;
@@ -199,6 +202,10 @@ module.exports = {
 
     //Generate the script that will be executed when the dashbored loads
     generateOnload: function (htmlId, lockedAccess, alwaysPassword, ask, askText) {
+        this.lockedAccess = lockedAccess;
+        this.alwaysPassword = alwaysPassword;
+        this.ask = ask;
+        this.askText = askText;
         return "";
     },
 

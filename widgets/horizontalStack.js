@@ -190,8 +190,6 @@ module.exports = {
         var ret = "";
         var widgetIds = this.config.widgets.split(",");
 
-        console.log(this);
-
         for (var i in widgetIds) {
             ret += `
             <widget id="${widgetIds[i]}" locked-access="${this.lockedAccess}" always-password="${this.alwaysPassword}" ask="${this.ask}" ask-text="${this.askText}" style="float: left"></widget>

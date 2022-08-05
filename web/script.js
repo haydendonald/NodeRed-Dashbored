@@ -361,7 +361,18 @@ function showCurrentPage(newPageId) {
 
 //Attempt to connect to the socket and setup the handlers
 var connectionInterval;
+var pingInterval;
+var lastMessage = Date.now();
 function connect() {
+    //Attempt to reconnect to the socket when disconnected
+    var socketReconnect = function() {
+        socketWasClosed = true;
+        message("error", "Disconnected From Server", "We are currently disconnected from the server! Attempting to get it back!", false);
+        clearInterval(pingInterval);
+        connect();
+    }
+
+    //Attempt connection to the socket
     var attempt = function () {
         printConsole("debug", "Attempt connection to the socket");
         if (socket) { socket = undefined; }
@@ -372,18 +383,26 @@ function connect() {
             clearInterval(connectionInterval);
             connectionInterval = undefined;
 
+            //Setup a ping to the server to ensure we're still connected, we can use this to gather server information
+            clearInterval(pingInterval);
+            pingInterval = setInterval(() => {
+                var temp = new Date(lastMessage);
+                temp.setSeconds(temp.getSeconds() + 10)
+                if(Date.now() > temp) {
+                    printConsole("error", "Didn't get a message from the server for a while, assuming we're disconnected");
+                    socketReconnect();
+                }
+            }, 5000);
+
             //If we lost the socket and got it back refresh to regenerate the page
             if (socketWasClosed == true) {
                 window.location.reload();
             }
-
-            //Request the weather
-            sendMsg(randString(), dashboredId, {
-                type: "weather"
-            });
         });
 
         socket.addEventListener("message", function (data) {
+            lastMessage = Date.now();
+
             //Check for control signals
             if (data.data == "reload") { setTimeout(function () { window.location.reload(); }, 1000); return; }
 
@@ -446,9 +465,7 @@ function connect() {
 
         socket.addEventListener("close", function () {
             printConsole("debug", "Socket closed");
-            socketWasClosed = true;
-            message("error", "Disconnected From Server", "We are currently disconnected from the server! Attempting to get it back!", false);
-            connect();
+            socketReconnect();
         });
     }
 

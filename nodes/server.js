@@ -31,7 +31,7 @@ module.exports = function (RED) {
         var weatherLong = config.weatherLong || "";
         var weatherUnit = config.weatherUnit || "";
         var weatherAppId = config.apiKey || "";
-        var weatherInterval;
+        var statusInterval;
 
         dashboards = {};
         widgets = {};
@@ -99,8 +99,7 @@ module.exports = function (RED) {
                             RED.log.error("Failed to get weather information: " + err);
                         }
                         else {
-                            //Broadcast to all sessions
-                            self.sendMsg("weather", undefined, out);
+                            return out;
                         }
                     });
                 }
@@ -110,8 +109,20 @@ module.exports = function (RED) {
             }
         }
 
-        //Get weather updates every couple minutes
-        weatherInterval = setInterval(getWeather, 500000);
+        //Send a status update every so often
+        var weatherCount = 600;
+        var weather;
+        statusInterval = setInterval(() => {
+            //Don't grab the weather every second, only get it every 10 minutes
+            if(weatherCount++ > 600) {
+                weather = this.getWeather();
+                weatherCount = 0;
+            }
+            this.sendMsg("status", undefined, {
+                "time": Date.now(),
+                "weather": weather,
+            });
+        }, 1000);
 
         ////////////////////
 
@@ -198,7 +209,7 @@ module.exports = function (RED) {
         node.on("close", () => {
             kickClients();
             wss.close();
-            clearInterval(weatherInterval);
+            clearInterval(statusInterval);
         });
     }
 

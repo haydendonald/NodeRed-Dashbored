@@ -431,11 +431,13 @@ module.exports = function (RED) {
                 //Set the listener for the clock updates
                 if (showClock == true) {
                     document.addScript(`
-                        addOnLoadFunction(function(msg) {
-                            setInterval(function() {
-                                    document.getElementById("clock").innerHTML = formatAMPM(new Date());
-                                }, 1000);
-                            });
+                        addOnMsgFunction(function(msg) {
+                            if(msg.id == "status") {
+                                if(msg.payload.time) {
+                                    document.getElementById("clock").innerHTML = formatAMPM(new Date(msg.payload.time));
+                                }
+                            }
+                        });
                         `);
                 }
 
@@ -443,8 +445,10 @@ module.exports = function (RED) {
                 if (showWeather) {
                     document.addScript(`
                     addOnMsgFunction(function(msg) {
-                        if(msg.id == "weather") {
-                            document.getElementById("weatherTemp").innerHTML = Math.round(msg.payload.main.temp) + "°";
+                        if(msg.id == "status") {
+                            if(msg.payload.weather) {
+                                document.getElementById("weatherTemp").innerHTML = Math.round(msg.payload.weather.main.temp) + "°";
+                            }
                         }
                     });
                 `);

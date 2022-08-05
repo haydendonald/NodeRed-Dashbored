@@ -29,3 +29,6 @@
 * Added a previous value parameter to widgets when they send out a new value
 ## - 0.3.1
 * Fixed a bug where the horizontal/vertical stack would not pass additional properties like ask and lock
+* Fixed a bug where the dashbored would not detect a disconnection from the server if the server went down in a bad way (network failure etc)
+* Changed the clock to get it's time from the server rather than the client
+* Moved the weather and clock data into the status message sent every second (this also allows for server disconnection detection)

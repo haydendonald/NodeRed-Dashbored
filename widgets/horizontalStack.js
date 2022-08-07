@@ -138,9 +138,9 @@ module.exports = {
     //Default config
     defaultConfig: {
         widgets: {
-            value: "",
-            required: true
+            value: ""
         },
+        widgetsHTML: {value: []},
         CSS: {
             value: `
                     `.replace(/^\s+|\s+$/gm, '')
@@ -190,11 +190,26 @@ module.exports = {
         var ret = "";
         var widgetIds = this.config.widgets.split(",");
 
+        //Add the widgets
         for (var i in widgetIds) {
+            if(widgetIds[i] == ""){break;}
             ret += `
             <widget id="${widgetIds[i]}" locked-access="${this.lockedAccess}" always-password="${this.alwaysPassword}" ask="${this.ask}" ask-text="${this.askText}" style="float: left"></widget>
             `;
         }
+
+        //If there is dynamic html elements add them now
+        if(this.config.widgetsHTML) {
+            for(var i in this.config.widgetsHTML) {
+                var temp = this.config.widgetsHTML[i];
+                temp = temp.replace("%locked-access%", `locked-access="${this.lockedAccess}"`);
+                temp = temp.replace("%always-password%", `always-password="${this.alwaysPassword}"`);
+                temp = temp.replace("%ask%", `ask="${this.ask}"`);
+                temp = temp.replace("%ask-text%", `ask-text="${this.askText}"`);
+                ret += temp;
+            }
+        }
+
         return ret;
     },
 

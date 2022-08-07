@@ -157,7 +157,6 @@ module.exports = function (RED, dashboredGeneration = undefined) {
                 }
                 case "options": {
                     for (var i in msg.payload) {
-                        console.log(i);
                         if (i == "title") { this.title = msg.payload[i]; }
                         else if (i == "restoreState") { this.restoreState = msg.payload[i]; }
                         else if (i == "setsState") { this.setsState = msg.payload[i]; }

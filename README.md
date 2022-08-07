@@ -29,7 +29,12 @@ Simply search for `node-red-contrib-dashbored` in the pallet manager or install 
 ## Dynamic Widget Options
 Sometimes it can be useful to modify widgets dynamically. In this example we will set the options of a few widgets dynamically.
 
-[Example JSON](./examples//dynamicWidgetOptions.json)
+[Example JSON](./examples/dynamicWidgetOptions.json)
+
+## Custom Dynamic Widgets
+Sometimes it can be useful to add widgets dynamically. In this example two custom toggle buttons will be added to a horizontal stack.
+
+[Example JSON](./examples/customWidgets.json)
 
 # Limitations
 * There is probably no or very little security. Data will probably be sent in plain text so don't expect any encryption.

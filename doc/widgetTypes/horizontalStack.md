@@ -9,6 +9,11 @@ Stacks many other widgets horizontally
 ## Messages
 None.
 
+## Dynamic Options
+This widget supports extra dynamic options:
+* `widgetsHTML`: Is an array of HTML elements to add to the stack.
+`widgetsHTML: ["<h1>Hello!</h1>", "<widget id='widget' type='toggleButton' %ask% %ask-text%>]` See [widgets](../widget.md#input) for more. To copy parameters like ask `%ask%` can be used.
+
 ## CSS
 * `#widget`: Apply styling to the widget container
 * `#title`: Apply styling to the title

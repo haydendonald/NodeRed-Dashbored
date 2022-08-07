@@ -33,5 +33,4 @@ Sometimes it can be useful to modify widgets dynamically. In this example we wil
 
 # Limitations
 * There is probably no or very little security. Data will probably be sent in plain text so don't expect any encryption.
-* Currently in the early stages so there will be issues / missing features
 * If you are using HomeAssistant access the editor externally. The configuration will not load if you access NodeRed through home assistant itself.

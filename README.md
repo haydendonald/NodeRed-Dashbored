@@ -25,6 +25,12 @@ Simply search for `node-red-contrib-dashbored` in the pallet manager or install 
 
 ## [Development](https://github.com/haydendonald/NodeRed-Dashbored/wiki)
 
+# Examples
+## Dynamic Widget Options
+Sometimes it can be useful to modify widgets dynamically. In this example we will set the options of a few widgets dynamically.
+
+[Example JSON](./examples//dynamicWidgetOptions.json)
+
 # Limitations
 * There is probably no or very little security. Data will probably be sent in plain text so don't expect any encryption.
 * Currently in the early stages so there will be issues / missing features

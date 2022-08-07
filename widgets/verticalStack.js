@@ -41,11 +41,13 @@ module.exports = {
             var options = [];
             var wids = {};
             for (var i = 0; i < widgets.length; i++) {
-                options.push({
-                    label: widgets[i].label,
-                    value: widgets[i].id
-                });
-                wids[widgets[i].id] = widgets[i];
+                if(element.id != widgets[i].id) {
+                    options.push({
+                        label: widgets[i].label,
+                        value: widgets[i].id
+                    });
+                    wids[widgets[i].id] = widgets[i];
+                }
             }
 
 
@@ -200,6 +202,7 @@ module.exports = {
         //Add the widgets
         for (var i in widgetIds) {
             if(widgetIds[i] == ""){break;}
+            if(widgetIds[i] == this.id){break;}
             ret += `
             <widget id="${widgetIds[i]}" locked-access="${this.lockedAccess}" always-password="${this.alwaysPassword}" ask="${this.ask}" ask-text="${this.askText}" style="float: none"></widget>
             `;

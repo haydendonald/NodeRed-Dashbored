@@ -28,7 +28,7 @@ The widget node accessible from the NodeRed flow.
 * `When another node sends get to the input output the get request here`: Send get requests from other widget node inputs here
 
 ### Input
-The input can take in the following message:
+The input can take in the following message to get or set the value(s)
 ```
 {
     //If we should set the value or get the current value
@@ -39,6 +39,18 @@ The input can take in the following message:
     }
 }
 ```
+It is also possible to alter the widget settings with the following. These options are not saved across redeploy but they can be used to create dynamic elements. Sending an empty payload will not set any values, this can be used to read the current options.
+```
+{
+    topic: "options",
+    payload: {
+        //Any options to alter here for example
+        title: "Hello World!"
+    }
+}
+```
+
+
 ### Output
 There are two outputs. The top output is called `output` and the bottom output is called `get`. When the value changes it will be sent via the output and if the node is requesting it's value (for example when NodeRed restarts and the value is unknown) it will send a message to the `get` output requesting the value.
 #### Output `output`

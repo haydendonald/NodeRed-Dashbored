@@ -155,6 +155,35 @@ module.exports = function (RED, dashboredGeneration = undefined) {
                     this.sendStatusToFlow("set", undefined, nodeId);
                     break;
                 }
+                case "options": {
+                    for (var i in msg.payload) {
+                        console.log(i);
+                        if (i == "title") { this.title = msg.payload[i]; }
+                        else if (i == "restoreState") { this.restoreState = msg.payload[i]; }
+                        else if (i == "setsState") { this.setsState = msg.payload[i]; }
+                        else if (i == "widthMultiplier") { this.widthMultiplier = parseFloat(msg.payload[i]); }
+                        else if (i == "heightMultiplier") { this.heightMultiplier = parseFloat(msg.payload[i]); }
+                        else {
+                            //If the configuration option is valid allow it to be set to the widget type
+                            if (this.defaultConfig[i]) {
+                                this.config[i] = msg.payload[i];
+                            }
+                        }
+                    }
+
+                    //Send the current config to the output
+                    var temp = {
+                        "title": this.title,
+                        "restoreState": this.restoreState,
+                        "setsState": this.setsState,
+                        "widthMultiplier": this.widthMultiplier,
+                        "heightMultiplier": this.heightMultiplier,
+                    };
+                    for (var i in this.defaultConfig) { temp[i] = this.config[i]; }
+                    this.sendToFlow(temp, "options", undefined, undefined, nodeId);
+
+                    break;
+                }
             }
         }
 

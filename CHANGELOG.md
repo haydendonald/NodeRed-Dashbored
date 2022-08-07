@@ -32,3 +32,5 @@
 * Fixed a bug where the dashbored would not detect a disconnection from the server if the server went down in a bad way (network failure etc)
 * Changed the clock to get it's time from the server rather than the client
 * Moved the weather and clock data into the status message sent every second (this also allows for server disconnection detection)
+## - 0.4.0
+* Added the ability to manipulate widget settings by setting them in the flow

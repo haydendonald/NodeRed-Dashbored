@@ -208,8 +208,8 @@ module.exports = {
             `;
 
             //Pass this widgets output to the stack output
-            this.subscribeToOtherWidget(widgetIds[i], this.id, (msg, messageType, get, sessionId, nodeId) => {
-                msg.id = widgetIds[i];
+            this.subscribeToOtherWidget(widgetIds[i], this.id, (msg, messageType, get, sessionId, nodeId, senderId) => {
+                if(!msg){msg = {};} msg.id = senderId;
                 this.sendToFlow(msg, messageType, get, sessionId, nodeId);
             });
         }
@@ -224,6 +224,11 @@ module.exports = {
                 temp = temp.replace("%ask-text%", `ask-text="${this.askText}"`);
                 temp = temp.replace(">", "style='float: none'>");
                 ret += temp;
+
+                var html = require("node-html-parser").parse(temp).querySelectorAll("*");
+                this.subscribeToOtherWidget(html[0].getAttribute("id"), this.id, (msg, messageType, get, sessionId, nodeId) => {
+                    this.sendToFlow(msg, messageType, get, sessionId, nodeId);
+                });
             }
         }
 

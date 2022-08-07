@@ -61,7 +61,7 @@ module.exports = function (RED, dashboredGeneration = undefined) {
         //Send to the flow
         this.sendToFlow = function (msg, messageType, get = undefined, sessionId = undefined, nodeId = undefined) {
             for (var i in nodeMsgFunctions) {
-                nodeMsgFunctions[i](msg, messageType, get, sessionId, nodeId);
+                nodeMsgFunctions[i](msg, messageType, get, sessionId, nodeId, this.id);
             }
         }
 
@@ -123,7 +123,7 @@ module.exports = function (RED, dashboredGeneration = undefined) {
         }
 
         //Add a callback for the sendToFlow function
-        //fn(msg, messageType, get, sessionId, nodeId);
+        //fn(msg, messageType, get, sessionId, nodeId, sendingWidgetId);
         this.addNodeMsgFunction = function (nodeId, fn) {
             nodeMsgFunctions[nodeId] = fn;
         };

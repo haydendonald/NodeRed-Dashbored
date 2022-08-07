@@ -142,7 +142,7 @@ module.exports = {
         widgets: {
             value: ""
         },
-        widgetsHTML: {value: []},
+        widgetsHTML: { value: [] },
         CSS: {
             value: `
                     `.replace(/^\s+|\s+$/gm, '')
@@ -168,9 +168,9 @@ module.exports = {
     //Setup the widget
     setupWidget: function (config) {
         //Override the multiplier
-        this.setWidthMultiplier = function(configMultiplier, multiplier) {
+        this.setWidthMultiplier = function (configMultiplier, multiplier) {
             var len = this.config.widgets.split(",").length;
-            if(this.config.widgets == ""){len = 0;}
+            if (this.config.widgets == "") { len = 0; }
             this.widthMultiplier = (parseFloat((configMultiplier || (this.config.widthMultiplier || 1)) * (multiplier || len + this.config.widgetsHTML.length)));
         };
         this.setWidthMultiplier();
@@ -182,6 +182,7 @@ module.exports = {
 
     //When a message comes from the dashbored
     onMessage: function (msg) {
+        console.log(msg);
     },
 
     //When a message comes from a node red flow
@@ -200,33 +201,39 @@ module.exports = {
 
         //Add the widgets
         for (var i in widgetIds) {
-            if(widgetIds[i] == ""){break;}
-            if(widgetIds[i] == this.id){break;}
+            if (widgetIds[i] == "") { break; }
+            if (widgetIds[i] == this.id) { break; }
             ret += `
             <widget id="${widgetIds[i]}" locked-access="${this.lockedAccess}" always-password="${this.alwaysPassword}" ask="${this.ask}" ask-text="${this.askText}" style="float: left"></widget>
             `;
 
             //Pass this widgets output to the stack output
-            this.subscribeToOtherWidget(widgetIds[i], this.id, (msg, messageType, get, sessionId, nodeId) => {
-                if(!msg){msg = {}};
-                msg.id = widgetIds[i];
+            this.subscribeToOtherWidget(widgetIds[i], this.id, (msg, messageType, get, sessionId, nodeId, senderId) => {
+                if (!msg) { msg = {}; } msg.id = senderId;
                 this.sendToFlow(msg, messageType, get, sessionId, nodeId);
             });
         }
 
         //If there is dynamic html elements add them now
-        if(this.config.widgetsHTML) {
-            for(var i in this.config.widgetsHTML) {
+        if (this.config.widgetsHTML) {
+            for (var i in this.config.widgetsHTML) {
                 var temp = this.config.widgetsHTML[i];
                 temp = temp.replace("%locked-access%", `locked-access="${this.lockedAccess}"`);
                 temp = temp.replace("%always-password%", `always-password="${this.alwaysPassword}"`);
                 temp = temp.replace("%ask%", `ask="${this.ask}"`);
                 temp = temp.replace("%ask-text%", `ask-text="${this.askText}"`);
-                temp = temp.replace(">", "style='float: left'>");
+                temp = temp.replace(">", " style='float: left'>");
                 ret += temp;
-            }
 
-            //TODO: ADD SUBSCRIBE
+                //Pass this widgets output to the stack output
+
+                //Bug: when loaded in for the first time this will fail because the widget has not been created yet
+                var html = require("node-html-parser").parse(temp).querySelectorAll("*");
+                this.subscribeToOtherWidget(html[0].getAttribute("id"), this.id, (msg, messageType, get, sessionId, nodeId, senderId) => {
+                    if (!msg) { msg = {}; } msg.id = senderId;
+                    this.sendToFlow(msg, messageType, get, sessionId, nodeId);
+                });
+            }
         }
 
         return ret;
@@ -238,7 +245,7 @@ module.exports = {
         this.alwaysPassword = alwaysPassword;
         this.ask = ask;
         this.askText = askText;
-        return "";
+        return `this.socket.on("open", function() {console.log("hello?"); sendMsg("${htmlId}", "${this.id}", "", function(id, sessionId, success, msg) {});});`;
     },
 
     //Generate the script that will be called when a message comes from NodeRed on the dashbored

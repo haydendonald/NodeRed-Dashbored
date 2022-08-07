@@ -165,7 +165,13 @@ module.exports = {
 
     //Setup the widget
     setupWidget: function (config) {
-        this.widthMultiplier = this.config.widgets.split(",").length;
+        //Override the multiplier
+        this.setWidthMultiplier = function(configMultiplier, multiplier) {
+            var len = this.config.widgets.split(",").length;
+            if(this.config.widgets == ""){len = 0;}
+            this.widthMultiplier = (parseFloat((configMultiplier || (this.config.widthMultiplier || 1)) * (multiplier || len + this.config.widgetsHTML.length)));
+        };
+        this.setWidthMultiplier();
         this.noHeight = true;
     },
 
@@ -206,6 +212,7 @@ module.exports = {
                 temp = temp.replace("%always-password%", `always-password="${this.alwaysPassword}"`);
                 temp = temp.replace("%ask%", `ask="${this.ask}"`);
                 temp = temp.replace("%ask-text%", `ask-text="${this.askText}"`);
+                temp = temp.replace(">", "style='float: left'>");
                 ret += temp;
             }
         }

@@ -41,9 +41,14 @@ module.exports = function (RED, dashboredGeneration = undefined) {
             }
         }
 
-        //Set our height/width multipliers
-        this.widthMultiplier = (parseFloat(config.widthMultiplier) || 1) * this.widthMultiplier;
-        this.heightMultiplier = (parseFloat(config.heightMultiplier) || 1) * this.heightMultiplier;
+        this.setWidthMultiplier = function(configMultiplier, multiplier) {
+            this.widthMultiplier = (parseFloat((configMultiplier || (config.widthMultiplier || 1)) * (multiplier || this.widthMultiplier)));
+        };
+        this.setWidthMultiplier();
+        this.setHeightMultiplier = function(configMultiplier, multiplier) {
+            this.heightMultiplier = (parseFloat((configMultiplier || (config.heightMultiplier || 1)) * (multiplier || this.heightMultiplier)));
+        };
+        this.setHeightMultiplier();
 
         //Send to the flow
         this.sendToFlow = function (msg, messageType, get = undefined, sessionId = undefined, nodeId = undefined) {
@@ -169,6 +174,9 @@ module.exports = function (RED, dashboredGeneration = undefined) {
                             }
                         }
                     }
+
+                    this.setWidthMultiplier();
+                    this.setHeightMultiplier();
 
                     //Send the current config to the output
                     var temp = {

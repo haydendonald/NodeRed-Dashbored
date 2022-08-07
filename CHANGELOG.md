@@ -34,3 +34,4 @@
 * Moved the weather and clock data into the status message sent every second (this also allows for server disconnection detection)
 ## - 0.4.0
 * Added the ability to manipulate widget settings by setting them in the flow
+* Added the ability to add custom HTML/widgets to the horizontal/vertical stack

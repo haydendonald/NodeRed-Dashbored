@@ -167,7 +167,13 @@ module.exports = {
 
     //Setup the widget
     setupWidget: function (config) {
-        this.heightMultiplier = this.config.widgets.split(",").length;
+        //Override the multiplier
+        this.setHeightMultiplier = function(configMultiplier, multiplier) {
+            var len = this.config.widgets.split(",").length;
+            if(this.config.widgets == ""){len = 0;}
+            this.heightMultiplier = (parseFloat((configMultiplier || (this.config.heightMultiplier || 1)) * (multiplier || len + this.config.widgetsHTML.length)));
+        };
+        this.setHeightMultiplier();
     },
 
     //When node red redeploys or closes
@@ -207,6 +213,7 @@ module.exports = {
                 temp = temp.replace("%always-password%", `always-password="${this.alwaysPassword}"`);
                 temp = temp.replace("%ask%", `ask="${this.ask}"`);
                 temp = temp.replace("%ask-text%", `ask-text="${this.askText}"`);
+                temp = temp.replace(">", "style='float: none'>");
                 ret += temp;
             }
         }

@@ -36,3 +36,4 @@
 * Added the ability to manipulate widget settings by setting them in the flow
 * Added the ability to add custom HTML/widgets to the horizontal/vertical stack
 * Fixed a bug where it was possible to add a hor/vert stack to itself causing a circular dependency loop crashing the dashbored
+* Added the ability for hor/vert stacks to send out internal widget updates to the output

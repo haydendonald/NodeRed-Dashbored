@@ -144,7 +144,7 @@ module.exports = {
         widgets: {
             value: ""
         },
-        widgetsHTML: {value: []},
+        widgetsHTML: { value: [] },
         CSS: {
             value: `
                     `.replace(/^\s+|\s+$/gm, '')
@@ -170,9 +170,9 @@ module.exports = {
     //Setup the widget
     setupWidget: function (config) {
         //Override the multiplier
-        this.setHeightMultiplier = function(configMultiplier, multiplier) {
+        this.setHeightMultiplier = function (configMultiplier, multiplier) {
             var len = this.config.widgets.split(",").length;
-            if(this.config.widgets == ""){len = 0;}
+            if (this.config.widgets == "") { len = 0; }
             this.heightMultiplier = (parseFloat((configMultiplier || (this.config.heightMultiplier || 1)) * (multiplier || len + this.config.widgetsHTML.length)));
         };
         this.setHeightMultiplier();
@@ -201,16 +201,22 @@ module.exports = {
 
         //Add the widgets
         for (var i in widgetIds) {
-            if(widgetIds[i] == ""){break;}
-            if(widgetIds[i] == this.id){break;}
+            if (widgetIds[i] == "") { break; }
+            if (widgetIds[i] == this.id) { break; }
             ret += `
             <widget id="${widgetIds[i]}" locked-access="${this.lockedAccess}" always-password="${this.alwaysPassword}" ask="${this.ask}" ask-text="${this.askText}" style="float: none"></widget>
             `;
+
+            //Pass this widgets output to the stack output
+            this.subscribeToOtherWidget(widgetIds[i], this.id, (msg, messageType, get, sessionId, nodeId) => {
+                msg.id = widgetIds[i];
+                this.sendToFlow(msg, messageType, get, sessionId, nodeId);
+            });
         }
 
         //If there is dynamic html elements add them now
-        if(this.config.widgetsHTML) {
-            for(var i in this.config.widgetsHTML) {
+        if (this.config.widgetsHTML) {
+            for (var i in this.config.widgetsHTML) {
                 var temp = this.config.widgetsHTML[i];
                 temp = temp.replace("%locked-access%", `locked-access="${this.lockedAccess}"`);
                 temp = temp.replace("%always-password%", `always-password="${this.alwaysPassword}"`);

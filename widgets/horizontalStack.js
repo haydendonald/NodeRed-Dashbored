@@ -205,6 +205,13 @@ module.exports = {
             ret += `
             <widget id="${widgetIds[i]}" locked-access="${this.lockedAccess}" always-password="${this.alwaysPassword}" ask="${this.ask}" ask-text="${this.askText}" style="float: left"></widget>
             `;
+
+            //Pass this widgets output to the stack output
+            this.subscribeToOtherWidget(widgetIds[i], this.id, (msg, messageType, get, sessionId, nodeId) => {
+                if(!msg){msg = {}};
+                msg.id = widgetIds[i];
+                this.sendToFlow(msg, messageType, get, sessionId, nodeId);
+            });
         }
 
         //If there is dynamic html elements add them now
@@ -218,6 +225,8 @@ module.exports = {
                 temp = temp.replace(">", "style='float: left'>");
                 ret += temp;
             }
+
+            //TODO: ADD SUBSCRIBE
         }
 
         return ret;

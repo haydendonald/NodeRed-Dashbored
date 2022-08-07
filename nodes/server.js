@@ -140,9 +140,23 @@ module.exports = function (RED) {
             return widgets;
         }
 
+        //Get a widget
+        node.getWidget = (id) => {
+            return RED.nodes.getNode(id);
+        }
+
         //Return a generated widget
         node.getGeneratedWidget = (id) => {
             return generatedWidgets[id];
+        }
+
+        //Try to find a widget, generated or not
+        node.findWidget = (id) => {
+            var wid = this.getWidget(id);
+            if(!wid) {
+                wid = this.getGeneratedWidget(id);
+            }
+            return wid;
         }
 
         //Get the weather

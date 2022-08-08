@@ -169,28 +169,10 @@ module.exports = function (RED) {
                             if (!elements[i].getAttribute("id")) { RED.log.error("A generated widget needs a unique id"); }
                             else {
                                 //If we still don't have a widget we need to generate it
-                                var config = {
-                                    id: widId,
-                                    server,
-                                    name: elements[i].getAttribute("name") || "Generated widget",
-                                    restoreState: elements[i].getAttribute("restoreState") || true,
-                                    setsState: elements[i].getAttribute("setsState") || true,
-                                    widthMultiplier: elements[i].getAttribute("widthMultiplier") || 1,
-                                    heightMultiplier: elements[i].getAttribute("heightMultiplier") || 1,
-                                    widgetType: elements[i].getAttribute("type"),
-                                    title: elements[i].getAttribute("title")
-                                };
-
-                                //Check if type exists
-                                if(server.getWidgetTypes()[config.widgetType]) {
-                                    var temp = {};
-                                    Object.assign(temp, require("./widget.js")(RED, true)(config));
-                                    server.addGeneratedWidget(temp.id, temp);
-                                    widget = server.getGeneratedWidget(widId);
-                                }
-                                else {
-                                    RED.log.error(`Failed to generate widget of type ${elements[i].getAttribute("type")}, the type is invalid`);
-                                }
+                                var widget = server.generateWidget(widId, elements[i].getAttribute("name") || "Generated widget", elements[i].getAttribute("type"),
+                                    elements[i].getAttribute("restoreState") || true, elements[i].getAttribute("setsState") || true, 
+                                    elements[i].getAttribute("widthMultiplier") || 1, elements[i].getAttribute("heightMultiplier") || 1,
+                                    elements[i].getAttribute("title"));
                             }
                             if (!widget) {
                                 RED.log.error(`Failed to generate widget of type ${elements[i].getAttribute("type")}`);

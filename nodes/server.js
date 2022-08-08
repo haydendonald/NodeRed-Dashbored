@@ -114,7 +114,7 @@ module.exports = function (RED) {
         var weather;
         statusInterval = setInterval(() => {
             //Don't grab the weather every second, only get it every 10 minutes
-            if(weatherCount++ > 600) {
+            if (weatherCount++ > 600) {
                 weather = this.getWeather();
                 weatherCount = 0;
             }
@@ -153,7 +153,7 @@ module.exports = function (RED) {
         //Try to find a widget, generated or not
         node.findWidget = (id) => {
             var wid = this.getWidget(id);
-            if(!wid) {
+            if (!wid) {
                 wid = this.getGeneratedWidget(id);
             }
             return wid;
@@ -177,7 +177,7 @@ module.exports = function (RED) {
             RED.log.info(`- Added Dashbored [${name}] at /${endpoint}`);
             RED.httpNode.get("/" + endpoint, (req, res) => {
                 RED.log.debug("Got request for dashbored " + dashboards[endpoint].name);
-    
+
                 //Handle the request
                 if (req.method != "GET") {
                     res.type("text/plain");
@@ -215,6 +215,32 @@ module.exports = function (RED) {
             generatedWidgets[id] = obj;
         }
 
+        //Register a new widget to the server
+        node.generateWidget = (id, name = "Generated Widget", widgetType, restoreState = true, setsState = true, widthMultiplier = 1, heightMultiplier = 1, title = "") => {
+            var config = {
+                id: id,
+                server: node,
+                name: name,
+                restoreState: restoreState,
+                setsState: setsState,
+                widthMultiplier: widthMultiplier,
+                heightMultiplier: heightMultiplier,
+                widgetType: widgetType,
+                title: title
+            };
+
+            //Check if type exists
+            if (node.getWidgetTypes()[config.widgetType]) {
+                var temp = {};
+                Object.assign(temp, require("./widget.js")(RED, true)(config));
+                node.addGeneratedWidget(temp.id, temp);
+                return node.getGeneratedWidget(id);
+            }
+            else {
+                RED.log.error(`Failed to generate widget of type ${type}, the type is invalid`);
+            }
+        };
+
         node.getWidgetTypes = () => {
             return widgetTypes;
         }
@@ -232,10 +258,10 @@ module.exports = function (RED) {
     RED.httpNode.get("/dashbored/style.css", (req, res) => { res.sendFile("style.css", { root: webFolder }); });
     RED.httpNode.get("/dashbored/temp.css", (req, res) => { res.sendFile("temp.css", { root: webFolder }); });
     RED.httpNode.get("/dashbored/css/*", (req, res) => {
-        res.sendFile("/css/" + req.url.split("/css/")[1], { root: fontAwesomeFolder }); 
+        res.sendFile("/css/" + req.url.split("/css/")[1], { root: fontAwesomeFolder });
     });
     RED.httpNode.get("/dashbored/webfonts/*", (req, res) => {
-        res.sendFile("/webfonts/" + req.url.split("/webfonts/")[1], { root: fontAwesomeFolder }); 
+        res.sendFile("/webfonts/" + req.url.split("/webfonts/")[1], { root: fontAwesomeFolder });
     });
 
     //Send the widget ids for the node red editor to populate (if theres a better way i'd like to know...)

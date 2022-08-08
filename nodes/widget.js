@@ -49,6 +49,14 @@ module.exports = function (RED, dashboredGeneration = undefined) {
             wid.addNodeMsgFunction(nodeId, func);
         }
 
+        //Send a message to another widget, emulating a message being sent via the NodeRed flow
+        this.sendMessageToOtherWidget = function(id, msg) {
+            var wid = server.findWidget(id);
+            if(!wid){return;}
+
+            wid.input(msg, id);
+        }
+
         this.setWidthMultiplier = function(configMultiplier, multiplier) {
             this.widthMultiplier = (parseFloat((configMultiplier || (config.widthMultiplier || 1)) * (multiplier || this.widthMultiplier)));
         };
@@ -59,7 +67,7 @@ module.exports = function (RED, dashboredGeneration = undefined) {
         this.setHeightMultiplier();
 
         //Send to the flow
-        this.sendToFlow = function (msg, messageType, get = undefined, sessionId = undefined, nodeId = undefined) {
+        this.sendToFlow = function (msg, messageType, get = undefined, sessionId = undefined, nodeId = this.id) {
             for (var i in nodeMsgFunctions) {
                 nodeMsgFunctions[i](msg, messageType, get, sessionId, nodeId, this.id);
             }

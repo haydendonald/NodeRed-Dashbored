@@ -18,6 +18,7 @@ module.exports = function (RED) {
         widget.addNodeMsgFunction(this.id, (output, outputType, get, sessionId, nodeId) => {
             var sendOutput = function () {
                 node.send([{
+                    "id": nodeId,
                     "topic": outputType,
                     "sessionId": sessionId,
                     "payload": output
@@ -27,6 +28,7 @@ module.exports = function (RED) {
             //If a get payload exists just send it
             if (get) {
                 node.send([undefined, {
+                    "id": nodeId,
                     "topic": "get",
                     "payload": get
                 }]);

@@ -189,8 +189,7 @@ module.exports = {
                 for (var i in this.config.widgetsHTML) {
                     var html = require("node-html-parser").parse(this.config.widgetsHTML[i]).querySelectorAll("*");
                     this.subscribeToOtherWidget(html[0].getAttribute("id"), this.id, (msg, messageType, get, sessionId, nodeId, senderId) => {
-                        if (!msg) { msg = {}; } msg.id = senderId;
-                        this.sendToFlow(msg, messageType, get, sessionId, nodeId);
+                        this.sendToFlow(msg, messageType, get, sessionId, senderId);
                     });
                 }
             }
@@ -199,6 +198,13 @@ module.exports = {
 
     //When a message comes from a node red flow
     onFlowMessage: function (msg) {
+        this.sendMessageToOtherWidget(msg.id, msg);
+
+
+        console.log(msg);
+
+
+
     },
 
     //Generate the CSS for the widget
@@ -221,8 +227,7 @@ module.exports = {
 
             //Pass this widgets output to the stack output
             this.subscribeToOtherWidget(widgetIds[i], this.id, (msg, messageType, get, sessionId, nodeId, senderId) => {
-                if (!msg) { msg = {}; } msg.id = senderId;
-                this.sendToFlow(msg, messageType, get, sessionId, nodeId);
+                this.sendToFlow(msg, messageType, get, sessionId, senderId);
             });
         }
 

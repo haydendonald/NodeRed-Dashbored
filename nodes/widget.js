@@ -60,7 +60,7 @@ module.exports = function (RED, dashboredGeneration = undefined) {
         }
 
         //Generate a widget
-        this.generateWidget = server.generateWidget;
+        this.generateWidgetHTML = server.generateWidgetHTML;
 
         this.setWidthMultiplier = function (configMultiplier, multiplier) {
             this.widthMultiplier = (parseFloat((configMultiplier || (config.widthMultiplier || 1)) * (multiplier || this.widthMultiplier)));

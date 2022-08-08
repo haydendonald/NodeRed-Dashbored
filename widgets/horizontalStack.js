@@ -175,6 +175,16 @@ module.exports = {
         };
         this.setWidthMultiplier();
         this.noHeight = true;
+
+        //Go through our HTML and generate the custom widgets
+        for (var i in this.config.widgetsHTML) {
+            var html = require("node-html-parser").parse(this.config.widgetsHTML[i]).querySelectorAll("*");
+            if (this.generateWidgetHTML(html[0])) {
+                this.subscribeToOtherWidget(html[0].getAttribute("id"), this.id, (msg, messageType, get, sessionId, nodeId, senderId) => {
+                    this.sendToFlow(msg, messageType, get, sessionId, senderId);
+                });
+            }
+        }
     },
 
     //When node red redeploys or closes
@@ -182,29 +192,13 @@ module.exports = {
 
     //When a message comes from the dashbored
     onMessage: function (msg) {
-        if (msg.id == this.id && !this.subscribed) {
-            //Subscribe to the internal widgets if we haven't yet
-            if (this.config.widgetsHTML) {
-                this.subscribed = true;
-                for (var i in this.config.widgetsHTML) {
-                    var html = require("node-html-parser").parse(this.config.widgetsHTML[i]).querySelectorAll("*");
-                    this.subscribeToOtherWidget(html[0].getAttribute("id"), this.id, (msg, messageType, get, sessionId, nodeId, senderId) => {
-                        this.sendToFlow(msg, messageType, get, sessionId, senderId);
-                    });
-                }
-            }
-        }
     },
 
     //When a message comes from a node red flow
     onFlowMessage: function (msg) {
-        this.sendMessageToOtherWidget(msg.id, msg);
-
-
-        console.log(msg);
-
-
-
+        if (!this.sendMessageToOtherWidget(msg.id, msg)) {
+            this.log.error(`Widget with id ${msg.id} was not found.`);
+        }
     },
 
     //Generate the CSS for the widget

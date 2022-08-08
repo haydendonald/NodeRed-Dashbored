@@ -216,7 +216,7 @@ module.exports = function (RED) {
         }
 
         //Register a new widget to the server
-        node.generateWidget = (id, name = "Generated Widget", widgetType, restoreState = true, setsState = true, widthMultiplier = 1, heightMultiplier = 1, title = "") => {
+        node.generateWidget = (id, name = "Generated Widget", widgetType, widgetConfig, restoreState = true, setsState = true, widthMultiplier = 1, heightMultiplier = 1, title = "") => {
             var config = {
                 id: id,
                 server: node,
@@ -234,12 +234,37 @@ module.exports = function (RED) {
                 var temp = {};
                 Object.assign(temp, require("./widget.js")(RED, true)(config));
                 node.addGeneratedWidget(temp.id, temp);
-                return node.getGeneratedWidget(id);
+                var widget = node.getGeneratedWidget(id);
+                if (!widget) { return; }
+
+                //Copy in the config
+                if (widgetConfig) {
+                    for (var j in widget.defaultConfig) {
+                        var val = widgetConfig[j];
+                        if (val) {
+                            widget.config[j] = val;
+                        }
+                    }
+                    widget.setupWidget(widget.config);
+                }
+
+                return widget;
             }
             else {
                 RED.log.error(`Failed to generate widget of type ${type}, the type is invalid`);
             }
         };
+
+        /**
+         * Generate a widget given it's HTML element
+         * @param {htmlElement} htmlElement The parsed HTML element
+         */
+        node.generateWidgetHTML = (htmlElement) => {
+            return node.generateWidget(htmlElement.getAttribute("id"), htmlElement.getAttribute("name") || "Generated widget", htmlElement.getAttribute("type"),
+                htmlElement.attributes, htmlElement.getAttribute("restoreState") || true, htmlElement.getAttribute("setsState") || true,
+                htmlElement.getAttribute("widthMultiplier") || 1, htmlElement.getAttribute("heightMultiplier") || 1,
+                htmlElement.getAttribute("title"));
+        }
 
         node.getWidgetTypes = () => {
             return widgetTypes;

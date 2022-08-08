@@ -26,6 +26,7 @@ module.exports = function (RED, dashboredGeneration = undefined) {
         this.title = config.title || "";
         this.restoreState = config.restoreState || false;
         this.setsState = config.setsState;
+        this.log = RED.log;
 
         var widType = server.getWidgetTypes()[config.widgetType];
         if (!widType) { RED.log.error(`Widget ${name} (${this.id}) has an invalid type ${config.widgetType}`); return; }
@@ -42,26 +43,30 @@ module.exports = function (RED, dashboredGeneration = undefined) {
         }
 
         //Subscribe to another widget's messages sent to the NodeRed flow
-        this.subscribeToOtherWidget = function(id, nodeId, func) {
+        this.subscribeToOtherWidget = function (id, nodeId, func) {
             var wid = server.findWidget(id);
-            if(!wid){return;}
+            if (!wid) { return; }
 
             wid.addNodeMsgFunction(nodeId, func);
         }
 
         //Send a message to another widget, emulating a message being sent via the NodeRed flow
-        this.sendMessageToOtherWidget = function(id, msg) {
+        this.sendMessageToOtherWidget = function (id, msg) {
             var wid = server.findWidget(id);
-            if(!wid){return;}
+            if (!wid) { return false; }
 
             wid.input(msg, id);
+            return true;
         }
 
-        this.setWidthMultiplier = function(configMultiplier, multiplier) {
+        //Generate a widget
+        this.generateWidget = server.generateWidget;
+
+        this.setWidthMultiplier = function (configMultiplier, multiplier) {
             this.widthMultiplier = (parseFloat((configMultiplier || (config.widthMultiplier || 1)) * (multiplier || this.widthMultiplier)));
         };
         this.setWidthMultiplier();
-        this.setHeightMultiplier = function(configMultiplier, multiplier) {
+        this.setHeightMultiplier = function (configMultiplier, multiplier) {
             this.heightMultiplier = (parseFloat((configMultiplier || (config.heightMultiplier || 1)) * (multiplier || this.heightMultiplier)));
         };
         this.setHeightMultiplier();
@@ -194,6 +199,7 @@ module.exports = function (RED, dashboredGeneration = undefined) {
 
                     this.setWidthMultiplier();
                     this.setHeightMultiplier();
+                    this.setupWidget(config);
 
                     //Send the current config to the output
                     var temp = {

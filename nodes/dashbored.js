@@ -169,24 +169,10 @@ module.exports = function (RED) {
                             if (!elements[i].getAttribute("id")) { RED.log.error("A generated widget needs a unique id"); }
                             else {
                                 //If we still don't have a widget we need to generate it
-                                var widget = server.generateWidget(widId, elements[i].getAttribute("name") || "Generated widget", elements[i].getAttribute("type"),
-                                    elements[i].getAttribute("restoreState") || true, elements[i].getAttribute("setsState") || true, 
-                                    elements[i].getAttribute("widthMultiplier") || 1, elements[i].getAttribute("heightMultiplier") || 1,
-                                    elements[i].getAttribute("title"));
+                                var widget = server.generateWidgetHTML(elements[i]);
                             }
                             if (!widget) {
                                 RED.log.error(`Failed to generate widget of type ${elements[i].getAttribute("type")}`);
-                            }
-                            else {
-                                //Copy in the config if set
-                                for (var j in widget.defaultConfig) {
-                                    var val = elements[i].getAttribute(j);
-                                    if (val) {
-                                        elements[i].removeAttribute(j);
-                                        widget.config[j] = val;
-                                    }
-                                }
-                                widget.setupWidget(widget.config);
                             }
                         }
                     }

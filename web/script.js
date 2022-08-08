@@ -10,6 +10,7 @@ var onLoadFunctions = [];
 var onMsgFunctions = [];
 var onLockFunctions = [];
 var onUnlockFunctions = [];
+var onLoadCompleteFunctions = [];
 var messageCallbacks = {};
 // var waitingFor = {};
 var elementsHiddenWhileLocked = [];
@@ -36,6 +37,11 @@ function randString() {
 function printConsole(type, message) {
     if (type.toUpperCase() == "debug" && !debug) { return; }
     console.log("[" + type.toUpperCase() + "] - " + message);
+}
+
+//Add a function to call when loading has completed
+function addOnLoadCompleteFunction(fn) {
+    onLoadCompleteFunctions.push(fn);
 }
 
 //Generate a string for the time with AM PM
@@ -362,7 +368,7 @@ function showCurrentPage(newPageId) {
 //Attempt to connect to the socket and setup the handlers
 var connectionInterval;
 var pingInterval;
-var lastMessage = Date.now();
+var lastMessage;
 function connect() {
     //Attempt to reconnect to the socket when disconnected
     var socketReconnect = function() {
@@ -379,7 +385,6 @@ function connect() {
         socket = new WebSocket("ws://" + location.host.split(":")[0] + ":4235");
         socket.addEventListener("open", function (event) {
             printConsole("debug", "Socket open");
-            hideShowElement("loader", false, 0.5);
             clearInterval(connectionInterval);
             connectionInterval = undefined;
 
@@ -401,6 +406,14 @@ function connect() {
         });
 
         socket.addEventListener("message", function (data) {
+            //Loading completed
+            if(!lastMessage) {
+                for(var i in onLoadCompleteFunctions) {
+                    onLoadCompleteFunctions[i]();
+                }
+                hideShowElement("loader", false, 0.5);
+            }
+
             lastMessage = Date.now();
 
             //Check for control signals

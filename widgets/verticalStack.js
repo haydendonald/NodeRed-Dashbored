@@ -183,6 +183,19 @@ module.exports = {
 
     //When a message comes from the dashbored
     onMessage: function (msg) {
+        if (msg.id == this.id && !this.subscribed) {
+            //Subscribe to the internal widgets if we haven't yet
+            if (this.config.widgetsHTML) {
+                this.subscribed = true;
+                for (var i in this.config.widgetsHTML) {
+                    var html = require("node-html-parser").parse(this.config.widgetsHTML[i]).querySelectorAll("*");
+                    this.subscribeToOtherWidget(html[0].getAttribute("id"), this.id, (msg, messageType, get, sessionId, nodeId, senderId) => {
+                        if (!msg) { msg = {}; } msg.id = senderId;
+                        this.sendToFlow(msg, messageType, get, sessionId, nodeId);
+                    });
+                }
+            }
+        }
     },
 
     //When a message comes from a node red flow
@@ -209,7 +222,7 @@ module.exports = {
 
             //Pass this widgets output to the stack output
             this.subscribeToOtherWidget(widgetIds[i], this.id, (msg, messageType, get, sessionId, nodeId, senderId) => {
-                if(!msg){msg = {};} msg.id = senderId;
+                if (!msg) { msg = {}; } msg.id = senderId;
                 this.sendToFlow(msg, messageType, get, sessionId, nodeId);
             });
         }
@@ -224,11 +237,6 @@ module.exports = {
                 temp = temp.replace("%ask-text%", `ask-text="${this.askText}"`);
                 temp = temp.replace(">", "style='float: none'>");
                 ret += temp;
-
-                var html = require("node-html-parser").parse(temp).querySelectorAll("*");
-                this.subscribeToOtherWidget(html[0].getAttribute("id"), this.id, (msg, messageType, get, sessionId, nodeId) => {
-                    this.sendToFlow(msg, messageType, get, sessionId, nodeId);
-                });
             }
         }
 
@@ -241,7 +249,7 @@ module.exports = {
         this.alwaysPassword = alwaysPassword;
         this.ask = ask;
         this.askText = askText;
-        return "";
+        return `addOnLoadCompleteFunction(() => {sendMsg("${htmlId}", "${this.id}", "");})`;
     },
 
     //Generate the script that will be called when a message comes from NodeRed on the dashbored

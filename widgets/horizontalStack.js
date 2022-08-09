@@ -259,7 +259,7 @@ module.exports = {
         this.alwaysPassword = alwaysPassword;
         this.ask = ask;
         this.askText = askText;
-        return `addOnLoadCompleteFunction(() => {sendMsg("${htmlId}", "${this.id}", "");})`;
+        return ``;
     },
 
     //Generate the script that will be called when a message comes from NodeRed on the dashbored

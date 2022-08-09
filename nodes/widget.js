@@ -54,7 +54,6 @@ module.exports = function (RED, dashboredGeneration = undefined) {
         this.sendMessageToOtherWidget = function (id, msg) {
             var wid = server.findWidget(id);
             if (!wid) { return false; }
-
             wid.input(msg, id);
             return true;
         }
@@ -171,7 +170,7 @@ module.exports = function (RED, dashboredGeneration = undefined) {
         }
 
         //When an input is passed to the node in the flow
-        this.input = (msg, nodeId) => {
+        this.input = function (msg, nodeId) {
             switch (msg.topic) {
                 case "get": {
                     this.sendStatusToFlow("get", undefined, nodeId);

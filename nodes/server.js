@@ -211,11 +211,6 @@ module.exports = function (RED) {
             widgets[id] = name;
         }
 
-        node.addGeneratedWidget = (id, obj, name, type) => {
-            RED.log.debug(`- Added generated widget ${name || "unknown"} (${id}) with type ${type || "unknown"}`);
-            generatedWidgets[id] = obj;
-        }
-
         //Register a new widget to the server
         node.generateWidget = (id, name = "Generated Widget", widgetType, widgetConfig, restoreState = true, setsState = true, widthMultiplier = 1, heightMultiplier = 1, title = "") => {
             var config = {
@@ -232,24 +227,22 @@ module.exports = function (RED) {
 
             //Check if type exists
             if (node.getWidgetTypes()[config.widgetType]) {
-                var temp = {};
-                Object.assign(temp, require("./widget.js")(RED, true)(config));
-                node.addGeneratedWidget(temp.id, temp, config.name, config.widgetType);
-                var widget = node.getGeneratedWidget(id);
-                if (!widget) { return; }
+                generatedWidgets[id] = {};
+                Object.assign(generatedWidgets[id], require("./widget.js")(RED, true)(config));
+                RED.log.debug(`- Added generated widget ${name} (${id}) with type ${widgetType}`);
 
                 //Copy in the config
                 if (widgetConfig) {
-                    for (var j in widget.defaultConfig) {
+                    for (var j in generatedWidgets[id].defaultConfig) {
                         var val = widgetConfig[j];
                         if (val) {
-                            widget.config[j] = val;
+                            generatedWidgets[id].config[j] = val;
                         }
                     }
-                    widget.setupWidget(widget.config);
+                    generatedWidgets[id].setupWidget(generatedWidgets[id].config);
                 }
 
-                return widget;
+                return generatedWidgets[id];
             }
             else {
                 RED.log.error(`Failed to generate widget of type ${type}, the type is invalid`);

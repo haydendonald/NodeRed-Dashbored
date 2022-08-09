@@ -167,6 +167,8 @@ module.exports = {
 
     //Setup the widget
     setupWidget: function (config) {
+        this.widgetIds = [];
+
         //Override the multiplier
         this.setWidthMultiplier = function (configMultiplier, multiplier) {
             var len = this.config.widgets.split(",").length;
@@ -176,13 +178,21 @@ module.exports = {
         this.setWidthMultiplier();
         this.noHeight = true;
 
+        //Go through the widgets and add their id to our listeners
+        var widIds = this.config.widgets.split(",");
+        for(var i in widIds) {
+            this.widgetIds.push(widIds[i]);
+        }
+
         //Go through our HTML and generate the custom widgets
         for (var i in this.config.widgetsHTML) {
             var html = require("node-html-parser").parse(this.config.widgetsHTML[i]).querySelectorAll("*");
             if (this.generateWidgetHTML(html[0])) {
-                this.subscribeToOtherWidget(html[0].getAttribute("id"), this.id, (msg, messageType, get, sessionId, nodeId, senderId) => {
+                var id = html[0].getAttribute("id");
+                this.subscribeToOtherWidget(id, this.id, (msg, messageType, get, sessionId, nodeId, senderId) => {
                     this.sendToFlow(msg, messageType, get, sessionId, senderId);
                 });
+                this.widgetIds.push(id);
             }
         }
     },
@@ -196,8 +206,10 @@ module.exports = {
 
     //When a message comes from a node red flow
     onFlowMessage: function (msg) {
-        if (!this.sendMessageToOtherWidget(msg.id, msg)) {
-            this.log.error(`Widget with id ${msg.id} was not found.`);
+        if (this.widgetIds.includes(msg.id)) {
+            if (!this.sendMessageToOtherWidget(msg.id, msg)) {
+                this.log.error(`Widget with id ${msg.id} was not found.`);
+            }
         }
     },
 

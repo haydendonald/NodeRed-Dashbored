@@ -74,7 +74,8 @@
         "tosidebar": true,
         "console": false,
         "tostatus": false,
-        "complete": "false",
+        "complete": "true",
+        "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
         "x": 720,
@@ -96,7 +97,7 @@
         "type": "function",
         "z": "30e05a0536730f1a",
         "name": "Set options",
-        "func": "return {\n    topic: \"options\",\n    payload: {\n        //Any options to alter here for example\n        title: \"Dynamic Stack!\",\n        widgetsHTML: [\n            \"<widget id='1' type='toggleButton' text='Button 1' %ask-text% %ask% %always-password% %locked-access%></widget>\",\n            \"<widget id='2' type='toggleButton' text='Button 2' %ask-text% %ask% %always-password% %locked-access%></widget>\"\n        ]\n    }\n}",
+        "func": "return {\n    topic: \"options\",\n    payload: {\n        //Any options to alter here for example\n        title: \"Dynamic Stack!\",\n        widgetsHTML: [\n            \"<widget id='button1' type='toggleButton' text='Button 1' %ask-text% %ask% %always-password% %locked-access%></widget>\",\n            \"<widget id='button2' type='toggleButton' text='Button 2' %ask-text% %ask% %always-password% %locked-access%></widget>\"\n        ]\n    }\n}",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -126,16 +127,64 @@
         ],
         "repeat": "",
         "crontab": "",
-        "once": false,
+        "once": true,
         "onceDelay": 0.1,
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 200,
+        "x": 210,
         "y": 420,
         "wires": [
             [
                 "9b420cd181d430cc"
+            ]
+        ]
+    },
+    {
+        "id": "acb7ff668a414e78",
+        "type": "function",
+        "z": "30e05a0536730f1a",
+        "name": "Set widget value",
+        "func": "return {\n    topic: \"set\",\n    id: \"button1\",\n    payload: {\n        state: \"on\"\n    }\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 460,
+        "wires": [
+            [
+                "586f507a4e46076a"
+            ]
+        ]
+    },
+    {
+        "id": "67af7a330e39ed3c",
+        "type": "inject",
+        "z": "30e05a0536730f1a",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 210,
+        "y": 460,
+        "wires": [
+            [
+                "acb7ff668a414e78"
             ]
         ]
     },
@@ -169,7 +218,7 @@
             }
         ],
         "buttonSelector-CSS": ".button {\nwidth: calc(100% - 10px);\nmargin: 5px;\n}\n.on {}\n.off {}",
-        "horizontalStack-widgets": "",
+        "horizontalStack-widgets": "6f915162f384b722",
         "verticalStack-widgets": "",
         "volume-mutedValue": "on",
         "volume-unmutedValue": "off",

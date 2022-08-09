@@ -6,7 +6,7 @@
 
 module.exports = {
     widgetType: "verticalStack",
-    version: "1.0.1",
+    version: "1.1",
     label: "Vertical Stack",
     description: "Stacks many widgets vertically",
     widthMultiplier: 1,
@@ -169,6 +169,8 @@ module.exports = {
 
     //Setup the widget
     setupWidget: function (config) {
+        this.widgetIds = [];
+
         //Override the multiplier
         this.setHeightMultiplier = function (configMultiplier, multiplier) {
             var len = this.config.widgets.split(",").length;
@@ -176,6 +178,24 @@ module.exports = {
             this.heightMultiplier = (parseFloat((configMultiplier || (this.config.heightMultiplier || 1)) * (multiplier || len + this.config.widgetsHTML.length)));
         };
         this.setHeightMultiplier();
+
+        //Go through the widgets and add their id to our listeners
+        var widIds = this.config.widgets.split(",");
+        for (var i in widIds) {
+            this.widgetIds.push(widIds[i]);
+        }
+
+        //Go through our HTML and generate the custom widgets
+        for (var i in this.config.widgetsHTML) {
+            var html = require("node-html-parser").parse(this.config.widgetsHTML[i]).querySelectorAll("*");
+            if (this.generateWidgetHTML(html[0])) {
+                var id = html[0].getAttribute("id");
+                this.subscribeToOtherWidget(id, this.id, (msg, messageType, get, sessionId, nodeId, senderId) => {
+                    this.sendToFlow(msg, messageType, get, sessionId, senderId);
+                });
+                this.widgetIds.push(id);
+            }
+        }
     },
 
     //When node red redeploys or closes
@@ -183,22 +203,16 @@ module.exports = {
 
     //When a message comes from the dashbored
     onMessage: function (msg) {
-        if (msg.id == this.id && !this.subscribed) {
-            //Subscribe to the internal widgets if we haven't yet
-            if (this.config.widgetsHTML) {
-                this.subscribed = true;
-                for (var i in this.config.widgetsHTML) {
-                    var html = require("node-html-parser").parse(this.config.widgetsHTML[i]).querySelectorAll("*");
-                    this.subscribeToOtherWidget(html[0].getAttribute("id"), this.id, (msg, messageType, get, sessionId, nodeId, senderId) => {
-                        this.sendToFlow(msg, messageType, get, sessionId, senderId);
-                    });
-                }
-            }
-        }
     },
 
     //When a message comes from a node red flow
     onFlowMessage: function (msg) {
+        console.log(msg);
+        if (this.widgetIds.includes(msg.id)) {
+            if (!this.sendMessageToOtherWidget(msg.id, msg)) {
+                this.log.error(`Widget with id ${msg.id} was not found.`);
+            }
+        }
     },
 
     //Generate the CSS for the widget
@@ -247,7 +261,7 @@ module.exports = {
         this.alwaysPassword = alwaysPassword;
         this.ask = ask;
         this.askText = askText;
-        return `addOnLoadCompleteFunction(() => {sendMsg("${htmlId}", "${this.id}", "");})`;
+        return ``;
     },
 
     //Generate the script that will be called when a message comes from NodeRed on the dashbored

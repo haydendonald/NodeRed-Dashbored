@@ -6,7 +6,7 @@
 
 module.exports = {
     widgetType: "horizontalStack",
-    version: "1.0.1",
+    version: "1.1",
     label: "Horizontal Stack",
     description: "Stacks many widgets horizontally",
     widthMultiplier: 1,

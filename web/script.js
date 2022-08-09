@@ -5,7 +5,6 @@
  * 
  */
 
-var debug = true;
 var onLoadFunctions = [];
 var onMsgFunctions = [];
 var onLockFunctions = [];
@@ -495,6 +494,7 @@ function connect() {
 
 window.onload = function () {
     printConsole("info", "Dashbored project by Hayden Donald\nhttps://github.com/haydendonald/NodeRed-Dashbored\nLet's Go!");
+    printConsole("debug", "Debug enabled");
     printConsole("debug", "Triggering onload functions");
 
     connect();

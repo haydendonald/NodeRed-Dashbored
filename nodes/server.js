@@ -206,12 +206,13 @@ module.exports = function (RED) {
             });
         }
 
-        node.addWidget = (id, name, type, widgetTypeVersion) => {
-            RED.log.info(`- Added widget ${name} (${id}) with type ${type}@${widgetTypeVersion}`);
+        node.addWidget = (id, name, type) => {
+            RED.log.debug(`- Added widget ${name} (${id}) with type ${type}`);
             widgets[id] = name;
         }
 
-        node.addGeneratedWidget = (id, obj) => {
+        node.addGeneratedWidget = (id, obj, name, type) => {
+            RED.log.debug(`- Added generated widget ${name || "unknown"} (${id}) with type ${type || "unknown"}`);
             generatedWidgets[id] = obj;
         }
 
@@ -233,7 +234,7 @@ module.exports = function (RED) {
             if (node.getWidgetTypes()[config.widgetType]) {
                 var temp = {};
                 Object.assign(temp, require("./widget.js")(RED, true)(config));
-                node.addGeneratedWidget(temp.id, temp);
+                node.addGeneratedWidget(temp.id, temp, config.name, config.widgetType);
                 var widget = node.getGeneratedWidget(id);
                 if (!widget) { return; }
 

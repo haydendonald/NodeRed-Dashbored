@@ -551,6 +551,7 @@ module.exports = function (RED) {
                 var dashboredId = "${id}";
                 var sessionId = "${sessionId}";
                 var locked = ${locked};
+                var debug = ${RED.settings.logging.console.level == "debug" || RED.settings.logging.console.level == "trace" || RED.settings.logging.console.level == "audit" || RED.settings.logging.console.level == "metric"};
 
                 addOnLoadFunction(function() {
                     hideShowElement("lockButton", ${alwaysShowLockButton});

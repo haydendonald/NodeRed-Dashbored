@@ -37,3 +37,5 @@
 * Added the ability to add custom HTML/widgets to the horizontal/vertical stack
 * Fixed a bug where it was possible to add a hor/vert stack to itself causing a circular dependency loop crashing the dashbored
 * Added the ability for hor/vert stacks to send out internal widget updates to the output
+* The dashbored will now only display debug messages to console when the NodeRed debug flag is set
+* Fixed a bug where the password would not visually clear when closed

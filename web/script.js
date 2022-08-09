@@ -238,6 +238,7 @@ function addElementHiddenWhileLocked(id) {
 function askPassword(correctCallback, incorrectCallback, bypassPassword) {
     if (bypassPassword === undefined) { bypassPassword = false; }
     if (bypassPassword == true) { correctCallback(); return; }
+    document.getElementById("currentPassword").innerHTML = "";
     hideShowElement("password", true);
     var password = "";
 

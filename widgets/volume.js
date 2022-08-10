@@ -6,7 +6,7 @@
 var util = require("../util.js");
 module.exports = {
     widgetType: "volume",
-    version: "0.0.3",
+    version: "1.0.0",
     label: "Volume",
     description: "Displays a volume control",
     widthMultiplier: 1,

@@ -1,8 +1,6 @@
 # Volume
 ![](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/widgets/volume.png)
 
-# In Development!
-
 Allows for a volume channel to be controlled
 
 ## Properties

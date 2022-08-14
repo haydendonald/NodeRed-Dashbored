@@ -10,5 +10,6 @@ module.exports = [
     require("../widgets/horizontalStack.js"),
     require("../widgets/verticalStack.js"),
     require("../widgets/volume.js"),
-    require("../widgets/actionButton.js")
+    require("../widgets/actionButton.js"),
+    require("../widgets/HVAC.js")
 ]

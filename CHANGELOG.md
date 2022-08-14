@@ -39,3 +39,5 @@
 * Added the ability for hor/vert stacks to send out internal widget updates to the output
 * The dashbored will now only display debug messages to console when the NodeRed debug flag is set
 * Fixed a bug where the password would not visually clear when closed
+## - 0.4.1
+* Added HVAC widget

@@ -23,6 +23,10 @@ module.exports = {
     generateConfigHTML: function () {
         return `
             <p><a href="https://github.com/haydendonald/NodeRed-Dashbored/blob/main/doc/widgetTypes/HVAC.md" target="_blank">See the documentation for more information</a></p>
+            <div class="form-row">       
+                <ol id="options"></ol>
+            </div>
+            
             <!-- CSS Editor -->
             <div class="form-row">
                 <label for="CSS">CSS</label>
@@ -35,14 +39,91 @@ module.exports = {
         return {
             //When the user opens the config panel get things ready
             oneditprepare: `
-                    element.cssEditor = RED.editor.createEditor({
-                        id: "CSS",
-                        mode: "ace/mode/css",
-                        value: element["HVAC-CSS"]
+                //Validate and add an item
+                function validate() {
+                    var self = this
+                    this["HVAC-modes"] = [];
+                    var optionsList = $("#options").editableList('items');
+                    optionsList.each(function (i) {
+                        var option = $(this);
+                        var curr = {};
+                        curr["label"] = option.find(".node-input-option-label").val();
+                        curr["value"] = option.find(".node-input-option-value").typedInput('value');
+                        curr["onColor"] = option.find(".node-input-option-onColor").val();
+                        curr["offColor"] = option.find(".node-input-option-offColor").val();
+                        self["HVAC-modes"].push(curr);
                     });
+                }
+
+                var optionsList = $("#options").css('min-height', '200px').editableList({
+                    header: $("<div>").css('padding-left', '32px').append($.parseHTML(
+                        "<div style='width:35%; display: inline-grid'><b>Label</b></div>" +
+                        "<div style='width:35%; display: inline-grid'><b>Value</b></div>" +
+                        "<div style='width:15%; display: inline-grid' class='node-input-option-color'><b>On Colour</b></div>" +
+                        "<div style='width:15%; display: inline-grid' class='node-input-option-color'><b>Off Colour</b></div>")),
+
+                    addItem: function (container, i, option) {
+                        var row = $('<div/>').appendTo(container);
+                        var labelField = $('<input/>', { class: "node-input-option-label", type: "text" }).css({ "width": "35%", "margin-left": "5px", "margin-right": "5px" }).appendTo(row);
+                        labelField.val(option.label || "Option " + i);
+
+                        var valueField = $('<input/>', { class: "node-input-option-value", type: "text" }).css({ "width": "35%", "margin-left": "5px", "margin-right": "5px" }).appendTo(row);
+                        valueField.typedInput({ types: ['str', 'num', 'bool'] });
+                        valueField.typedInput("type", option.valueType || "str");
+                        valueField.typedInput("value", option.value || "option_" + i);
+                        valueField.on('change', function (type, value) {
+                            validate();
+                        });
+
+
+                        var onColorField = $('<input/>', { class: "node-input-option-onColor", type: "color" }).css({ "width": "10%", "margin-left": "5px", "display": onColorField }).appendTo(row);
+                        onColorField.val(option.onColor || "#32CD32");
+
+                        var offColorField = $('<input/>', { class: "node-input-option-offColor", type: "color" }).css({ "width": "10%", "margin-left": "5px", "display": offColorField }).appendTo(row);
+                        offColorField.val(option.offColor || "#f2f2f2");
+                        validate();
+
+
+                    },
+                    removeItem: function (data) {
+                        validate()
+                    },
+                    removable: true,
+                    sortable: true,
+
+                });
+
+                //Add existing options
+                if (element["HVAC-modes"]) {
+                    element["HVAC-modes"].forEach(function (option, index) {
+                        optionsList.editableList('addItem', { label: option.label, value: option.value, onColor: option.onColor, offColor: option.offColor });
+                    });
+                }
+
+                element.cssEditor = RED.editor.createEditor({
+                    id: "CSS",
+                    mode: "ace/mode/css",
+                    value: element["HVAC-CSS"]
+                });
                 `,
             //When the user clicks save on the editor set our values
             oneditsave: `
+                    var self = this;
+                    var temp = [];
+                    var optionsList = $("#options").editableList('items');
+                    optionsList.each(function (i) {
+                        var option = $(this);
+                        var curr = {};
+                        curr["label"] = option.find(".node-input-option-label").val();
+                        curr["value"] = option.find(".node-input-option-value").typedInput('value');
+                        curr["onColor"] = option.find(".node-input-option-onColor").val();
+                        curr["offColor"] = option.find(".node-input-option-offColor").val();
+                        temp.push(curr);
+                    });
+
+                    element["HVAC-modes"] = temp;
+
+
                     //Set the CSS value
                     element["HVAC-CSS"] = element.cssEditor.getValue();
 
@@ -58,6 +139,14 @@ module.exports = {
                 `,
             //When the user clicks the "copy configuration" button update the values shown
             update: `
+                    var optionsList = $("#options");
+                    optionsList.editableList("empty");
+                    for(var i in settings.modes.value) {
+                        var option = settings.modes.value[i];
+                        optionsList.editableList('addItem', { label: option.label, value: option.value, onColor: option.onColor, offColor: option.offColor });
+                    }
+        
+
                     element.cssEditor.setValue(settings.CSS.value);
                     element.cssEditor.clearSelection();
                 `
@@ -70,26 +159,26 @@ module.exports = {
                 {
                     "label": "Auto",
                     "value": "auto",
-                    "onColor": "#32CD32",
-                    "offColor": "#ff3333"
+                    "onColor": "rgb(50, 205, 50)",
+                    "offColor": "#434343"
                 },
                 {
                     "label": "Heat",
                     "value": "heat",
-                    "onColor": "#32CD32",
-                    "offColor": "#ff3333"
+                    "onColor": "rgb(255, 0, 0)",
+                    "offColor": "#434343"
                 },
                 {
                     "label": "Cool",
                     "value": "cool",
-                    "onColor": "#32CD32",
-                    "offColor": "#ff3333"
+                    "onColor": "rgb(50, 100, 205)",
+                    "offColor": "#434343"
                 },
                 {
                     "label": "Off",
                     "value": "off",
-                    "onColor": "#32CD32",
-                    "offColor": "#ff3333"
+                    "onColor": "rgb(205, 50, 50)",
+                    "offColor": "#434343"
                 }
             ],
             validate: function (values) {
@@ -167,26 +256,23 @@ module.exports = {
 
     //When a message comes from the dashbored
     onMessage: function (msg) {
-        // if (msg.id == this.id) {
-        //     var vals = this.getValues();
-        //     var temp;
-        //     if (msg.payload.muted != undefined) { vals["muted"] = msg.payload.muted; }
-        //     if (msg.payload.volume != undefined) {
-        //         vals["volume"] = msg.payload.volume;
-        //         if(vals["volume"] >= 100){vals["volume"] = 100;}
-        //         if(vals["volume"] <= 0){vals["volume"] = 0;}
-        //     }
-        //     var temp = vals;
-        //     temp["previousVolume"] = this.getValues()["volume"];
-        //     temp["previousMuted"] = this.getValues()["muted"];
-        //     this.sendStatusChangesToFlow(msg.sessionId, temp);
+        if (msg.id == this.id) {
+            var vals = this.getValues();
+            var oldVals = this.getValues();;
 
-        //     //Set the internal state if set
-        //     if (this.setsState) {
-        //         this.setValues(vals);
-        //         this.sendToDashbored(this.id, msg.sessionId, this.getValues());
-        //     }
-        // }
+            if (msg.payload.setTemperature) {
+                vals["setTemperature"] = msg.payload.setTemperature;
+            }
+
+            vals["previousSetTemperature"] = oldVals["setTemperature"];
+            this.sendStatusChangesToFlow(msg.sessionId, vals);
+
+            //Set the internal state if set
+            if (this.setsState) {
+                this.setValues(vals);
+                this.sendToDashbored(this.id, msg.sessionId, this.getValues());
+            }
+        }
     },
 
     //When a message comes from a node red flow
@@ -207,168 +293,136 @@ module.exports = {
         return this.config.CSS;
     },
 
-    updateHTML: function (htmlId) {
+    //Get the current values to set to HTML
+    generateValues: function (values, modes) {
+        var temp = {};
 
+        //Get the current mode and it's colour
+        var modeColor = "white";
+        for (var i in modes) {
+            if (modes[i].value == values["currentMode"]) {
+                modeColor = modes[i].onColor;
+                temp[modes[i].value] = modes[i].onColor;
+            }
+            else {
+                temp[modes[i].value] = modes[i].offColor;
+            }
+        }
+
+        //Generate the set temperature html
+        var currentTemperatureHTML = `Currently ${values.currentTemperature}`;
+        var setTemperatureHTML = `Off`;
+        if (values.currentMode != "off") {
+            setTemperatureHTML = `${values.currentAction} to ${values.setTemperature}`;
+        }
+
+        return {
+            currentTemperatureHTML,
+            setTemperatureHTML,
+            modes: temp,
+            modeColor
+        };
     },
 
     //Generate the HTML for the widget that will be inserted into the dashbored
     generateHTML: function (htmlId) {
         var html = "";
-        var values = this.getValues();
-        //console.log(this);
+        var generatedValues = this.generateValues(this.getValues(), this.config.modes);
 
+        console.log(generatedValues);
 
-        //Add the mode buttons
-        var modesHTML = `<div class="${util.generateCSSClass(htmlId, "div")}">`;
         var buttonHeight = `height: calc((100% / ${this.config.modes.length}) - 10px)`;
-        for(var i in this.config.modes) {
+        var modesHTML = "";
+        for (var i in this.config.modes) {
             var current = this.config.modes[i];
-            modesHTML += util.generateTag(htmlId, "button", "mode_" + current.value, current.label, `class="${util.generateCSSClass(htmlId, "button")}" style="${buttonHeight}"`);
+            modesHTML += util.generateTag(htmlId, "button", "mode_" + current.value,
+                current.label, `class="${util.generateCSSClass(htmlId, "button")}" style="${buttonHeight};
+                                background-color:${generatedValues.modes[current.value]};"
+                                mode="${current.value}"`);
         }
-        modesHTML += "</div>";
+        html += `${util.generateTag(htmlId, "div", "modesDiv", modesHTML, `class="${util.generateCSSClass(htmlId, "div")}"; modes='${JSON.stringify(this.config.modes)}'`)}`;
 
         //Add the temperature control
         var tempHTML = `<div class="${util.generateCSSClass(htmlId, "div")}">`;
-        var modeColor = "white";
-        for(var i in this.config.modes) {
-            if(this.config.modes[i].value == values["currentMode"]) {
-                modeColor = this.config.modes[i].onColor;
-                break;
-            }
-        }
         tempHTML += util.generateTag(htmlId, "button", "tempDiv", `
-            ${util.generateTag(htmlId, "h1", "currentTemperature", ``, ``)}
-            <h1>Currently ${values["currentTemperature"]}</h1>
+            ${util.generateTag(htmlId, "h1", "currentTemperature", `${generatedValues.currentTemperatureHTML}`, "")}
+            ${util.generateTag(htmlId, "h2", "setTemperature", `${generatedValues.setTemperatureHTML}`, "value=1")}
+        `, `class="${util.generateCSSClass(htmlId, "button")}" style="height: calc((100% / ${(this.config.modes.length - 2)}) - 10px); background-color: ${generatedValues.modeColor}"`);
 
-
-            <h2 style="color: ${modeColor}; display: ${values["currentMode"] == "off" ? "none" : "block"}">${values["currentAction"] != "" ? values["currentAction"] + " to " : "Set:"} ${values["setTemperature"]}</h2>
-            <h2 style="color: ${modeColor}; display: ${values["currentMode"] == "off" ? "block" : "none"}">Off</h2>
-        
-        `, `class="${util.generateCSSClass(htmlId, "button")}" style="${buttonHeight}"`);
-        
-        //Add blank divs to fill out the space depending on how many modes there are
-        for(var i = 0; i < this.config.modes.length - 3; i++) {
-            tempHTML += util.generateTag(htmlId, "div", "spacer", "", `class="${util.generateCSSClass(htmlId, "tempDiv")}" style="height: calc((100% / ${this.config.modes.length}) - 10px)"`);
-        }
-        
-
+        //Add the plus minus buttons for temperature
         tempHTML += util.generateTag(htmlId, "button", "tempPlus", "+", `class="${util.generateCSSClass(htmlId, "button")}" style="${buttonHeight}"`);
-        tempHTML += util.generateTag(htmlId, "button", "tempPlus", "-", `class="${util.generateCSSClass(htmlId, "button")}" style="${buttonHeight}"`);
+        tempHTML += util.generateTag(htmlId, "button", "tempMinus", "-", `class="${util.generateCSSClass(htmlId, "button")}" style="${buttonHeight}"`);
+        html += tempHTML + "</div>";
 
-
-
-
-        tempHTML += "</div>";
-
-        html += modesHTML;
-        html += tempHTML;
-
-
-
-        // var volumeLevel = util.generateTag(htmlId, "div", "volumeLevelTop", "", "");
-        // var buttons = `
-        //     ${util.generateTag(htmlId, "button", "plus", "+", `class=${util.generateCSSClass(htmlId, "button")}`)}
-        //     ${util.generateTag(htmlId, "button", "minus", "-", `class=${util.generateCSSClass(htmlId, "button")}`)}
-        //     ${util.generateTag(htmlId, "button", "muteButton", "Mute", `class=${util.generateCSSClass(htmlId, "button")}`)}
-        // `;
-        // return `
-        //     ${util.generateTag(htmlId, "div", "volumeLevelContainer", volumeLevel, "")}
-        //     ${util.generateTag(htmlId, "div", "buttonContainer", buttons, "")}
-        // `;
-        console.log(html);
         return html;
     },
 
     //Generate the script that will be executed when the dashbored loads
     generateOnload: function (htmlId, lockedAccess, alwaysPassword, ask, askText) {
-        return ``;
-        // //When the user clicks the volume up button
-        // var volPlusAction = `
-        // var yesAction = function() {
-        //     var waiting = true;
-        //     setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
-        //     sendMsg("${htmlId}", "${this.id}", {volume: parseInt(${util.getElement(htmlId, "widget")}.getAttribute("volume")) + ${this.config.increment}}, function(id, sessionId, success, msg) {
-        //         if(id == "${this.id}") {
-        //             waiting = false;
-        //             loadingAnimation(event.target.id, false);
-        //             if(!success) {
-        //                 failedToSend();
-        //             }
-        //         }
-        //     });
-        // }
-        // var noAction = function() {}
-        // ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")} 
-        // `;
+        var self = this;
 
-        // //When the user clicks the volume down button
-        // var volMinusAction = `
-        // var yesAction = function() {
-        //     var waiting = true;
-        //     setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
-        //     sendMsg("${htmlId}", "${this.id}", {volume: parseInt(${util.getElement(htmlId, "widget")}.getAttribute("volume")) - ${this.config.increment}}, function(id, sessionId, success, msg) {
-        //         if(id == "${this.id}") {
-        //             waiting = false;
-        //             loadingAnimation(event.target.id, false);
-                    
-        //             if(!success) {
-        //                 failedToSend();
-        //             }
-        //         }
-        //     });
-        // }
-        // var noAction = function() {}
-        // ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
-        // `;
+        //When the user clicks a temp button
+        var generateTempClick = function (adjustment) {
+            return `
+                var yesAction = function() {
+                    var waiting = true;
+                    setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
+                    sendMsg("${htmlId}", "${self.id}", {setTemperature: parseInt(${util.getElement(htmlId, "setTemperature")}.getAttribute("value")) + ${adjustment}}, function(id, sessionId, success, msg) {
+                        if(id == "${self.id}") {
+                            waiting = false;
+                            loadingAnimation(event.target.id, false);
+                            if(!success) {
+                                failedToSend();
+                            }
+                        }
+                    });
+                }
+                var noAction = function() {}
+                ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")} 
+            `;
+        }
 
-        // //When the mute button is pressed
-        // var muteAction = `
-        //     var yesAction = function() {
-        //         var waiting = true;
-        //         var currentlyMuted = ${util.getElement(htmlId, "widget")}.getAttribute("muted") == "${this.config.mutedValue}";
-        //         setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
-        //         sendMsg("${htmlId}", "${this.id}", {muted: (currentlyMuted ? "${this.config.unmutedValue}" : "${this.config.mutedValue}")}, function(id, sessionId, success, msg) {
-        //             if(id == "${this.id}") {
-        //                 waiting = false;
-        //                 loadingAnimation(event.target.id, false);
-        //                 if(!success) {
-        //                     failedToSend();
-        //                 }
-        //             }
-        //         });
-        //     }
-        //     var noAction = function() {}
-        //     ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
-        // `;
+        var generateMode = function(mode) {
+            return `
+                var yesAction = function() {
+                    var waiting = true;
+                    setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
+                    sendMsg("${htmlId}", "${self.id}", {mode: "${mode.value}"}, function(id, sessionId, success, msg) {
+                        if(id == "${self.id}") {
+                            waiting = false;
+                            loadingAnimation(event.target.id, false);
+                            if(!success) {
+                                failedToSend();
+                            }
+                        }
+                    });
+                }
+                var noAction = function() {}
+                ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")} 
+            `;
+        };
 
-        // return `
-        // ${util.getElement(htmlId, "plus")}.onclick = function(event) {${volPlusAction}};
-        // ${util.getElement(htmlId, "minus")}.onclick = function(event) {${volMinusAction}};
-        // ${util.getElement(htmlId, "muteButton")}.onclick = function(event) {${muteAction}};
-        // ${util.getElement(htmlId, "widget")}.setAttribute("muted", "${this.getValue("muted")}");
-        // ${util.getElement(htmlId, "widget")}.setAttribute("volume", ${this.getValue("volume")});
+        var modes = [];
+        for(var i in this.config.modes) {
+            modes += generateMode(this.config.modes[i]);
+        }
 
-        // //Set the default UI
-        // ${this.showMute(htmlId, this.getValue("muted") == `${this.config.mutedValue}`)}
-        // ${this.showVolume(htmlId, this.getValue("volume"))}
-        // `;
+        return `
+            ${util.getElement(htmlId, "tempPlus")}.onclick = function(event) {${generateTempClick(1)}};
+            ${util.getElement(htmlId, "tempMinus")}.onclick = function(event) {${generateTempClick(-1)}};
+            ${modes}
+        `;
     },
 
     //Generate the script that will be called when a message comes from NodeRed on the dashbored
     generateOnMsg: function (htmlId) {
-        return ``;
-        // return `
-        //     if(msg.payload.muted != undefined) {
-        //         ${util.getElement(htmlId, "widget")}.setAttribute("muted", msg.payload.muted);
-        //         var muted = msg.payload.muted == "${this.config.mutedValue}";
-        //         ${this.showMute(htmlId)}
-        //     }
-        //     if(msg.payload.volume != undefined) {
-        //         ${util.getElement(htmlId, "widget")}.setAttribute("volume", msg.payload.volume);
-        //         var volume = msg.payload.volume;
-        //         ${this.showVolume(htmlId)}
-        //     }
-        // `;
+        return `
+            var values = ${this.generateValues}(msg.payload, JSON.parse(${util.getElement(htmlId, "modesDiv")}.getAttribute("modes")));
+            if(msg.payload.setTemperature != undefined) {
+                ${util.getElement(htmlId, "setTemperature")}.setAttribute("value", msg.payload.setTemperature);
+                ${util.getElement(htmlId, "setTemperature")}.innerHTML = values.setTemperatureHTML;
+            }
+        `;
     },
 
     //Generate any extra scripts to add to the document

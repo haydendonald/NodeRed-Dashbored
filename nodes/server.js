@@ -195,7 +195,16 @@ module.exports = function (RED) {
                                 res.send("Internal Server Error");
                             }
                             else {
-                                RED.nodes.getNode(dashboards[endpoint].id).handleHTTP(data, req, res);
+                                var temp = RED.nodes.getNode(dashboards[endpoint].id);
+                                if(temp) {
+                                    temp.handleHTTP(data, req, res);
+                                }
+                                else {
+                                    RED.log.error("Dashbored attempted to load while node not ready");
+                                    res.type("text/plain");
+                                    res.status(503);
+                                    res.send("Internal Server Error - Not ready to accept the request");
+                                }  
                             }
                         });
                     } else {

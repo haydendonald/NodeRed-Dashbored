@@ -41,3 +41,4 @@
 * Fixed a bug where the password would not visually clear when closed
 ## - 0.4.1
 * Added HVAC widget
+* Fixed a bug where if the dashbored were to reload while NodeRed is redeploying it would crash node-red.

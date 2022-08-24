@@ -154,44 +154,44 @@ module.exports = {
     },
     //Default config
     defaultConfig: {
-        modes: {
-            value: [
-                {
-                    "label": "Auto",
-                    "value": "auto",
-                    "onColor": "rgb(50, 205, 50)",
-                    "offColor": "#434343"
-                },
-                {
-                    "label": "Heat",
-                    "value": "heat",
-                    "onColor": "rgb(255, 0, 0)",
-                    "offColor": "#434343"
-                },
-                {
-                    "label": "Cool",
-                    "value": "cool",
-                    "onColor": "rgb(50, 100, 205)",
-                    "offColor": "#434343"
-                },
-                {
-                    "label": "Off",
-                    "value": "off",
-                    "onColor": "rgb(205, 50, 50)",
-                    "offColor": "#434343"
-                }
-            ],
-            validate: function (values) {
-                if (values === undefined) { return false; }
-                for (var i in values) {
-                    if (values[i].label === undefined) { return false; }
-                    if (values[i].value === undefined || values[i].value == "") { return false; }
-                    if (values[i].offColor === undefined || values[i].offColor == "") { return false; }
-                    if (values[i].onColor === undefined || values[i].onColor == "") { return false; }
-                }
-                return true;
-            }
-        },
+        // modes: {
+        //     value: [
+        //         {
+        //             "label": "Auto",
+        //             "value": "auto",
+        //             "onColor": "rgb(50, 205, 50)",
+        //             "offColor": "#434343"
+        //         },
+        //         {
+        //             "label": "Heat",
+        //             "value": "heat",
+        //             "onColor": "rgb(255, 0, 0)",
+        //             "offColor": "#434343"
+        //         },
+        //         {
+        //             "label": "Cool",
+        //             "value": "cool",
+        //             "onColor": "rgb(50, 100, 205)",
+        //             "offColor": "#434343"
+        //         },
+        //         {
+        //             "label": "Off",
+        //             "value": "off",
+        //             "onColor": "rgb(205, 50, 50)",
+        //             "offColor": "#434343"
+        //         }
+        //     ],
+        //     validate: function (values) {
+        //         // if (values === undefined) { return false; }
+        //         // for (var i in values) {
+        //         //     if (values[i].label === undefined) { return false; }
+        //         //     if (values[i].value === undefined || values[i].value == "") { return false; }
+        //         //     if (values[i].offColor === undefined || values[i].offColor == "") { return false; }
+        //         //     if (values[i].onColor === undefined || values[i].onColor == "") { return false; }
+        //         // }
+        //         return true;
+        //     }
+        // },
         CSS: {
             value: `
                 .button {
@@ -220,6 +220,18 @@ module.exports = {
                     font-size: 100%;
                     margin-top: 10px;
                 }
+                .autoColor {
+                    background-color: rgb(50, 205, 50);
+                }
+                .heatColor {
+                    background-color: rgb(205, 50, 50);
+                }
+                .coolColor {
+                    background-color: rgb(50, 100, 205);
+                }
+                .offColor {
+                    background-color: gray;
+                }
                 `.replace(/^\s+|\s+$/gm, ''), required: false
         }
     },
@@ -229,18 +241,18 @@ module.exports = {
     //Default value(s)
     getDefaultValues: function () {
         return {
-            currentMode: "heat",
-            currentAction: "Heating",
-            setTemperature: 22,
-            currentTemperature: 20
+            setMode: "off",
+            currentMode: "off",
+            setTemperature: 21,
+            currentTemperature: 21
         }
     },
 
     //Return the current values
     getValues: function () {
         return {
+            setMode: this.getValue("setMode"),
             currentMode: this.getValue("currentMode"),
-            currentAction: this.getValue("currentAction"),
             setTemperature: this.getValue("setTemperature"),
             currentTemperature: this.getValue("currentTemperature")
         }
@@ -258,13 +270,16 @@ module.exports = {
     onMessage: function (msg) {
         if (msg.id == this.id) {
             var vals = this.getValues();
-            var oldVals = this.getValues();;
-
-            if (msg.payload.setTemperature) {
-                vals["setTemperature"] = msg.payload.setTemperature;
+            var oldVals = this.getValues();
+            for (var i in vals) {
+                if (msg.payload[i]) {
+                    vals[i] = msg.payload[i];
+                }
             }
 
             vals["previousSetTemperature"] = oldVals["setTemperature"];
+            vals["previousSetMode"] = oldVals["setMode"];
+            vals["previousMode"] = oldVals["currentMode"];
             this.sendStatusChangesToFlow(msg.sessionId, vals);
 
             //Set the internal state if set
@@ -277,15 +292,14 @@ module.exports = {
 
     //When a message comes from a node red flow
     onFlowMessage: function (msg) {
-        // if (msg.payload) {
-        //     if (msg.payload.volume != undefined) {
-        //         this.setValue("volume", msg.payload.volume);
-        //     }
-        //     if (msg.payload.muted != undefined) {
-        //         this.setValue("muted", msg.payload.muted);
-        //     }
-        //     this.sendToDashbored(this.id, msg.sessionId, this.getValues());
-        // }
+        if (msg.payload) {
+            for (var i in this.getValues()) {
+                if (msg.payload[i]) {
+                    this.setValue(i, msg.payload[i]);
+                }
+            }
+            this.sendToDashbored(this.id, msg.sessionId, this.getValues());
+        }
     },
 
     //Generate the CSS for the widget
@@ -299,8 +313,12 @@ module.exports = {
 
         //Get the current mode and it's colour
         var modeColor = "white";
+        var currentModeColor = "gray";
         for (var i in modes) {
-            if (modes[i].value == values["currentMode"]) {
+            if(modes[i].value == values["currentMode"]) {
+                currentModeColor = modes[i].onColor;
+            }
+            if (modes[i].value == values["setMode"]) {
                 modeColor = modes[i].onColor;
                 temp[modes[i].value] = modes[i].onColor;
             }
@@ -312,22 +330,42 @@ module.exports = {
         //Generate the set temperature html
         var currentTemperatureHTML = `Currently ${values.currentTemperature}`;
         var setTemperatureHTML = `Off`;
-        if (values.currentMode != "off") {
-            setTemperatureHTML = `${values.currentAction} to ${values.setTemperature}`;
+        if (values.setMode != "off") {
+            var action = "Working";
+            switch(values.currentMode) {
+                case "heat": {action = "Heating"; break;}
+                case "cool": {action = "Cooling"; break;}
+                case "off": {action = "Reached"; break;}
+                case "auto": {
+                    if(values["currentTemperature"] == values["setTemperature"]) {
+                        action = "Reached";
+                    }
+                    if(values["currentTemperature"] > values["setTemperature"]) {
+                        action = "Cooling to";
+                    }
+                    else {
+                        action = "Heating to";
+                    }
+                    break;
+                }
+            }
+
+            setTemperatureHTML = `${action} ${values.setTemperature}`;
         }
 
         return {
             currentTemperatureHTML,
             setTemperatureHTML,
             modes: temp,
-            modeColor
+            currentModeColor
         };
     },
 
     //Generate the HTML for the widget that will be inserted into the dashbored
     generateHTML: function (htmlId) {
         var html = "";
-        var generatedValues = this.generateValues(this.getValues(), this.config.modes);
+        var values = this.getValues();
+        var generatedValues = this.generateValues(values, this.config.modes);
 
         console.log(generatedValues);
 
@@ -340,14 +378,14 @@ module.exports = {
                                 background-color:${generatedValues.modes[current.value]};"
                                 mode="${current.value}"`);
         }
-        html += `${util.generateTag(htmlId, "div", "modesDiv", modesHTML, `class="${util.generateCSSClass(htmlId, "div")}"; modes='${JSON.stringify(this.config.modes)}'`)}`;
+        html += `${util.generateTag(htmlId, "div", "modesDiv", modesHTML, `class="${util.generateCSSClass(htmlId, "div")}" setMode="${values["setMode"]}"`)}`;
 
         //Add the temperature control
         var tempHTML = `<div class="${util.generateCSSClass(htmlId, "div")}">`;
         tempHTML += util.generateTag(htmlId, "button", "tempDiv", `
             ${util.generateTag(htmlId, "h1", "currentTemperature", `${generatedValues.currentTemperatureHTML}`, "")}
-            ${util.generateTag(htmlId, "h2", "setTemperature", `${generatedValues.setTemperatureHTML}`, "value=1")}
-        `, `class="${util.generateCSSClass(htmlId, "button")}" style="height: calc((100% / ${(this.config.modes.length - 2)}) - 10px); background-color: ${generatedValues.modeColor}"`);
+            ${util.generateTag(htmlId, "h2", "setTemperature", `${generatedValues.setTemperatureHTML}`, `value=${values["setTemperature"]}`)}
+        `, `class="${util.generateCSSClass(htmlId, "button")}" style="height: calc((100% / ${(this.config.modes.length - 2)}) - 10px); background-color: ${generatedValues.currentModeColor}"`);
 
         //Add the plus minus buttons for temperature
         tempHTML += util.generateTag(htmlId, "button", "tempPlus", "+", `class="${util.generateCSSClass(htmlId, "button")}" style="${buttonHeight}"`);
@@ -365,29 +403,31 @@ module.exports = {
         var generateTempClick = function (adjustment) {
             return `
                 var yesAction = function() {
-                    var waiting = true;
-                    setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
-                    sendMsg("${htmlId}", "${self.id}", {setTemperature: parseInt(${util.getElement(htmlId, "setTemperature")}.getAttribute("value")) + ${adjustment}}, function(id, sessionId, success, msg) {
-                        if(id == "${self.id}") {
-                            waiting = false;
-                            loadingAnimation(event.target.id, false);
-                            if(!success) {
-                                failedToSend();
+                    if(${util.getElement(htmlId, "modesDiv")}.getAttribute("setMode") != "off") {
+                        var waiting = true;
+                        setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
+                        sendMsg("${htmlId}", "${self.id}", {setTemperature: parseInt(${util.getElement(htmlId, "setTemperature")}.getAttribute("value")) + ${adjustment}}, function(id, sessionId, success, msg) {
+                            if(id == "${self.id}") {
+                                waiting = false;
+                                loadingAnimation(event.target.id, false);
+                                if(!success) {
+                                    failedToSend();
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                 }
                 var noAction = function() {}
                 ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")} 
             `;
         }
 
-        var generateMode = function(mode) {
+        var generateMode = function (mode) {
             return `
                 var yesAction = function() {
                     var waiting = true;
                     setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
-                    sendMsg("${htmlId}", "${self.id}", {mode: "${mode.value}"}, function(id, sessionId, success, msg) {
+                    sendMsg("${htmlId}", "${self.id}", {setMode: "${mode.value}"}, function(id, sessionId, success, msg) {
                         if(id == "${self.id}") {
                             waiting = false;
                             loadingAnimation(event.target.id, false);
@@ -403,9 +443,10 @@ module.exports = {
         };
 
         var modes = [];
-        for(var i in this.config.modes) {
-            modes += generateMode(this.config.modes[i]);
+        for (var i in this.config.modes) {
+            modes += `${util.getElement(htmlId, "mode_" + this.config.modes[i].value)}.onclick = function(event) {${generateMode(this.config.modes[i])}};`
         }
+
 
         return `
             ${util.getElement(htmlId, "tempPlus")}.onclick = function(event) {${generateTempClick(1)}};
@@ -416,11 +457,34 @@ module.exports = {
 
     //Generate the script that will be called when a message comes from NodeRed on the dashbored
     generateOnMsg: function (htmlId) {
+        var updateModes = "";
+        for (var i in this.config.modes) {
+            var curr = this.config.modes[i];
+            updateModes += `${util.getElement(htmlId, "mode_" + curr.value)}.style.backgroundColor = 
+                msg.payload.setMode == "${curr.value}" ? "${curr.onColor}": "${curr.offColor}";
+            
+            if(msg.payload.currentMode == "${curr.value}"){color = "${curr.onColor}"}`;
+        }
+
         return `
             var values = ${this.generateValues}(msg.payload, JSON.parse(${util.getElement(htmlId, "modesDiv")}.getAttribute("modes")));
+
+
+            console.log(values);
+
+
             if(msg.payload.setTemperature != undefined) {
                 ${util.getElement(htmlId, "setTemperature")}.setAttribute("value", msg.payload.setTemperature);
                 ${util.getElement(htmlId, "setTemperature")}.innerHTML = values.setTemperatureHTML;
+            }
+            if(msg.payload.setMode != undefined) {
+                var color = "gray";
+                ${updateModes}
+                ${util.getElement(htmlId, "tempDiv")}.style.backgroundColor = color;
+                ${util.getElement(htmlId, "modesDiv")}.setAttribute("setMode", msg.payload.setMode);    
+            }
+            if(msg.payload.currentTemperature !== undefined) {
+                ${util.getElement(htmlId, "currentTemperature")}.innerHTML = values.currentTemperatureHTML;
             }
         `;
     },

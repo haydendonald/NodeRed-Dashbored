@@ -23,10 +23,6 @@ module.exports = {
     generateConfigHTML: function () {
         return `
             <p><a href="https://github.com/haydendonald/NodeRed-Dashbored/blob/main/doc/widgetTypes/HVAC.md" target="_blank">See the documentation for more information</a></p>
-            <div class="form-row">       
-                <ol id="options"></ol>
-            </div>
-            
             <!-- CSS Editor -->
             <div class="form-row">
                 <label for="CSS">CSS</label>
@@ -39,67 +35,6 @@ module.exports = {
         return {
             //When the user opens the config panel get things ready
             oneditprepare: `
-                //Validate and add an item
-                function validate() {
-                    var self = this
-                    this["HVAC-modes"] = [];
-                    var optionsList = $("#options").editableList('items');
-                    optionsList.each(function (i) {
-                        var option = $(this);
-                        var curr = {};
-                        curr["label"] = option.find(".node-input-option-label").val();
-                        curr["value"] = option.find(".node-input-option-value").typedInput('value');
-                        curr["onColor"] = option.find(".node-input-option-onColor").val();
-                        curr["offColor"] = option.find(".node-input-option-offColor").val();
-                        self["HVAC-modes"].push(curr);
-                    });
-                }
-
-                var optionsList = $("#options").css('min-height', '200px').editableList({
-                    header: $("<div>").css('padding-left', '32px').append($.parseHTML(
-                        "<div style='width:35%; display: inline-grid'><b>Label</b></div>" +
-                        "<div style='width:35%; display: inline-grid'><b>Value</b></div>" +
-                        "<div style='width:15%; display: inline-grid' class='node-input-option-color'><b>On Colour</b></div>" +
-                        "<div style='width:15%; display: inline-grid' class='node-input-option-color'><b>Off Colour</b></div>")),
-
-                    addItem: function (container, i, option) {
-                        var row = $('<div/>').appendTo(container);
-                        var labelField = $('<input/>', { class: "node-input-option-label", type: "text" }).css({ "width": "35%", "margin-left": "5px", "margin-right": "5px" }).appendTo(row);
-                        labelField.val(option.label || "Option " + i);
-
-                        var valueField = $('<input/>', { class: "node-input-option-value", type: "text" }).css({ "width": "35%", "margin-left": "5px", "margin-right": "5px" }).appendTo(row);
-                        valueField.typedInput({ types: ['str', 'num', 'bool'] });
-                        valueField.typedInput("type", option.valueType || "str");
-                        valueField.typedInput("value", option.value || "option_" + i);
-                        valueField.on('change', function (type, value) {
-                            validate();
-                        });
-
-
-                        var onColorField = $('<input/>', { class: "node-input-option-onColor", type: "color" }).css({ "width": "10%", "margin-left": "5px", "display": onColorField }).appendTo(row);
-                        onColorField.val(option.onColor || "#32CD32");
-
-                        var offColorField = $('<input/>', { class: "node-input-option-offColor", type: "color" }).css({ "width": "10%", "margin-left": "5px", "display": offColorField }).appendTo(row);
-                        offColorField.val(option.offColor || "#f2f2f2");
-                        validate();
-
-
-                    },
-                    removeItem: function (data) {
-                        validate()
-                    },
-                    removable: true,
-                    sortable: true,
-
-                });
-
-                //Add existing options
-                if (element["HVAC-modes"]) {
-                    element["HVAC-modes"].forEach(function (option, index) {
-                        optionsList.editableList('addItem', { label: option.label, value: option.value, onColor: option.onColor, offColor: option.offColor });
-                    });
-                }
-
                 element.cssEditor = RED.editor.createEditor({
                     id: "CSS",
                     mode: "ace/mode/css",
@@ -108,22 +43,6 @@ module.exports = {
                 `,
             //When the user clicks save on the editor set our values
             oneditsave: `
-                    var self = this;
-                    var temp = [];
-                    var optionsList = $("#options").editableList('items');
-                    optionsList.each(function (i) {
-                        var option = $(this);
-                        var curr = {};
-                        curr["label"] = option.find(".node-input-option-label").val();
-                        curr["value"] = option.find(".node-input-option-value").typedInput('value');
-                        curr["onColor"] = option.find(".node-input-option-onColor").val();
-                        curr["offColor"] = option.find(".node-input-option-offColor").val();
-                        temp.push(curr);
-                    });
-
-                    element["HVAC-modes"] = temp;
-
-
                     //Set the CSS value
                     element["HVAC-CSS"] = element.cssEditor.getValue();
 
@@ -139,14 +58,6 @@ module.exports = {
                 `,
             //When the user clicks the "copy configuration" button update the values shown
             update: `
-                    var optionsList = $("#options");
-                    optionsList.editableList("empty");
-                    for(var i in settings.modes.value) {
-                        var option = settings.modes.value[i];
-                        optionsList.editableList('addItem', { label: option.label, value: option.value, onColor: option.onColor, offColor: option.offColor });
-                    }
-        
-
                     element.cssEditor.setValue(settings.CSS.value);
                     element.cssEditor.clearSelection();
                 `
@@ -154,44 +65,6 @@ module.exports = {
     },
     //Default config
     defaultConfig: {
-        // modes: {
-        //     value: [
-        //         {
-        //             "label": "Auto",
-        //             "value": "auto",
-        //             "onColor": "rgb(50, 205, 50)",
-        //             "offColor": "#434343"
-        //         },
-        //         {
-        //             "label": "Heat",
-        //             "value": "heat",
-        //             "onColor": "rgb(255, 0, 0)",
-        //             "offColor": "#434343"
-        //         },
-        //         {
-        //             "label": "Cool",
-        //             "value": "cool",
-        //             "onColor": "rgb(50, 100, 205)",
-        //             "offColor": "#434343"
-        //         },
-        //         {
-        //             "label": "Off",
-        //             "value": "off",
-        //             "onColor": "rgb(205, 50, 50)",
-        //             "offColor": "#434343"
-        //         }
-        //     ],
-        //     validate: function (values) {
-        //         // if (values === undefined) { return false; }
-        //         // for (var i in values) {
-        //         //     if (values[i].label === undefined) { return false; }
-        //         //     if (values[i].value === undefined || values[i].value == "") { return false; }
-        //         //     if (values[i].offColor === undefined || values[i].offColor == "") { return false; }
-        //         //     if (values[i].onColor === undefined || values[i].onColor == "") { return false; }
-        //         // }
-        //         return true;
-        //     }
-        // },
         CSS: {
             value: `
                 .button {
@@ -260,6 +133,7 @@ module.exports = {
 
     //Setup the widget
     setupWidget: function (config) {
+        this.config.modes = ["auto", "heat", "cool", "off"];
         this.heightMultiplier = this.config.modes.length;
     },
 
@@ -308,43 +182,30 @@ module.exports = {
     },
 
     //Get the current values to set to HTML
-    generateValues: function (values, modes) {
-        var temp = {};
-
-        //Get the current mode and it's colour
-        var modeColor = "white";
-        var currentModeColor = "gray";
-        for (var i in modes) {
-            if(modes[i].value == values["currentMode"]) {
-                currentModeColor = modes[i].onColor;
-            }
-            if (modes[i].value == values["setMode"]) {
-                modeColor = modes[i].onColor;
-                temp[modes[i].value] = modes[i].onColor;
-            }
-            else {
-                temp[modes[i].value] = modes[i].offColor;
-            }
-        }
+    generateValues: function (values) {
+        var currentClass;
 
         //Generate the set temperature html
         var currentTemperatureHTML = `Currently ${values.currentTemperature}`;
         var setTemperatureHTML = `Off`;
         if (values.setMode != "off") {
             var action = "Working";
-            switch(values.currentMode) {
-                case "heat": {action = "Heating"; break;}
-                case "cool": {action = "Cooling"; break;}
-                case "off": {action = "Reached"; break;}
+            switch (values.currentMode) {
+                case "heat": { action = "Heating to"; currentClass = "heatColor"; break; }
+                case "cool": { action = "Cooling to"; currentClass = "coolColor"; break; }
+                case "off": { action = "Reached"; currentClass = "offColor"; break; }
                 case "auto": {
-                    if(values["currentTemperature"] == values["setTemperature"]) {
+                    if (values["currentTemperature"] == values["setTemperature"]) {
                         action = "Reached";
+                        currentClass = "offColor";
                     }
-                    if(values["currentTemperature"] > values["setTemperature"]) {
+                    if (values["currentTemperature"] > values["setTemperature"]) {
                         action = "Cooling to";
+                        currentClass = "coolColor";
                     }
                     else {
                         action = "Heating to";
+                        currentClass = "heatColor";
                     }
                     break;
                 }
@@ -356,8 +217,7 @@ module.exports = {
         return {
             currentTemperatureHTML,
             setTemperatureHTML,
-            modes: temp,
-            currentModeColor
+            currentClass
         };
     },
 
@@ -365,18 +225,27 @@ module.exports = {
     generateHTML: function (htmlId) {
         var html = "";
         var values = this.getValues();
-        var generatedValues = this.generateValues(values, this.config.modes);
-
-        console.log(generatedValues);
+        var generatedValues = this.generateValues(values);
 
         var buttonHeight = `height: calc((100% / ${this.config.modes.length}) - 10px)`;
+
+        //Add the modes
         var modesHTML = "";
-        for (var i in this.config.modes) {
-            var current = this.config.modes[i];
-            modesHTML += util.generateTag(htmlId, "button", "mode_" + current.value,
-                current.label, `class="${util.generateCSSClass(htmlId, "button")}" style="${buttonHeight};
-                                background-color:${generatedValues.modes[current.value]};"
-                                mode="${current.value}"`);
+        if (this.config.modes.includes("auto")) {
+            modesHTML += `${util.generateTag(htmlId, "button", "mode_auto", "Auto",
+                `class="${util.generateCSSClass(htmlId, "button")} ${values["setMode"] == "auto" ? util.generateCSSClass(htmlId, "autoColor") : ""}" style="${buttonHeight}"`)}`;
+        }
+        if (this.config.modes.includes("heat")) {
+            modesHTML += `${util.generateTag(htmlId, "button", "mode_heat", "Heat",
+                `class="${util.generateCSSClass(htmlId, "button")} ${values["setMode"] == "heat" ? util.generateCSSClass(htmlId, "heatColor") : ""}" style="${buttonHeight}"`)}`;
+        }
+        if (this.config.modes.includes("cool")) {
+            modesHTML += `${util.generateTag(htmlId, "button", "mode_cool", "Cool",
+                `class="${util.generateCSSClass(htmlId, "button")} ${values["setMode"] == "cool" ? util.generateCSSClass(htmlId, "coolColor") : ""}" style="${buttonHeight}"`)}`;
+        }
+        if (this.config.modes.includes("off")) {
+            modesHTML += `${util.generateTag(htmlId, "button", "mode_off", "Off",
+                `class="${util.generateCSSClass(htmlId, "button")} ${values["setMode"] == "off" ? util.generateCSSClass(htmlId, "offColor") : ""}" style="${buttonHeight}"`)}`;
         }
         html += `${util.generateTag(htmlId, "div", "modesDiv", modesHTML, `class="${util.generateCSSClass(htmlId, "div")}" setMode="${values["setMode"]}"`)}`;
 
@@ -385,7 +254,7 @@ module.exports = {
         tempHTML += util.generateTag(htmlId, "button", "tempDiv", `
             ${util.generateTag(htmlId, "h1", "currentTemperature", `${generatedValues.currentTemperatureHTML}`, "")}
             ${util.generateTag(htmlId, "h2", "setTemperature", `${generatedValues.setTemperatureHTML}`, `value=${values["setTemperature"]}`)}
-        `, `class="${util.generateCSSClass(htmlId, "button")}" style="height: calc((100% / ${(this.config.modes.length - 2)}) - 10px); background-color: ${generatedValues.currentModeColor}"`);
+        `, `class="${util.generateCSSClass(htmlId, "button")} ${util.generateCSSClass(htmlId, generatedValues.currentClass)}" style="height: calc((100% / ${(this.config.modes.length - 2)}) - 10px);"`);
 
         //Add the plus minus buttons for temperature
         tempHTML += util.generateTag(htmlId, "button", "tempPlus", "+", `class="${util.generateCSSClass(htmlId, "button")}" style="${buttonHeight}"`);
@@ -427,7 +296,7 @@ module.exports = {
                 var yesAction = function() {
                     var waiting = true;
                     setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
-                    sendMsg("${htmlId}", "${self.id}", {setMode: "${mode.value}"}, function(id, sessionId, success, msg) {
+                    sendMsg("${htmlId}", "${self.id}", {setMode: "${mode}"}, function(id, sessionId, success, msg) {
                         if(id == "${self.id}") {
                             waiting = false;
                             loadingAnimation(event.target.id, false);
@@ -444,9 +313,8 @@ module.exports = {
 
         var modes = [];
         for (var i in this.config.modes) {
-            modes += `${util.getElement(htmlId, "mode_" + this.config.modes[i].value)}.onclick = function(event) {${generateMode(this.config.modes[i])}};`
+            modes += `${util.getElement(htmlId, "mode_" + this.config.modes[i])}.onclick = function(event) {${generateMode(this.config.modes[i])}};`
         }
-
 
         return `
             ${util.getElement(htmlId, "tempPlus")}.onclick = function(event) {${generateTempClick(1)}};
@@ -457,35 +325,37 @@ module.exports = {
 
     //Generate the script that will be called when a message comes from NodeRed on the dashbored
     generateOnMsg: function (htmlId) {
-        var updateModes = "";
+        var updateCurrentModeDiv = `if(msg.payload.currentMode != undefined) {`;
+        var updateModes = `if(msg.payload.setMode != undefined) {${util.getElement(htmlId, "modesDiv")}.setAttribute("setMode", msg.payload.setMode);`;
         for (var i in this.config.modes) {
-            var curr = this.config.modes[i];
-            updateModes += `${util.getElement(htmlId, "mode_" + curr.value)}.style.backgroundColor = 
-                msg.payload.setMode == "${curr.value}" ? "${curr.onColor}": "${curr.offColor}";
-            
-            if(msg.payload.currentMode == "${curr.value}"){color = "${curr.onColor}"}`;
+            updateCurrentModeDiv += `
+                if("${this.config.modes[i]}" == msg.payload.currentMode) {
+                    ${util.getElement(htmlId, "tempDiv")}.classList.add("${util.generateCSSClass(htmlId, this.config.modes[i])}Color")
+                }
+                else {
+                    ${util.getElement(htmlId, "tempDiv")}.classList.remove("${util.generateCSSClass(htmlId, this.config.modes[i])}Color")
+                }  
+            `;
+            updateModes += `
+                if("${this.config.modes[i]}" == msg.payload.setMode) {
+                    ${util.getElement(htmlId, "mode_" + this.config.modes[i])}.classList.add("${util.generateCSSClass(htmlId, this.config.modes[i])}Color")
+                }
+                else {
+                    ${util.getElement(htmlId, "mode_" + this.config.modes[i])}.classList.remove("${util.generateCSSClass(htmlId, this.config.modes[i])}Color")
+                }
+            `;
         }
+        updateCurrentModeDiv += "}";
+        updateModes += "}";
 
         return `
-            var values = ${this.generateValues}(msg.payload, JSON.parse(${util.getElement(htmlId, "modesDiv")}.getAttribute("modes")));
-
-
-            console.log(values);
-
-
+            var values = ${this.generateValues}(msg.payload);
             if(msg.payload.setTemperature != undefined) {
                 ${util.getElement(htmlId, "setTemperature")}.setAttribute("value", msg.payload.setTemperature);
                 ${util.getElement(htmlId, "setTemperature")}.innerHTML = values.setTemperatureHTML;
             }
-            if(msg.payload.setMode != undefined) {
-                var color = "gray";
-                ${updateModes}
-                ${util.getElement(htmlId, "tempDiv")}.style.backgroundColor = color;
-                ${util.getElement(htmlId, "modesDiv")}.setAttribute("setMode", msg.payload.setMode);    
-            }
-            if(msg.payload.currentTemperature !== undefined) {
-                ${util.getElement(htmlId, "currentTemperature")}.innerHTML = values.currentTemperatureHTML;
-            }
+            ${updateModes}
+            ${updateCurrentModeDiv}
         `;
     },
 

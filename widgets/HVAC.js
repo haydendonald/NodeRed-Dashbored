@@ -16,7 +16,7 @@ module.exports = {
     maxWidth: undefined,
     maxHeight: undefined,
 
-    resetConfig: true, //DEBUG FLAG TO CLEAR CONFIGURATION
+    //resetConfig: true, //DEBUG FLAG TO CLEAR CONFIGURATION
 
     //Insert the HTML into the config on the NodeRed flow
     //The ids MUST be node-config-input-<WIDGETNAME>-<CONFIGNAME> otherwise they may not be set
@@ -25,15 +25,15 @@ module.exports = {
             <p><a href="https://github.com/haydendonald/NodeRed-Dashbored/blob/main/doc/widgetTypes/HVAC.md" target="_blank">See the documentation for more information</a></p>
             
             <div class="form-row">
-                <label for="node-config-input-HVAC-auto">Auto Mode</label>
+                <label for="node-config-input-HVAC-auto">Enable Auto Mode</label>
                 <input type="checkbox" id="node-config-input-HVAC-auto">
             </div>
                 <div class="form-row">
-                <label for="node-config-input-HVAC-heat">Heat Mode</label>
+                <label for="node-config-input-HVAC-heat">Enable Heat Mode</label>
                 <input type="checkbox" id="node-config-input-HVAC-heat">
             </div>
             <div class="form-row">
-                <label for="node-config-input-HVAC-cool">Cool Mode</label>
+                <label for="node-config-input-HVAC-cool">Enable Cool Mode</label>
                 <input type="checkbox" id="node-config-input-HVAC-cool">
             </div>
             
@@ -49,6 +49,10 @@ module.exports = {
         return {
             //When the user opens the config panel get things ready
             oneditprepare: `
+                $("#node-config-input-HVAC-auto").prop("checked", element["HVAC-auto"]);
+                $("#node-config-input-HVAC-heat").prop("checked", element["HVAC-heat"]);
+                $("#node-config-input-HVAC-cool").prop("checked", element["HVAC-cool"]);
+
                 element.cssEditor = RED.editor.createEditor({
                     id: "CSS",
                     mode: "ace/mode/css",
@@ -57,6 +61,10 @@ module.exports = {
                 `,
             //When the user clicks save on the editor set our values
             oneditsave: `
+                    element["HVAC-auto"] = $("#node-config-input-HVAC-auto").val();
+                    element["HVAC-heat"] = $("#node-config-input-HVAC-heat").val();
+                    element["HVAC-cool"] = $("#node-config-input-HVAC-cool").val();
+
                     //Set the CSS value
                     element["HVAC-CSS"] = element.cssEditor.getValue();
 
@@ -72,10 +80,9 @@ module.exports = {
                 `,
             //When the user clicks the "copy configuration" button update the values shown
             update: `
-            console.log($("#node-config-input-HVAC-auto"));
-                    $("#node-config-input-HVAC-auto").val(settings.auto.value);
-                    $("#node-config-input-HVAC-heat").val(settings.heat.value);
-                    $("#node-config-input-HVAC-cool").val(settings.cool.value);
+                    $("#node-config-input-HVAC-auto").prop("checked", settings.auto.value);
+                    $("#node-config-input-HVAC-heat").prop("checked", settings.heat.value);
+                    $("#node-config-input-HVAC-cool").prop("checked", settings.cool.value);
 
                     element.cssEditor.setValue(settings.CSS.value);
                     element.cssEditor.clearSelection();
@@ -155,11 +162,10 @@ module.exports = {
 
     //Setup the widget
     setupWidget: function (config) {
-        console.log(this.config);
         this.config.modes = ["off"];
-        if(this.config.auto == true) {this.config.modes.push("auto");}
-        if(this.config.heat == true) {this.config.modes.push("heat");}
-        if(this.config.cool == true) {this.config.modes.push("cool");}
+        if(config["HVAC-auto"] == true) {this.config.modes.push("auto");}
+        if(config["HVAC-heat"] == true) {this.config.modes.push("heat");}
+        if(config["HVAC-cool"] == true) {this.config.modes.push("cool");}
         this.heightMultiplier = this.config.modes.length;
     },
 

@@ -167,6 +167,7 @@ module.exports = {
         if(config["HVAC-heat"] == true) {this.config.modes.push("heat");}
         if(config["HVAC-cool"] == true) {this.config.modes.push("cool");}
         this.heightMultiplier = this.config.modes.length;
+        if(this.heightMultiplier < 3){this.heightMultiplier = 3;}
     },
 
     //When node red redeploys or closes
@@ -258,8 +259,9 @@ module.exports = {
         var html = "";
         var values = this.getValues();
         var generatedValues = this.generateValues(values);
+        var height = this.config.modes.length < 3 ? 3 : this.config.modes.length;
 
-        var buttonHeight = `height: calc((100% / ${this.config.modes.length}) - 10px)`;
+        var buttonHeight = `height: calc((100% / ${height}) - 10px)`;
 
         //Add the modes
         var modesHTML = "";
@@ -286,7 +288,7 @@ module.exports = {
         tempHTML += util.generateTag(htmlId, "button", "tempDiv", `
             ${util.generateTag(htmlId, "h1", "currentTemperature", `${generatedValues.currentTemperatureHTML}`, "")}
             ${util.generateTag(htmlId, "h2", "setTemperature", `${generatedValues.setTemperatureHTML}`, `value=${values["setTemperature"]}`)}
-        `, `class="${util.generateCSSClass(htmlId, "button")} ${util.generateCSSClass(htmlId, generatedValues.currentClass)}" style="height: calc((100% / ${(this.config.modes.length - 2)}) - 10px);"`);
+        `, `class="${util.generateCSSClass(htmlId, "button")} ${util.generateCSSClass(htmlId, generatedValues.currentClass)}" style="height: calc((100% / ${height == 3 ? 3 : 2}) - 10px);"`);
 
         //Add the plus minus buttons for temperature
         tempHTML += util.generateTag(htmlId, "button", "tempPlus", "+", `class="${util.generateCSSClass(htmlId, "button")}" style="${buttonHeight}"`);

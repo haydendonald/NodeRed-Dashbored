@@ -9,7 +9,7 @@ Allows a HVAC or AC unit to be controlled.
 * `Enable Cool Mode`: If the cool mode is available.
 
 ## Example
-![](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/example/HVAC.png)
+![](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/examples/HVAC.png)
 Download example [JSON](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/examples/HVAC.json)
 ### Input
 Sending a payload will set the HVAC

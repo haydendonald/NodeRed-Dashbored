@@ -23,3 +23,8 @@ Stacks many other widgets horizontally
 Stacks many other widgets vertically
 
 ![Vertical Stack](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/widgets/vertStack.png)
+
+## [HVAC](https://github.com/haydendonald/NodeRed-Dashbored/blob/main/doc/widgetTypes/HVAC.md)
+Control a HVAC unit
+
+![HVAC](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/widgets/HVAC.png)

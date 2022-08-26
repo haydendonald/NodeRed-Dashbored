@@ -219,7 +219,7 @@ module.exports = {
         var currentClass;
 
         //Generate the set temperature html
-        var currentTemperatureHTML = `Currently ${values.currentTemperature}`;
+        var currentTemperatureHTML = `Currently ${values.currentTemperature}°`;
         var setTemperatureHTML = `Off`;
         if (values.setMode != "off") {
             var action = "Working";
@@ -244,7 +244,7 @@ module.exports = {
                 }
             }
 
-            setTemperatureHTML = `${action} ${values.setTemperature}`;
+            setTemperatureHTML = `${action} ${values.setTemperature}°`;
         }
 
         return {

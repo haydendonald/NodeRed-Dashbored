@@ -14,24 +14,54 @@ A more customizable dashboard for NodeRed, not to be confused with the [NodeRed 
 # Installation
 Simply search for `node-red-contrib-dashbored` in the pallet manager or install using `npm install node-red-contrib-dashbored`
 
+# Supported Widgets
+## [Action Button](https://github.com/haydendonald/NodeRed-Dashbored/blob/main/doc/widgetTypes/actionButton.md)
+Is a simple button that performs an action.
+
+![Action Button](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/widgets/actionButton.png)
+
+## [Toggle Button](https://github.com/haydendonald/NodeRed-Dashbored/blob/main/doc/widgetTypes/toggleButton.md)
+Switches between two states. Useful for on/off applications.
+
+![Toggle Button](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/widgets/toggleButton.png)
+
+## [Button Selector](https://github.com/haydendonald/NodeRed-Dashbored/blob/main/doc/widgetTypes/buttonSelector.md)
+This allows for a selection of a value using a simple button layout
+
+![Button Selector](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/widgets/buttonSelector.png)
+
+## [Horizontal Stack](https://github.com/haydendonald/NodeRed-Dashbored/blob/main/doc/widgetTypes/horizontalStack.md)
+Stacks many other widgets horizontally
+
+![Horizontal Stack](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/widgets/horStack.png)
+
+## [Vertical Stack](https://github.com/haydendonald/NodeRed-Dashbored/blob/main/doc/widgetTypes/verticalStack.md)
+Stacks many other widgets vertically
+
+![Vertical Stack](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/widgets/vertStack.png)
+
+## [HVAC](https://github.com/haydendonald/NodeRed-Dashbored/blob/main/doc/widgetTypes/HVAC.md)
+Control a HVAC unit
+
+![HVAC](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/widgets/HVAC.png)
+
+
 # Learn More
 ## [Widgets](https://github.com/haydendonald/NodeRed-Dashbored/blob/main/doc/widget.md)
-
-## [Supported Widgets](https://github.com/haydendonald/NodeRed-Dashbored/blob/main/doc/widgetTypes.md)
 
 ## [The Dashbored Node](https://github.com/haydendonald/NodeRed-Dashbored/blob/main/doc/dashbored.md)
 
 ## [The Server Node](https://github.com/haydendonald/NodeRed-Dashbored/blob/main/doc/server.md)
 
-## [Development](https://github.com/haydendonald/NodeRed-Dashbored/wiki)
+## [Development](https://github.com/haydendonald/NodeRed-Dashbored/blob/main/doc/development.md)
 
-# Examples
-## Dynamic Widget Options
+## Examples
+### Dynamic Widget Options
 Sometimes it can be useful to modify widgets dynamically. In this example we will set the options of a few widgets dynamically.
 
 [Example JSON](./examples/dynamicWidgetOptions.json)
 
-## Custom Dynamic Widgets
+### Custom Dynamic Widgets
 Sometimes it can be useful to add widgets dynamically. In this example two custom toggle buttons will be added to a horizontal stack.
 
 [Example JSON](./examples/customWidgets.json)

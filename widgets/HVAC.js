@@ -321,7 +321,7 @@ module.exports = {
                     }
                 }
                 var noAction = function() {}
-                ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")} 
+                ${util.generateWidgetAction(lockedAccess, alwaysPassword, "no", "", "yesAction", "noAction")} 
             `;
         }
 

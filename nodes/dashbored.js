@@ -197,6 +197,20 @@ module.exports = function (RED) {
                     var widthMultiplier = parseFloat(widgetElement.getAttribute("widthMultiplier") || widget.widthMultiplier);
                     var heightMultiplier = parseFloat(widgetElement.getAttribute("heightMultiplier") || widget.heightMultiplier);
 
+                    //Copy in settings
+                    if(widgetElement.getAttribute("setsState")) {
+                        widget.setsState = widgetElement.getAttribute("setsState") == "yes" || widgetElement.getAttribute("setsState") == "true";
+                    }
+                    if(widgetElement.getAttribute("restoreState")) {
+                        widget.restoreState = widgetElement.getAttribute("restoreState") == "yes" || widgetElement.getAttribute("restoreState") == "true";
+                    }
+                    if(widgetElement.getAttribute("widthMultiplier")) {
+                        widget.widthMultiplier = parseFloat(widgetElement.getAttribute("widthMultiplier"));
+                    }
+                    if(widgetElement.getAttribute("heightMultiplier")) {
+                        widget.heightMultiplier = parseFloat(widgetElement.getAttribute("heightMultiplier"));
+                    }
+
                     //Hide the widget when locked
                     if (lockedAccess == "no") {
                         document.addScript(`

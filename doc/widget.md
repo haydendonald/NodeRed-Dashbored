@@ -46,6 +46,12 @@ It is also possible to alter the widget settings with the following. These optio
     payload: {
         //Any options to alter here for example
         title: "Hello World!"
+        restoreState: true,
+        setsState: true,
+        widthMultiplier: 1,
+        heightMultiplier: 1,
+        CSS: ""
+        //Extra widget settings
     }
 }
 ```

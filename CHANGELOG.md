@@ -44,3 +44,5 @@
 * Fixed a bug where if the dashbored were to reload while NodeRed is redeploying it would crash node-red.
 ## - 0.5.1
 * Removed ask from the temperature adjustments for the HVAC widget
+## - 0.5.2
+* Added restoreState, setState, widthMultipliers to the widgets

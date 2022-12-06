@@ -81,6 +81,10 @@
         <input type="checkbox" id="node-config-input-alwaysShowLockButton" placeholder="true">
     </div>
     <div class="form-row">
+        <label for="node-config-input-htmlToDOM"><i class="icon-tag"></i> Add console messages to HTML (for debugging)</label>
+        <input type="checkbox" id="node-config-input-htmlToDOM" placeholder="true">
+    </div>
+    <div class="form-row">
         <label for="node-config-input-navMode"><i class="icon-tag"></i> Navigation Bar Position</label>
         <input type="text" id="node-config-input-navMode" placeholder="right">
     </div>
@@ -143,6 +147,9 @@
                 value: true
             },
             alwaysShowLockButton: {
+                value: false
+            },
+            htmlToDOM: {
                 value: false
             },
             navMode: {

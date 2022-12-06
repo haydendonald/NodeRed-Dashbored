@@ -24,6 +24,7 @@ module.exports = function (RED) {
         var alwaysShowLockButton = config.alwaysShowLockButton;
         var showHeader = config.showHeader;
         var showNav = config.showNav;
+        var consoleToDOM = config.htmlToDOM || false;
 
         var baseHeight = config.baseHeight || "150px";
         var baseWidth = config.baseWidth || "200px";
@@ -198,16 +199,16 @@ module.exports = function (RED) {
                     var heightMultiplier = parseFloat(widgetElement.getAttribute("heightMultiplier") || widget.heightMultiplier);
 
                     //Copy in settings
-                    if(widgetElement.getAttribute("setsState")) {
+                    if (widgetElement.getAttribute("setsState")) {
                         widget.setsState = widgetElement.getAttribute("setsState") == "yes" || widgetElement.getAttribute("setsState") == "true";
                     }
-                    if(widgetElement.getAttribute("restoreState")) {
+                    if (widgetElement.getAttribute("restoreState")) {
                         widget.restoreState = widgetElement.getAttribute("restoreState") == "yes" || widgetElement.getAttribute("restoreState") == "true";
                     }
-                    if(widgetElement.getAttribute("widthMultiplier")) {
+                    if (widgetElement.getAttribute("widthMultiplier")) {
                         widget.widthMultiplier = parseFloat(widgetElement.getAttribute("widthMultiplier"));
                     }
-                    if(widgetElement.getAttribute("heightMultiplier")) {
+                    if (widgetElement.getAttribute("heightMultiplier")) {
                         widget.heightMultiplier = parseFloat(widgetElement.getAttribute("heightMultiplier"));
                     }
 
@@ -242,11 +243,11 @@ module.exports = function (RED) {
                     var CSS = function () {
                         var ret = `
                         #${randomId}_widget {`
-                        
-                        if(!widget.noHeight) {
+
+                        if (!widget.noHeight) {
                             ret += `height: calc(${baseHeight} * ${heightMultiplier});`;
                         }
-                        if(!widget.noWidth) {
+                        if (!widget.noWidth) {
                             ret += `width: calc(${baseWidth} * ${widthMultiplier}) ;`;
                         }
                         if (widget.minWidth) {
@@ -557,6 +558,23 @@ module.exports = function (RED) {
 
             //Generate the pages 
             addPagesToDashbored(document);
+
+            //Add the debug console on HTML
+            if (consoleToDOM == true) {
+                document.addScript(`
+                if (typeof console  != "undefined") 
+                if (typeof console.log != 'undefined')
+                    console.olog = console.log;
+                else
+                    console.olog = function() {};
+
+                console.log = function(message) {
+                    console.olog(message);
+                    document.getElementById("debug").append('<p>' + message + '</p>  ');
+                };
+                console.error = console.debug = console.info =  console.log
+                `);
+            }
 
             //Add the onload scripts and delete the element
             var sessionId = util.randString();

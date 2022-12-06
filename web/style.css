@@ -256,6 +256,13 @@ button:focus {
     }
 }
 
+#debug {
+    position: absolute;
+    z-index: 99;
+    background-color: black;
+    color: white;
+}
+
 /** Loader **/
 
 #loader {

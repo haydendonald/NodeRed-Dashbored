@@ -46,3 +46,5 @@
 * Removed ask from the temperature adjustments for the HVAC widget
 ## - 0.5.2
 * Added restoreState, setState, widthMultipliers to the widgets
+## - 0.5.3
+* Added the ability to debug the the page by sending console messages to the DOM

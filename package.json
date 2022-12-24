@@ -18,6 +18,9 @@
         "control",
         "touch"
     ],
+    "engines": {
+        "node": ">=12.0.0"
+    },
     "node-red": {
         "nodes": {
             "dashbored-server": "./nodes/server.js",
@@ -25,7 +28,8 @@
             "dashbored-dashbored": "./nodes/dashbored.js",
             "dashbored-widget-node": "./nodes/widgetNode.js",
             "dashbored-node": "./nodes/dashboredNode.js"
-        }
+        },
+        "version": ">=2.0.0"
     },
     "author": "Hayden Donald",
     "bugs": {

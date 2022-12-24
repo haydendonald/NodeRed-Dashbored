@@ -1,7 +1,7 @@
 {
     "name": "node-red-contrib-dashbored",
-    "version": "0.5.3",
-    "description": "A more customizable dashboard for NodeRed",
+    "version": "1.0.0",
+    "description": "A customizable dashboard for NodeRed",
     "main": "",
     "repository": {
         "type": "git",

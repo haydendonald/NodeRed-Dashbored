@@ -1,0 +1,538 @@
+[
+    {
+        "id": "48a3768dde4ecff9",
+        "type": "dashbored-node",
+        "z": "7c1c2953339d9ae1",
+        "name": "Example Dashbored 1",
+        "dashbored": "f9a3e522a3bc9bc4",
+        "x": 380,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e8ca25985a0a9cd4",
+        "type": "dashbored-node",
+        "z": "7c1c2953339d9ae1",
+        "name": "Example Dashbored 2",
+        "dashbored": "a69033f005c277fa",
+        "x": 380,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7f65d287db303db6",
+        "type": "dashbored-widget-node",
+        "z": "7c1c2953339d9ae1",
+        "name": "Toggle Button",
+        "widget": "563b6fc60531e2c4",
+        "onlyOutputOnInput": false,
+        "sendSetToOutput": false,
+        "getOutputOthers": false,
+        "x": 360,
+        "y": 240,
+        "wires": [
+            [
+                "da8309ce2e3616a6"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "9659d50f8da82583",
+        "type": "dashbored-widget-node",
+        "z": "7c1c2953339d9ae1",
+        "name": "Button Selector",
+        "widget": "9594faf78c63bda4",
+        "onlyOutputOnInput": false,
+        "sendSetToOutput": false,
+        "getOutputOthers": false,
+        "x": 360,
+        "y": 280,
+        "wires": [
+            [
+                "da8309ce2e3616a6"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "a428fe43b42dd93e",
+        "type": "dashbored-widget-node",
+        "z": "7c1c2953339d9ae1",
+        "name": "Horizontal Stack",
+        "widget": "abc9d0f5616c9052",
+        "onlyOutputOnInput": false,
+        "sendSetToOutput": false,
+        "getOutputOthers": false,
+        "x": 360,
+        "y": 320,
+        "wires": [
+            [
+                "da8309ce2e3616a6"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "622b2d560a350e31",
+        "type": "dashbored-widget-node",
+        "z": "7c1c2953339d9ae1",
+        "name": "Vertical Stack",
+        "widget": "16a969cb9deb4e49",
+        "onlyOutputOnInput": false,
+        "sendSetToOutput": false,
+        "getOutputOthers": false,
+        "x": 360,
+        "y": 360,
+        "wires": [
+            [
+                "da8309ce2e3616a6"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "ba0885973268e538",
+        "type": "dashbored-widget-node",
+        "z": "7c1c2953339d9ae1",
+        "name": "Volume",
+        "widget": "fc3ed37caaad0243",
+        "onlyOutputOnInput": false,
+        "sendSetToOutput": false,
+        "getOutputOthers": false,
+        "x": 340,
+        "y": 400,
+        "wires": [
+            [
+                "da8309ce2e3616a6"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "79d58d5dce99026b",
+        "type": "dashbored-widget-node",
+        "z": "7c1c2953339d9ae1",
+        "name": "Action Button",
+        "widget": "6ac2c0bc823c2cfe",
+        "onlyOutputOnInput": false,
+        "sendSetToOutput": false,
+        "getOutputOthers": false,
+        "x": 360,
+        "y": 440,
+        "wires": [
+            [
+                "da8309ce2e3616a6"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "d3b19fb504fec189",
+        "type": "dashbored-widget-node",
+        "z": "7c1c2953339d9ae1",
+        "name": "HVAC",
+        "widget": "f3110c8863ebaeb0",
+        "onlyOutputOnInput": false,
+        "sendSetToOutput": false,
+        "getOutputOthers": false,
+        "x": 330,
+        "y": 480,
+        "wires": [
+            [
+                "da8309ce2e3616a6"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "da8309ce2e3616a6",
+        "type": "debug",
+        "z": "7c1c2953339d9ae1",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 600,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "f9a3e522a3bc9bc4",
+        "type": "dashbored-dashbored",
+        "name": "Example Dashbored 1",
+        "server": "996f910b8a42f234",
+        "endpoint": "example1",
+        "password": "",
+        "headerImage": "",
+        "headerText": "Dashbored",
+        "showClock": true,
+        "showWeather": true,
+        "showHeader": true,
+        "showNav": true,
+        "alwaysShowLockButton": false,
+        "htmlToDOM": false,
+        "navMode": "bottom",
+        "baseHeight": "150px",
+        "baseWidth": "200px",
+        "headerHeight": "60px",
+        "navHeight": "100px",
+        "HTML": "<page name=\"Example 1\" icon=\"fa-home\">\n    <widget name=\"Toggle Button\" id=\"563b6fc60531e2c4\"></widget>\n    <widget name=\"Button Selector\" id=\"9594faf78c63bda4\"></widget>\n    <widget name=\"Horizontal Stack\" id=\"abc9d0f5616c9052\"></widget>\n    <widget name=\"Vertical Stack\" id=\"16a969cb9deb4e49\"></widget>\n    <widget name=\"Volume\" id=\"fc3ed37caaad0243\"></widget>\n    <widget name=\"Action Button\" id=\"6ac2c0bc823c2cfe\"></widget>\n    <widget name=\"HVAC\" id=\"f3110c8863ebaeb0\"></widget>\n</page>",
+        "CSS": "/* You can add custom CSS styling here, see https://github.com/haydendonald/NodeRed-Dashbored/wiki/Dashbored#css-classes */"
+    },
+    {
+        "id": "a69033f005c277fa",
+        "type": "dashbored-dashbored",
+        "name": "Example Dashbored 2",
+        "server": "996f910b8a42f234",
+        "endpoint": "example2",
+        "password": "",
+        "headerImage": "",
+        "headerText": "Dashbored",
+        "showClock": true,
+        "showWeather": true,
+        "showHeader": true,
+        "showNav": true,
+        "alwaysShowLockButton": false,
+        "htmlToDOM": false,
+        "navMode": "bottom",
+        "baseHeight": "150px",
+        "baseWidth": "200px",
+        "headerHeight": "60px",
+        "navHeight": "100px",
+        "HTML": "<page name=\"Example 1\" icon=\"fa-home\">\n    <widget name=\"Toggle Button\" id=\"563b6fc60531e2c4\"></widget>\n    <widget name=\"Button Selector\" id=\"9594faf78c63bda4\"></widget>\n    <widget name=\"Horizontal Stack\" id=\"abc9d0f5616c9052\"></widget>\n    <widget name=\"Vertical Stack\" id=\"16a969cb9deb4e49\"></widget>\n</page>",
+        "CSS": "/* You can add custom CSS styling here, see https://github.com/haydendonald/NodeRed-Dashbored/wiki/Dashbored#css-classes */"
+    },
+    {
+        "id": "563b6fc60531e2c4",
+        "type": "dashbored-widget",
+        "name": "Toggle Button",
+        "server": "996f910b8a42f234",
+        "widgetType": "toggleButton",
+        "widthMultiplier": "1",
+        "heightMultiplier": "1",
+        "title": "Toggle Button 1",
+        "restoreState": true,
+        "setsState": true,
+        "toggleButton-text": "Toggle Button",
+        "toggleButton-onValue": "on",
+        "toggleButton-offValue": "off",
+        "toggleButton-CSS": ".on {\nbackground-color: #32CD32;\ncolor: white;\n}\n.off {\nbackground-color: #f2f2f2;\ncolor: black;\n}\n#button {\nwidth: calc(100% - 10px);\nheight: calc(100% - 10px);\nmargin: 5px;\n}\n#widget {}\n#title {}\n#content {}",
+        "buttonSelector-options": [
+            {
+                "label": "Option 0",
+                "value": "option_0",
+                "onColor": "#32CD32",
+                "offColor": "#ff3333"
+            },
+            {
+                "label": "Option 1",
+                "value": "option_1",
+                "onColor": "#32CD32",
+                "offColor": "#ff3333"
+            }
+        ],
+        "buttonSelector-CSS": ".button {\nwidth: calc(100% - 10px);\nmargin: 5px;\n}\n.on {}\n.off {}",
+        "horizontalStack-widgetsHTML": [],
+        "verticalStack-widgetsHTML": [],
+        "volume-mutedValue": "on",
+        "volume-unmutedValue": "off",
+        "volume-increment": 1,
+        "volume-CSS": "#volumeLevelContainer {\ntransform: rotate(180deg);\noverflow: hidden;\nbackground-color: white;\nwidth: 20%;\nheight: 90%;\nmargin-top: 5%;\nmargin-left: 10%;\nmargin-right: 5%;\nfloat: right;\nborder-radius: 10em;\n}\n#volumeLevelTop {\nbackground-color: #01e301;\nwidth: 100%;\nheight: 100%;\n}\n#buttonContainer {\nfloat: right;\nheight: 100%;\nwidth: 60%;\n}\n.button {\ndisplay: block;\nwidth: 100%;\nheight: calc((100%/3) - (2.5px * 3));\npadding: 0;\nmargin-top: 5px;\ntransition: background-color 0.1s;\n}\n.mutedColor {\nbackground-color: red !important;\n}\n.clickColor {\nbackground-color: white !important;\n}",
+        "actionButton-text": "Action Button",
+        "actionButton-color": "#434343",
+        "actionButton-flashColor": "#f2f2f2",
+        "actionButton-CSS": "#button {\nwidth: calc(100% - 10px);\nheight: calc(100% - 10px);\nmargin: 5px;\ntransition: background-color 0.1s ease;\n}",
+        "HVAC-auto": true,
+        "HVAC-heat": true,
+        "HVAC-cool": true,
+        "HVAC-CSS": ".button {\nwidth: calc(100% - 10px);\nmargin: 5px;\n}\n.div {\nheight: 100%;\nwidth: 50%;\nfloat: left;\n}\n.tempDiv {\ntext-align: center;\nwidth: calc(100% - 10px);\npadding: 5px;\n}\n.innerTempDiv {\nbackground-color: gray;\nborder-radius: 20px;\npadding: 20px;\n}\n.button h1 {\nfont-size: 150%;\n}\n.button h2 {\nfont-size: 100%;\nmargin-top: 10px;\n}\n.autoColor {\nbackground-color: rgb(50, 205, 50);\n}\n.heatColor {\nbackground-color: rgb(205, 50, 50);\n}\n.coolColor {\nbackground-color: rgb(50, 100, 205);\n}\n.offColor {\nbackground-color: gray;\n}"
+    },
+    {
+        "id": "9594faf78c63bda4",
+        "type": "dashbored-widget",
+        "name": "Button Selector",
+        "server": "996f910b8a42f234",
+        "widgetType": "buttonSelector",
+        "widthMultiplier": "1",
+        "heightMultiplier": "1",
+        "title": "Button Selector",
+        "restoreState": true,
+        "setsState": true,
+        "toggleButton-text": "Toggle Button",
+        "toggleButton-onValue": "on",
+        "toggleButton-offValue": "off",
+        "toggleButton-CSS": ".on {\nbackground-color: #32CD32;\ncolor: white;\n}\n.off {\nbackground-color: #f2f2f2;\ncolor: black;\n}\n#button {\nwidth: calc(100% - 10px);\nheight: calc(100% - 10px);\nmargin: 5px;\n}\n#widget {}\n#title {}\n#content {}",
+        "buttonSelector-options": [
+            {
+                "label": "Option 0",
+                "value": "option_0",
+                "onColor": "#32cd32",
+                "offColor": "#ff3333"
+            },
+            {
+                "label": "Option 1",
+                "value": "option_1",
+                "onColor": "#32cd32",
+                "offColor": "#ff3333"
+            }
+        ],
+        "buttonSelector-CSS": ".button {\nwidth: calc(100% - 10px);\nmargin: 5px;\n}\n.on {}\n.off {}",
+        "horizontalStack-widgetsHTML": [],
+        "verticalStack-widgetsHTML": [],
+        "volume-mutedValue": "on",
+        "volume-unmutedValue": "off",
+        "volume-increment": 1,
+        "volume-CSS": "#volumeLevelContainer {\ntransform: rotate(180deg);\noverflow: hidden;\nbackground-color: white;\nwidth: 20%;\nheight: 90%;\nmargin-top: 5%;\nmargin-left: 10%;\nmargin-right: 5%;\nfloat: right;\nborder-radius: 10em;\n}\n#volumeLevelTop {\nbackground-color: #01e301;\nwidth: 100%;\nheight: 100%;\n}\n#buttonContainer {\nfloat: right;\nheight: 100%;\nwidth: 60%;\n}\n.button {\ndisplay: block;\nwidth: 100%;\nheight: calc((100%/3) - (2.5px * 3));\npadding: 0;\nmargin-top: 5px;\ntransition: background-color 0.1s;\n}\n.mutedColor {\nbackground-color: red !important;\n}\n.clickColor {\nbackground-color: white !important;\n}",
+        "actionButton-text": "Action Button",
+        "actionButton-color": "#434343",
+        "actionButton-flashColor": "#f2f2f2",
+        "actionButton-CSS": "#button {\nwidth: calc(100% - 10px);\nheight: calc(100% - 10px);\nmargin: 5px;\ntransition: background-color 0.1s ease;\n}",
+        "HVAC-auto": true,
+        "HVAC-heat": true,
+        "HVAC-cool": true,
+        "HVAC-CSS": ".button {\nwidth: calc(100% - 10px);\nmargin: 5px;\n}\n.div {\nheight: 100%;\nwidth: 50%;\nfloat: left;\n}\n.tempDiv {\ntext-align: center;\nwidth: calc(100% - 10px);\npadding: 5px;\n}\n.innerTempDiv {\nbackground-color: gray;\nborder-radius: 20px;\npadding: 20px;\n}\n.button h1 {\nfont-size: 150%;\n}\n.button h2 {\nfont-size: 100%;\nmargin-top: 10px;\n}\n.autoColor {\nbackground-color: rgb(50, 205, 50);\n}\n.heatColor {\nbackground-color: rgb(205, 50, 50);\n}\n.coolColor {\nbackground-color: rgb(50, 100, 205);\n}\n.offColor {\nbackground-color: gray;\n}"
+    },
+    {
+        "id": "abc9d0f5616c9052",
+        "type": "dashbored-widget",
+        "name": "Horizontal Stack",
+        "server": "996f910b8a42f234",
+        "widgetType": "horizontalStack",
+        "widthMultiplier": "1",
+        "heightMultiplier": "1",
+        "title": "Horizontal Stack",
+        "restoreState": true,
+        "setsState": true,
+        "toggleButton-text": "Toggle Button",
+        "toggleButton-onValue": "on",
+        "toggleButton-offValue": "off",
+        "toggleButton-CSS": ".on {\nbackground-color: #32CD32;\ncolor: white;\n}\n.off {\nbackground-color: #f2f2f2;\ncolor: black;\n}\n#button {\nwidth: calc(100% - 10px);\nheight: calc(100% - 10px);\nmargin: 5px;\n}\n#widget {}\n#title {}\n#content {}",
+        "buttonSelector-options": [
+            {
+                "label": "Option 0",
+                "value": "option_0",
+                "onColor": "#32CD32",
+                "offColor": "#ff3333"
+            },
+            {
+                "label": "Option 1",
+                "value": "option_1",
+                "onColor": "#32CD32",
+                "offColor": "#ff3333"
+            }
+        ],
+        "buttonSelector-CSS": ".button {\nwidth: calc(100% - 10px);\nmargin: 5px;\n}\n.on {}\n.off {}",
+        "horizontalStack-widgets": "563b6fc60531e2c4,563b6fc60531e2c4",
+        "verticalStack-widgetsHTML": [],
+        "volume-mutedValue": "on",
+        "volume-unmutedValue": "off",
+        "volume-increment": 1,
+        "volume-CSS": "#volumeLevelContainer {\ntransform: rotate(180deg);\noverflow: hidden;\nbackground-color: white;\nwidth: 20%;\nheight: 90%;\nmargin-top: 5%;\nmargin-left: 10%;\nmargin-right: 5%;\nfloat: right;\nborder-radius: 10em;\n}\n#volumeLevelTop {\nbackground-color: #01e301;\nwidth: 100%;\nheight: 100%;\n}\n#buttonContainer {\nfloat: right;\nheight: 100%;\nwidth: 60%;\n}\n.button {\ndisplay: block;\nwidth: 100%;\nheight: calc((100%/3) - (2.5px * 3));\npadding: 0;\nmargin-top: 5px;\ntransition: background-color 0.1s;\n}\n.mutedColor {\nbackground-color: red !important;\n}\n.clickColor {\nbackground-color: white !important;\n}",
+        "actionButton-text": "Action Button",
+        "actionButton-color": "#434343",
+        "actionButton-flashColor": "#f2f2f2",
+        "actionButton-CSS": "#button {\nwidth: calc(100% - 10px);\nheight: calc(100% - 10px);\nmargin: 5px;\ntransition: background-color 0.1s ease;\n}",
+        "HVAC-auto": true,
+        "HVAC-heat": true,
+        "HVAC-cool": true,
+        "HVAC-CSS": ".button {\nwidth: calc(100% - 10px);\nmargin: 5px;\n}\n.div {\nheight: 100%;\nwidth: 50%;\nfloat: left;\n}\n.tempDiv {\ntext-align: center;\nwidth: calc(100% - 10px);\npadding: 5px;\n}\n.innerTempDiv {\nbackground-color: gray;\nborder-radius: 20px;\npadding: 20px;\n}\n.button h1 {\nfont-size: 150%;\n}\n.button h2 {\nfont-size: 100%;\nmargin-top: 10px;\n}\n.autoColor {\nbackground-color: rgb(50, 205, 50);\n}\n.heatColor {\nbackground-color: rgb(205, 50, 50);\n}\n.coolColor {\nbackground-color: rgb(50, 100, 205);\n}\n.offColor {\nbackground-color: gray;\n}"
+    },
+    {
+        "id": "16a969cb9deb4e49",
+        "type": "dashbored-widget",
+        "name": "Vertical Stack",
+        "server": "996f910b8a42f234",
+        "widgetType": "verticalStack",
+        "widthMultiplier": "1",
+        "heightMultiplier": "1",
+        "title": "Vertical Stack",
+        "restoreState": true,
+        "setsState": true,
+        "toggleButton-text": "Toggle Button",
+        "toggleButton-onValue": "on",
+        "toggleButton-offValue": "off",
+        "toggleButton-CSS": ".on {\nbackground-color: #32CD32;\ncolor: white;\n}\n.off {\nbackground-color: #f2f2f2;\ncolor: black;\n}\n#button {\nwidth: calc(100% - 10px);\nheight: calc(100% - 10px);\nmargin: 5px;\n}\n#widget {}\n#title {}\n#content {}",
+        "buttonSelector-options": [
+            {
+                "label": "Option 0",
+                "value": "option_0",
+                "onColor": "#32CD32",
+                "offColor": "#ff3333"
+            },
+            {
+                "label": "Option 1",
+                "value": "option_1",
+                "onColor": "#32CD32",
+                "offColor": "#ff3333"
+            }
+        ],
+        "buttonSelector-CSS": ".button {\nwidth: calc(100% - 10px);\nmargin: 5px;\n}\n.on {}\n.off {}",
+        "horizontalStack-widgetsHTML": [],
+        "verticalStack-widgets": "563b6fc60531e2c4,563b6fc60531e2c4",
+        "volume-mutedValue": "on",
+        "volume-unmutedValue": "off",
+        "volume-increment": 1,
+        "volume-CSS": "#volumeLevelContainer {\ntransform: rotate(180deg);\noverflow: hidden;\nbackground-color: white;\nwidth: 20%;\nheight: 90%;\nmargin-top: 5%;\nmargin-left: 10%;\nmargin-right: 5%;\nfloat: right;\nborder-radius: 10em;\n}\n#volumeLevelTop {\nbackground-color: #01e301;\nwidth: 100%;\nheight: 100%;\n}\n#buttonContainer {\nfloat: right;\nheight: 100%;\nwidth: 60%;\n}\n.button {\ndisplay: block;\nwidth: 100%;\nheight: calc((100%/3) - (2.5px * 3));\npadding: 0;\nmargin-top: 5px;\ntransition: background-color 0.1s;\n}\n.mutedColor {\nbackground-color: red !important;\n}\n.clickColor {\nbackground-color: white !important;\n}",
+        "actionButton-text": "Action Button",
+        "actionButton-color": "#434343",
+        "actionButton-flashColor": "#f2f2f2",
+        "actionButton-CSS": "#button {\nwidth: calc(100% - 10px);\nheight: calc(100% - 10px);\nmargin: 5px;\ntransition: background-color 0.1s ease;\n}",
+        "HVAC-auto": true,
+        "HVAC-heat": true,
+        "HVAC-cool": true,
+        "HVAC-CSS": ".button {\nwidth: calc(100% - 10px);\nmargin: 5px;\n}\n.div {\nheight: 100%;\nwidth: 50%;\nfloat: left;\n}\n.tempDiv {\ntext-align: center;\nwidth: calc(100% - 10px);\npadding: 5px;\n}\n.innerTempDiv {\nbackground-color: gray;\nborder-radius: 20px;\npadding: 20px;\n}\n.button h1 {\nfont-size: 150%;\n}\n.button h2 {\nfont-size: 100%;\nmargin-top: 10px;\n}\n.autoColor {\nbackground-color: rgb(50, 205, 50);\n}\n.heatColor {\nbackground-color: rgb(205, 50, 50);\n}\n.coolColor {\nbackground-color: rgb(50, 100, 205);\n}\n.offColor {\nbackground-color: gray;\n}"
+    },
+    {
+        "id": "fc3ed37caaad0243",
+        "type": "dashbored-widget",
+        "name": "Volume",
+        "server": "996f910b8a42f234",
+        "widgetType": "volume",
+        "widthMultiplier": "1",
+        "heightMultiplier": "1",
+        "title": "Volume",
+        "restoreState": true,
+        "setsState": true,
+        "toggleButton-text": "Toggle Button",
+        "toggleButton-onValue": "on",
+        "toggleButton-offValue": "off",
+        "toggleButton-CSS": ".on {\nbackground-color: #32CD32;\ncolor: white;\n}\n.off {\nbackground-color: #f2f2f2;\ncolor: black;\n}\n#button {\nwidth: calc(100% - 10px);\nheight: calc(100% - 10px);\nmargin: 5px;\n}\n#widget {}\n#title {}\n#content {}",
+        "buttonSelector-options": [
+            {
+                "label": "Option 0",
+                "value": "option_0",
+                "onColor": "#32CD32",
+                "offColor": "#ff3333"
+            },
+            {
+                "label": "Option 1",
+                "value": "option_1",
+                "onColor": "#32CD32",
+                "offColor": "#ff3333"
+            }
+        ],
+        "buttonSelector-CSS": ".button {\nwidth: calc(100% - 10px);\nmargin: 5px;\n}\n.on {}\n.off {}",
+        "horizontalStack-widgetsHTML": [],
+        "verticalStack-widgetsHTML": [],
+        "volume-mutedValue": "on",
+        "volume-unmutedValue": "off",
+        "volume-increment": 1,
+        "volume-CSS": "#volumeLevelContainer {\ntransform: rotate(180deg);\noverflow: hidden;\nbackground-color: white;\nwidth: 20%;\nheight: 90%;\nmargin-top: 5%;\nmargin-left: 10%;\nmargin-right: 5%;\nfloat: right;\nborder-radius: 10em;\n}\n#volumeLevelTop {\nbackground-color: #01e301;\nwidth: 100%;\nheight: 100%;\n}\n#buttonContainer {\nfloat: right;\nheight: 100%;\nwidth: 60%;\n}\n.button {\ndisplay: block;\nwidth: 100%;\nheight: calc((100%/3) - (2.5px * 3));\npadding: 0;\nmargin-top: 5px;\ntransition: background-color 0.1s;\n}\n.mutedColor {\nbackground-color: red !important;\n}\n.clickColor {\nbackground-color: white !important;\n}",
+        "actionButton-text": "Action Button",
+        "actionButton-color": "#434343",
+        "actionButton-flashColor": "#f2f2f2",
+        "actionButton-CSS": "#button {\nwidth: calc(100% - 10px);\nheight: calc(100% - 10px);\nmargin: 5px;\ntransition: background-color 0.1s ease;\n}",
+        "HVAC-auto": true,
+        "HVAC-heat": true,
+        "HVAC-cool": true,
+        "HVAC-CSS": ".button {\nwidth: calc(100% - 10px);\nmargin: 5px;\n}\n.div {\nheight: 100%;\nwidth: 50%;\nfloat: left;\n}\n.tempDiv {\ntext-align: center;\nwidth: calc(100% - 10px);\npadding: 5px;\n}\n.innerTempDiv {\nbackground-color: gray;\nborder-radius: 20px;\npadding: 20px;\n}\n.button h1 {\nfont-size: 150%;\n}\n.button h2 {\nfont-size: 100%;\nmargin-top: 10px;\n}\n.autoColor {\nbackground-color: rgb(50, 205, 50);\n}\n.heatColor {\nbackground-color: rgb(205, 50, 50);\n}\n.coolColor {\nbackground-color: rgb(50, 100, 205);\n}\n.offColor {\nbackground-color: gray;\n}"
+    },
+    {
+        "id": "6ac2c0bc823c2cfe",
+        "type": "dashbored-widget",
+        "name": "Action Button",
+        "server": "996f910b8a42f234",
+        "widgetType": "actionButton",
+        "widthMultiplier": "1",
+        "heightMultiplier": "1",
+        "title": "Action Button",
+        "restoreState": true,
+        "setsState": true,
+        "toggleButton-text": "Toggle Button",
+        "toggleButton-onValue": "on",
+        "toggleButton-offValue": "off",
+        "toggleButton-CSS": ".on {\nbackground-color: #32CD32;\ncolor: white;\n}\n.off {\nbackground-color: #f2f2f2;\ncolor: black;\n}\n#button {\nwidth: calc(100% - 10px);\nheight: calc(100% - 10px);\nmargin: 5px;\n}\n#widget {}\n#title {}\n#content {}",
+        "buttonSelector-options": [
+            {
+                "label": "Option 0",
+                "value": "option_0",
+                "onColor": "#32CD32",
+                "offColor": "#ff3333"
+            },
+            {
+                "label": "Option 1",
+                "value": "option_1",
+                "onColor": "#32CD32",
+                "offColor": "#ff3333"
+            }
+        ],
+        "buttonSelector-CSS": ".button {\nwidth: calc(100% - 10px);\nmargin: 5px;\n}\n.on {}\n.off {}",
+        "horizontalStack-widgetsHTML": [],
+        "verticalStack-widgetsHTML": [],
+        "volume-mutedValue": "on",
+        "volume-unmutedValue": "off",
+        "volume-increment": 1,
+        "volume-CSS": "#volumeLevelContainer {\ntransform: rotate(180deg);\noverflow: hidden;\nbackground-color: white;\nwidth: 20%;\nheight: 90%;\nmargin-top: 5%;\nmargin-left: 10%;\nmargin-right: 5%;\nfloat: right;\nborder-radius: 10em;\n}\n#volumeLevelTop {\nbackground-color: #01e301;\nwidth: 100%;\nheight: 100%;\n}\n#buttonContainer {\nfloat: right;\nheight: 100%;\nwidth: 60%;\n}\n.button {\ndisplay: block;\nwidth: 100%;\nheight: calc((100%/3) - (2.5px * 3));\npadding: 0;\nmargin-top: 5px;\ntransition: background-color 0.1s;\n}\n.mutedColor {\nbackground-color: red !important;\n}\n.clickColor {\nbackground-color: white !important;\n}",
+        "actionButton-text": "Action Button",
+        "actionButton-color": "#434343",
+        "actionButton-flashColor": "#f2f2f2",
+        "actionButton-CSS": "#button {\nwidth: calc(100% - 10px);\nheight: calc(100% - 10px);\nmargin: 5px;\ntransition: background-color 0.1s ease;\n}",
+        "HVAC-auto": true,
+        "HVAC-heat": true,
+        "HVAC-cool": true,
+        "HVAC-CSS": ".button {\nwidth: calc(100% - 10px);\nmargin: 5px;\n}\n.div {\nheight: 100%;\nwidth: 50%;\nfloat: left;\n}\n.tempDiv {\ntext-align: center;\nwidth: calc(100% - 10px);\npadding: 5px;\n}\n.innerTempDiv {\nbackground-color: gray;\nborder-radius: 20px;\npadding: 20px;\n}\n.button h1 {\nfont-size: 150%;\n}\n.button h2 {\nfont-size: 100%;\nmargin-top: 10px;\n}\n.autoColor {\nbackground-color: rgb(50, 205, 50);\n}\n.heatColor {\nbackground-color: rgb(205, 50, 50);\n}\n.coolColor {\nbackground-color: rgb(50, 100, 205);\n}\n.offColor {\nbackground-color: gray;\n}"
+    },
+    {
+        "id": "f3110c8863ebaeb0",
+        "type": "dashbored-widget",
+        "name": "HVAC",
+        "server": "996f910b8a42f234",
+        "widgetType": "HVAC",
+        "widthMultiplier": "1",
+        "heightMultiplier": "1",
+        "title": "HVAC",
+        "restoreState": true,
+        "setsState": true,
+        "toggleButton-text": "Toggle Button",
+        "toggleButton-onValue": "on",
+        "toggleButton-offValue": "off",
+        "toggleButton-CSS": ".on {\nbackground-color: #32CD32;\ncolor: white;\n}\n.off {\nbackground-color: #f2f2f2;\ncolor: black;\n}\n#button {\nwidth: calc(100% - 10px);\nheight: calc(100% - 10px);\nmargin: 5px;\n}\n#widget {}\n#title {}\n#content {}",
+        "buttonSelector-options": [
+            {
+                "label": "Option 0",
+                "value": "option_0",
+                "onColor": "#32CD32",
+                "offColor": "#ff3333"
+            },
+            {
+                "label": "Option 1",
+                "value": "option_1",
+                "onColor": "#32CD32",
+                "offColor": "#ff3333"
+            }
+        ],
+        "buttonSelector-CSS": ".button {\nwidth: calc(100% - 10px);\nmargin: 5px;\n}\n.on {}\n.off {}",
+        "horizontalStack-widgetsHTML": [],
+        "verticalStack-widgetsHTML": [],
+        "volume-mutedValue": "on",
+        "volume-unmutedValue": "off",
+        "volume-increment": 1,
+        "volume-CSS": "#volumeLevelContainer {\ntransform: rotate(180deg);\noverflow: hidden;\nbackground-color: white;\nwidth: 20%;\nheight: 90%;\nmargin-top: 5%;\nmargin-left: 10%;\nmargin-right: 5%;\nfloat: right;\nborder-radius: 10em;\n}\n#volumeLevelTop {\nbackground-color: #01e301;\nwidth: 100%;\nheight: 100%;\n}\n#buttonContainer {\nfloat: right;\nheight: 100%;\nwidth: 60%;\n}\n.button {\ndisplay: block;\nwidth: 100%;\nheight: calc((100%/3) - (2.5px * 3));\npadding: 0;\nmargin-top: 5px;\ntransition: background-color 0.1s;\n}\n.mutedColor {\nbackground-color: red !important;\n}\n.clickColor {\nbackground-color: white !important;\n}",
+        "actionButton-text": "Action Button",
+        "actionButton-color": "#434343",
+        "actionButton-flashColor": "#f2f2f2",
+        "actionButton-CSS": "#button {\nwidth: calc(100% - 10px);\nheight: calc(100% - 10px);\nmargin: 5px;\ntransition: background-color 0.1s ease;\n}",
+        "HVAC-auto": true,
+        "HVAC-heat": true,
+        "HVAC-cool": true,
+        "HVAC-CSS": ".button {\nwidth: calc(100% - 10px);\nmargin: 5px;\n}\n.div {\nheight: 100%;\nwidth: 50%;\nfloat: left;\n}\n.tempDiv {\ntext-align: center;\nwidth: calc(100% - 10px);\npadding: 5px;\n}\n.innerTempDiv {\nbackground-color: gray;\nborder-radius: 20px;\npadding: 20px;\n}\n.button h1 {\nfont-size: 150%;\n}\n.button h2 {\nfont-size: 100%;\nmargin-top: 10px;\n}\n.autoColor {\nbackground-color: rgb(50, 205, 50);\n}\n.heatColor {\nbackground-color: rgb(205, 50, 50);\n}\n.coolColor {\nbackground-color: rgb(50, 100, 205);\n}\n.offColor {\nbackground-color: gray;\n}"
+    },
+    {
+        "id": "996f910b8a42f234",
+        "type": "dashbored-server",
+        "name": "Dashbored Server",
+        "weatherLat": "-37.8136",
+        "weatherLong": "144.9631",
+        "weatherUnit": "metric",
+        "apiKey": ""
+    }
+]

@@ -48,3 +48,5 @@
 * Added restoreState, setState, widthMultipliers to the widgets
 ## - 0.5.3
 * Added the ability to debug the the page by sending console messages to the DOM
+## - 1.0.0
+* Release!

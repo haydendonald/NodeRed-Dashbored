@@ -1,4 +1,4 @@
-# NodeRed Dashbored
+# NodeRed Dashbored (Yes, that is spelt correctly)
 A customizable dashboard for NodeRed, not to be confused with the [NodeRed Dashboard](https://github.com/node-red/node-red-dashboard) project.
 
 ![Example 1](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/example1.png)

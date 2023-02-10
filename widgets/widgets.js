@@ -11,5 +11,6 @@ module.exports = [
     require("../widgets/verticalStack.js"),
     require("../widgets/volume.js"),
     require("../widgets/actionButton.js"),
-    require("../widgets/HVAC.js")
+    require("../widgets/HVAC.js"),
+    require("../widgets/draggableVolume.js"),
 ]

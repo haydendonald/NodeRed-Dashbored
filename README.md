@@ -53,6 +53,11 @@ Control a volume channel
 
 ![Volume](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/widgets/volume.png)
 
+## [Draggable Volume](https://github.com/haydendonald/NodeRed-Dashbored/blob/main/doc/widgetTypes/draggableVolume.md)
+Control a volume channel by dragging the slider
+
+![DraggableVolume](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/widgets/draggableVolume.png)
+
 ## [HVAC](https://github.com/haydendonald/NodeRed-Dashbored/blob/main/doc/widgetTypes/HVAC.md)
 Control a HVAC unit
 

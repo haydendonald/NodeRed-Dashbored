@@ -50,3 +50,5 @@
 * Added the ability to debug the the page by sending console messages to the DOM
 ## - 1.0.0
 * Release!
+## - 1.1.0
+* Added a draggable volume widget

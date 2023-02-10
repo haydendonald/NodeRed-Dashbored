@@ -5,8 +5,8 @@ module.exports = {
      * @param {string} id The node element random id
      * @param {string} tag The tag to create
      * @param {string} elementName The element name
-     * @param {string} inner The element name
-     * @param {string} attributes The element name
+     * @param {string} inner The elements inner content
+     * @param {string} attributes The element's attributes like class=""
      */
     generateTag: (id, tag, elementName, inner, attributes = "") => {
         return `<${tag} id="${id}_${elementName}" ${attributes}>${inner}</${tag}>`;

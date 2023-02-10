@@ -15,6 +15,7 @@ module.exports = {
     minWeight: undefined,
     maxWidth: undefined,
     maxHeight: undefined,
+    resetConfig: true,
 
     //Insert the HTML into the config on the NodeRed flow
     //The ids MUST be node-config-input-<WIDGETNAME>-<CONFIGNAME> otherwise they may not be set
@@ -83,42 +84,33 @@ module.exports = {
         increment: { value: 1, required: true },
         CSS: {
             value: `
-                #volumeLevelContainer {
-                    transform: rotate(180deg);
-                    overflow: hidden;
-                    background-color: white;
-                    width: 20%;
-                    height: 90%;
-                    margin-top: 5%;
-                    margin-left: 10%;
-                    margin-right: 5%;
-                    float: right;
-                    border-radius: 10em;
-                }
-                #volumeLevelTop {
-                    background-color: #01e301;
-                    width: 100%;
-                    height: 100%;
-                }
-                #buttonContainer {
-                    float: right;
-                    height: 100%;
-                    width: 60%;
-                }
-                .button {
-                    display: block;
-                    width: 100%;
-                    height: calc((100%/3) - (2.5px * 3));
-                    padding: 0;
-                    margin-top: 5px;
-                    transition: background-color 0.1s;
-                }
-                .mutedColor {
-                    background-color: red !important;
-                }
-                .clickColor {
-                    background-color: white !important;
-                }
+            .button {
+                display: block;
+                width: 100%;
+                height: calc((100%/3) - (2.5px * 3));
+                padding: 0;
+                margin-top: 5px;
+                transition: background-color 0.1s;
+            }
+            .mutedColor {
+                background-color: red !important;
+            }
+            .clickColor {
+                background-color: white !important;
+            }
+            #volumeLevel {
+                writing-mode: bt-lr; /* IE */
+                -webkit-appearance: slider-vertical; /* Chromium */
+                width: 100%;
+                height: 100%;
+                padding: 0 5px;
+            }
+
+
+
+
+
+
                 `.replace(/^\s+|\s+$/gm, ''), required: false
         }
     },
@@ -150,39 +142,39 @@ module.exports = {
 
     //When a message comes from the dashbored
     onMessage: function (msg) {
-        if (msg.id == this.id) {
-            var vals = this.getValues();
-            var temp;
-            if (msg.payload.muted != undefined) { vals["muted"] = msg.payload.muted; }
-            if (msg.payload.volume != undefined) {
-                vals["volume"] = msg.payload.volume;
-                if(vals["volume"] >= 100){vals["volume"] = 100;}
-                if(vals["volume"] <= 0){vals["volume"] = 0;}
-            }
-            var temp = vals;
-            temp["previousVolume"] = this.getValues()["volume"];
-            temp["previousMuted"] = this.getValues()["muted"];
-            this.sendStatusChangesToFlow(msg.sessionId, temp);
+        // if (msg.id == this.id) {
+        //     var vals = this.getValues();
+        //     var temp;
+        //     if (msg.payload.muted != undefined) { vals["muted"] = msg.payload.muted; }
+        //     if (msg.payload.volume != undefined) {
+        //         vals["volume"] = msg.payload.volume;
+        //         if(vals["volume"] >= 100){vals["volume"] = 100;}
+        //         if(vals["volume"] <= 0){vals["volume"] = 0;}
+        //     }
+        //     var temp = vals;
+        //     temp["previousVolume"] = this.getValues()["volume"];
+        //     temp["previousMuted"] = this.getValues()["muted"];
+        //     this.sendStatusChangesToFlow(msg.sessionId, temp);
 
-            //Set the internal state if set
-            if (this.setsState) {
-                this.setValues(vals);
-                this.sendToDashbored(this.id, msg.sessionId, this.getValues());
-            }
-        }
+        //     //Set the internal state if set
+        //     if (this.setsState) {
+        //         this.setValues(vals);
+        //         this.sendToDashbored(this.id, msg.sessionId, this.getValues());
+        //     }
+        // }
     },
 
     //When a message comes from a node red flow
     onFlowMessage: function (msg) {
-        if (msg.payload) {
-            if (msg.payload.volume != undefined) {
-                this.setValue("volume", msg.payload.volume);
-            }
-            if (msg.payload.muted != undefined) {
-                this.setValue("muted", msg.payload.muted);
-            }
-            this.sendToDashbored(this.id, msg.sessionId, this.getValues());
-        }
+        // if (msg.payload) {
+        //     if (msg.payload.volume != undefined) {
+        //         this.setValue("volume", msg.payload.volume);
+        //     }
+        //     if (msg.payload.muted != undefined) {
+        //         this.setValue("muted", msg.payload.muted);
+        //     }
+        //     this.sendToDashbored(this.id, msg.sessionId, this.getValues());
+        // }
     },
 
     //Generate the CSS for the widget
@@ -192,138 +184,135 @@ module.exports = {
 
     //Generate the HTML for the widget that will be inserted into the dashbored
     generateHTML: function (htmlId) {
-        var volumeLevel = util.generateTag(htmlId, "div", "volumeLevelTop", "", "");
-        var buttons = `
-            ${util.generateTag(htmlId, "button", "plus", "+", `class=${util.generateCSSClass(htmlId, "button")}`)}
-            ${util.generateTag(htmlId, "button", "minus", "-", `class=${util.generateCSSClass(htmlId, "button")}`)}
+        return `
+
+        ${util.generateTag(htmlId, "input", "volumeLevel", "", `type="range" orient="vertical" class=${util.generateCSSClass(htmlId, "range")}`)}
             ${util.generateTag(htmlId, "button", "muteButton", "Mute", `class=${util.generateCSSClass(htmlId, "button")}`)}
         `;
-        return `
-            ${util.generateTag(htmlId, "div", "volumeLevelContainer", volumeLevel, "")}
-            ${util.generateTag(htmlId, "div", "buttonContainer", buttons, "")}
-        `;
     },
 
-    /**
-     * Generate the script to show the mute status
-     * @param {*} htmlId 
-     * @param {boolean} muted Should it be muted. Leave undefined and use variable "muted"
-     * @returns script
-     */
-    showMute: function (htmlId, muted) {
-        return `
-        if(${muted != undefined ? muted : "muted"}) {
-            ${util.getElement(htmlId, "muteButton")}.classList.add("${util.generateCSSClass(htmlId, "mutedColor")}");
-            ${util.getElement(htmlId, "volumeLevelTop")}.classList.add("${util.generateCSSClass(htmlId, "mutedColor")}");
-        }
-        else {
-            ${util.getElement(htmlId, "muteButton")}.classList.remove("${util.generateCSSClass(htmlId, "mutedColor")}");
-            ${util.getElement(htmlId, "volumeLevelTop")}.classList.remove("${util.generateCSSClass(htmlId, "mutedColor")}");
-        }
-        `;
-    },
+    // /**
+    //  * Generate the script to show the mute status
+    //  * @param {*} htmlId 
+    //  * @param {boolean} muted Should it be muted. Leave undefined and use variable "muted"
+    //  * @returns script
+    //  */
+    // showMute: function (htmlId, muted) {
+    //     return `
+    //     if(${muted != undefined ? muted : "muted"}) {
+    //         ${util.getElement(htmlId, "muteButton")}.classList.add("${util.generateCSSClass(htmlId, "mutedColor")}");
+    //         ${util.getElement(htmlId, "volumeLevelTop")}.classList.add("${util.generateCSSClass(htmlId, "mutedColor")}");
+    //     }
+    //     else {
+    //         ${util.getElement(htmlId, "muteButton")}.classList.remove("${util.generateCSSClass(htmlId, "mutedColor")}");
+    //         ${util.getElement(htmlId, "volumeLevelTop")}.classList.remove("${util.generateCSSClass(htmlId, "mutedColor")}");
+    //     }
+    //     `;
+    // },
 
-    /**
-     * Show a volume level from 0 - 100%
-     * @param {*} htmlId 
-     * @param {boolean} volume The level. Leave undefined and use variable "volume"
-     * @returns script
-     */
-    showVolume: function (htmlId, volume) {
-        return ` 
-        ${volume != undefined ? "" : "volume = volume + '%';"};
-        ${util.getElement(htmlId, "volumeLevelTop")}.style.height = ${volume != undefined ? '"' + volume + '%"' : "volume"};
-        `;
-    },
+    // /**
+    //  * Show a volume level from 0 - 100%
+    //  * @param {*} htmlId 
+    //  * @param {boolean} volume The level. Leave undefined and use variable "volume"
+    //  * @returns script
+    //  */
+    // showVolume: function (htmlId, volume) {
+    //     return ` 
+    //     ${volume != undefined ? "" : "volume = volume + '%';"};
+    //     ${util.getElement(htmlId, "volumeLevelTop")}.style.height = ${volume != undefined ? '"' + volume + '%"' : "volume"};
+    //     `;
+    // },
 
     //Generate the script that will be executed when the dashbored loads
     generateOnload: function (htmlId, lockedAccess, alwaysPassword, ask, askText) {
-        //When the user clicks the volume up button
-        var volPlusAction = `
-        var yesAction = function() {
-            var waiting = true;
-            setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
-            sendMsg("${htmlId}", "${this.id}", {volume: parseInt(${util.getElement(htmlId, "widget")}.getAttribute("volume")) + ${this.config.increment}}, function(id, sessionId, success, msg) {
-                if(id == "${this.id}") {
-                    waiting = false;
-                    loadingAnimation(event.target.id, false);
-                    if(!success) {
-                        failedToSend();
-                    }
-                }
-            });
-        }
-        var noAction = function() {}
-        ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")} 
-        `;
+        // //When the user clicks the volume up button
+        // var volPlusAction = `
+        // var yesAction = function() {
+        //     var waiting = true;
+        //     setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
+        //     sendMsg("${htmlId}", "${this.id}", {volume: parseInt(${util.getElement(htmlId, "widget")}.getAttribute("volume")) + ${this.config.increment}}, function(id, sessionId, success, msg) {
+        //         if(id == "${this.id}") {
+        //             waiting = false;
+        //             loadingAnimation(event.target.id, false);
+        //             if(!success) {
+        //                 failedToSend();
+        //             }
+        //         }
+        //     });
+        // }
+        // var noAction = function() {}
+        // ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")} 
+        // `;
 
-        //When the user clicks the volume down button
-        var volMinusAction = `
-        var yesAction = function() {
-            var waiting = true;
-            setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
-            sendMsg("${htmlId}", "${this.id}", {volume: parseInt(${util.getElement(htmlId, "widget")}.getAttribute("volume")) - ${this.config.increment}}, function(id, sessionId, success, msg) {
-                if(id == "${this.id}") {
-                    waiting = false;
-                    loadingAnimation(event.target.id, false);
+        // //When the user clicks the volume down button
+        // var volMinusAction = `
+        // var yesAction = function() {
+        //     var waiting = true;
+        //     setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
+        //     sendMsg("${htmlId}", "${this.id}", {volume: parseInt(${util.getElement(htmlId, "widget")}.getAttribute("volume")) - ${this.config.increment}}, function(id, sessionId, success, msg) {
+        //         if(id == "${this.id}") {
+        //             waiting = false;
+        //             loadingAnimation(event.target.id, false);
                     
-                    if(!success) {
-                        failedToSend();
-                    }
-                }
-            });
-        }
-        var noAction = function() {}
-        ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
-        `;
+        //             if(!success) {
+        //                 failedToSend();
+        //             }
+        //         }
+        //     });
+        // }
+        // var noAction = function() {}
+        // ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
+        // `;
 
-        //When the mute button is pressed
-        var muteAction = `
-            var yesAction = function() {
-                var waiting = true;
-                var currentlyMuted = ${util.getElement(htmlId, "widget")}.getAttribute("muted") == "${this.config.mutedValue}";
-                setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
-                sendMsg("${htmlId}", "${this.id}", {muted: (currentlyMuted ? "${this.config.unmutedValue}" : "${this.config.mutedValue}")}, function(id, sessionId, success, msg) {
-                    if(id == "${this.id}") {
-                        waiting = false;
-                        loadingAnimation(event.target.id, false);
-                        if(!success) {
-                            failedToSend();
-                        }
-                    }
-                });
-            }
-            var noAction = function() {}
-            ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
-        `;
+        // //When the mute button is pressed
+        // var muteAction = `
+        //     var yesAction = function() {
+        //         var waiting = true;
+        //         var currentlyMuted = ${util.getElement(htmlId, "widget")}.getAttribute("muted") == "${this.config.mutedValue}";
+        //         setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
+        //         sendMsg("${htmlId}", "${this.id}", {muted: (currentlyMuted ? "${this.config.unmutedValue}" : "${this.config.mutedValue}")}, function(id, sessionId, success, msg) {
+        //             if(id == "${this.id}") {
+        //                 waiting = false;
+        //                 loadingAnimation(event.target.id, false);
+        //                 if(!success) {
+        //                     failedToSend();
+        //                 }
+        //             }
+        //         });
+        //     }
+        //     var noAction = function() {}
+        //     ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
+        // `;
 
-        return `
-        ${util.getElement(htmlId, "plus")}.onclick = function(event) {${volPlusAction}};
-        ${util.getElement(htmlId, "minus")}.onclick = function(event) {${volMinusAction}};
-        ${util.getElement(htmlId, "muteButton")}.onclick = function(event) {${muteAction}};
-        ${util.getElement(htmlId, "widget")}.setAttribute("muted", "${this.getValue("muted")}");
-        ${util.getElement(htmlId, "widget")}.setAttribute("volume", ${this.getValue("volume")});
+        // return `
+        // ${util.getElement(htmlId, "plus")}.onclick = function(event) {${volPlusAction}};
+        // ${util.getElement(htmlId, "minus")}.onclick = function(event) {${volMinusAction}};
+        // ${util.getElement(htmlId, "muteButton")}.onclick = function(event) {${muteAction}};
+        // ${util.getElement(htmlId, "widget")}.setAttribute("muted", "${this.getValue("muted")}");
+        // ${util.getElement(htmlId, "widget")}.setAttribute("volume", ${this.getValue("volume")});
 
-        //Set the default UI
-        ${this.showMute(htmlId, this.getValue("muted") == `${this.config.mutedValue}`)}
-        ${this.showVolume(htmlId, this.getValue("volume"))}
-        `;
+        // //Set the default UI
+        // ${this.showMute(htmlId, this.getValue("muted") == `${this.config.mutedValue}`)}
+        // ${this.showVolume(htmlId, this.getValue("volume"))}
+        // `;
+        return ``;
     },
 
     //Generate the script that will be called when a message comes from NodeRed on the dashbored
     generateOnMsg: function (htmlId) {
-        return `
-            if(msg.payload.muted != undefined) {
-                ${util.getElement(htmlId, "widget")}.setAttribute("muted", msg.payload.muted);
-                var muted = msg.payload.muted == "${this.config.mutedValue}";
-                ${this.showMute(htmlId)}
-            }
-            if(msg.payload.volume != undefined) {
-                ${util.getElement(htmlId, "widget")}.setAttribute("volume", msg.payload.volume);
-                var volume = msg.payload.volume;
-                ${this.showVolume(htmlId)}
-            }
-        `;
+        return ``;
+        // return `
+        //     if(msg.payload.muted != undefined) {
+        //         ${util.getElement(htmlId, "widget")}.setAttribute("muted", msg.payload.muted);
+        //         var muted = msg.payload.muted == "${this.config.mutedValue}";
+        //         ${this.showMute(htmlId)}
+        //     }
+        //     if(msg.payload.volume != undefined) {
+        //         ${util.getElement(htmlId, "widget")}.setAttribute("volume", msg.payload.volume);
+        //         var volume = msg.payload.volume;
+        //         ${this.showVolume(htmlId)}
+        //     }
+        // `;
     },
 
     //Generate any extra scripts to add to the document

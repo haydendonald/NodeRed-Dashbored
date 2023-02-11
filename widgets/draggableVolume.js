@@ -98,16 +98,25 @@ module.exports = {
             .clickColor {
                 background-color: white !important;
             }
-            #volumeLevel {
-                writing-mode: bt-lr; /* IE */
-                -webkit-appearance: slider-vertical; /* Chromium */
+
+
+            #volumeLevelContainer {
+                transform: rotate(180deg);
+                overflow: hidden;
+                background-color: white;
+                width: 20%;
+                height: 90%;
+                margin-top: 5%;
+                margin-left: 10%;
+                margin-right: 5%;
+                float: right;
+                border-radius: 10em;
+            }
+            #volumeLevelTop {
+                background-color: #01e301;
                 width: 100%;
                 height: 100%;
-                padding: 0 5px;
             }
-
-
-
 
 
 
@@ -184,118 +193,127 @@ module.exports = {
 
     //Generate the HTML for the widget that will be inserted into the dashbored
     generateHTML: function (htmlId) {
-        return `
-
-        ${util.generateTag(htmlId, "input", "volumeLevel", "", `type="range" orient="vertical" class=${util.generateCSSClass(htmlId, "range")}`)}
+        var volumeLevel = util.generateTag(htmlId, "div", "volumeLevelTop", "", "");
+        var buttons = `
+            ${util.generateTag(htmlId, "button", "plus", "+", `class=${util.generateCSSClass(htmlId, "button")}`)}
+            ${util.generateTag(htmlId, "button", "minus", "-", `class=${util.generateCSSClass(htmlId, "button")}`)}
             ${util.generateTag(htmlId, "button", "muteButton", "Mute", `class=${util.generateCSSClass(htmlId, "button")}`)}
+        `;
+        return `
+            ${util.generateTag(htmlId, "div", "volumeLevelContainer", volumeLevel, `mouseIsHeld="false"`)}
+            ${util.generateTag(htmlId, "div", "buttonContainer", buttons, "")}
         `;
     },
 
-    // /**
-    //  * Generate the script to show the mute status
-    //  * @param {*} htmlId 
-    //  * @param {boolean} muted Should it be muted. Leave undefined and use variable "muted"
-    //  * @returns script
-    //  */
-    // showMute: function (htmlId, muted) {
-    //     return `
-    //     if(${muted != undefined ? muted : "muted"}) {
-    //         ${util.getElement(htmlId, "muteButton")}.classList.add("${util.generateCSSClass(htmlId, "mutedColor")}");
-    //         ${util.getElement(htmlId, "volumeLevelTop")}.classList.add("${util.generateCSSClass(htmlId, "mutedColor")}");
-    //     }
-    //     else {
-    //         ${util.getElement(htmlId, "muteButton")}.classList.remove("${util.generateCSSClass(htmlId, "mutedColor")}");
-    //         ${util.getElement(htmlId, "volumeLevelTop")}.classList.remove("${util.generateCSSClass(htmlId, "mutedColor")}");
-    //     }
-    //     `;
-    // },
+    /**
+     * Generate the script to show the mute status
+     * @param {*} htmlId 
+     * @param {boolean} muted Should it be muted. Leave undefined and use variable "muted"
+     * @returns script
+     */
+    showMute: function (htmlId, muted) {
+        return `
+        if(${muted != undefined ? muted : "muted"}) {
+            ${util.getElement(htmlId, "muteButton")}.classList.add("${util.generateCSSClass(htmlId, "mutedColor")}");
+            ${util.getElement(htmlId, "volumeLevelTop")}.classList.add("${util.generateCSSClass(htmlId, "mutedColor")}");
+        }
+        else {
+            ${util.getElement(htmlId, "muteButton")}.classList.remove("${util.generateCSSClass(htmlId, "mutedColor")}");
+            ${util.getElement(htmlId, "volumeLevelTop")}.classList.remove("${util.generateCSSClass(htmlId, "mutedColor")}");
+        }
+        `;
+    },
 
-    // /**
-    //  * Show a volume level from 0 - 100%
-    //  * @param {*} htmlId 
-    //  * @param {boolean} volume The level. Leave undefined and use variable "volume"
-    //  * @returns script
-    //  */
-    // showVolume: function (htmlId, volume) {
-    //     return ` 
-    //     ${volume != undefined ? "" : "volume = volume + '%';"};
-    //     ${util.getElement(htmlId, "volumeLevelTop")}.style.height = ${volume != undefined ? '"' + volume + '%"' : "volume"};
-    //     `;
-    // },
+    /**
+     * Show a volume level from 0 - 100%
+     * @param {*} htmlId 
+     * @param {boolean} volume The level. Leave undefined and use variable "volume"
+     * @returns script
+     */
+    showVolume: function (htmlId, volume) {
+        return ` 
+        ${volume != undefined ? "" : "volume = volume + '%';"};
+        ${util.getElement(htmlId, "volumeLevelTop")}.style.height = ${volume != undefined ? '"' + volume + '%"' : "volume"};
+        `;
+    },
 
     //Generate the script that will be executed when the dashbored loads
     generateOnload: function (htmlId, lockedAccess, alwaysPassword, ask, askText) {
-        // //When the user clicks the volume up button
-        // var volPlusAction = `
-        // var yesAction = function() {
-        //     var waiting = true;
-        //     setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
-        //     sendMsg("${htmlId}", "${this.id}", {volume: parseInt(${util.getElement(htmlId, "widget")}.getAttribute("volume")) + ${this.config.increment}}, function(id, sessionId, success, msg) {
-        //         if(id == "${this.id}") {
-        //             waiting = false;
-        //             loadingAnimation(event.target.id, false);
-        //             if(!success) {
-        //                 failedToSend();
-        //             }
-        //         }
-        //     });
-        // }
-        // var noAction = function() {}
-        // ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")} 
-        // `;
+        //When the user changes the volume level
+        var volPlusAction = `
+        var yesAction = function() {
+            var waiting = true;
+            setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
+            sendMsg("${htmlId}", "${this.id}", {volume: parseInt(${util.getElement(htmlId, "widget")}.getAttribute("volume")) + ${this.config.increment}}, function(id, sessionId, success, msg) {
+                if(id == "${this.id}") {
+                    waiting = false;
+                    loadingAnimation(event.target.id, false);
+                    if(!success) {
+                        failedToSend();
+                    }
+                }
+            });
+        }
+        var noAction = function() {
+            //TODO: Update the UI to the previous value
+        }
+        ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")} 
+        `;
 
-        // //When the user clicks the volume down button
-        // var volMinusAction = `
-        // var yesAction = function() {
-        //     var waiting = true;
-        //     setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
-        //     sendMsg("${htmlId}", "${this.id}", {volume: parseInt(${util.getElement(htmlId, "widget")}.getAttribute("volume")) - ${this.config.increment}}, function(id, sessionId, success, msg) {
-        //         if(id == "${this.id}") {
-        //             waiting = false;
-        //             loadingAnimation(event.target.id, false);
-                    
-        //             if(!success) {
-        //                 failedToSend();
-        //             }
-        //         }
-        //     });
-        // }
-        // var noAction = function() {}
-        // ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
-        // `;
 
-        // //When the mute button is pressed
-        // var muteAction = `
-        //     var yesAction = function() {
-        //         var waiting = true;
-        //         var currentlyMuted = ${util.getElement(htmlId, "widget")}.getAttribute("muted") == "${this.config.mutedValue}";
-        //         setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
-        //         sendMsg("${htmlId}", "${this.id}", {muted: (currentlyMuted ? "${this.config.unmutedValue}" : "${this.config.mutedValue}")}, function(id, sessionId, success, msg) {
-        //             if(id == "${this.id}") {
-        //                 waiting = false;
-        //                 loadingAnimation(event.target.id, false);
-        //                 if(!success) {
-        //                     failedToSend();
-        //                 }
-        //             }
-        //         });
-        //     }
-        //     var noAction = function() {}
-        //     ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
-        // `;
+        //When the mute button is pressed
+        var muteAction = `
+            var yesAction = function() {
+                var waiting = true;
+                var currentlyMuted = ${util.getElement(htmlId, "widget")}.getAttribute("muted") == "${this.config.mutedValue}";
+                setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
+                sendMsg("${htmlId}", "${this.id}", {muted: (currentlyMuted ? "${this.config.unmutedValue}" : "${this.config.mutedValue}")}, function(id, sessionId, success, msg) {
+                    if(id == "${this.id}") {
+                        waiting = false;
+                        loadingAnimation(event.target.id, false);
+                        if(!success) {
+                            failedToSend();
+                        }
+                    }
+                });
+            }
+            var noAction = function() {}
+            ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
+        `;
 
-        // return `
-        // ${util.getElement(htmlId, "plus")}.onclick = function(event) {${volPlusAction}};
-        // ${util.getElement(htmlId, "minus")}.onclick = function(event) {${volMinusAction}};
-        // ${util.getElement(htmlId, "muteButton")}.onclick = function(event) {${muteAction}};
-        // ${util.getElement(htmlId, "widget")}.setAttribute("muted", "${this.getValue("muted")}");
-        // ${util.getElement(htmlId, "widget")}.setAttribute("volume", ${this.getValue("volume")});
 
-        // //Set the default UI
-        // ${this.showMute(htmlId, this.getValue("muted") == `${this.config.mutedValue}`)}
-        // ${this.showVolume(htmlId, this.getValue("volume"))}
-        // `;
-        return ``;
+        //Listen if the user has the mouse held or not
+        var mouseClickedFunc = `function(event) {this.setAttribute("mouseIsHeld", true);}`;
+        var mouseUnClickedFunc = `function(event) {this.setAttribute("mouseIsHeld", false);}`;
+        var mouseClickListeners = `
+            ${util.getElement(htmlId, "volumeLevelTop")}.onmousedown = ${mouseClickedFunc}
+
+            ${util.getElement(htmlId, "volumeLevelTop")}.onmouseup = ${mouseUnClickedFunc}
+            ${util.getElement(htmlId, "volumeLevelTop")}.onmouseout = ${mouseUnClickedFunc}
+            ${util.getElement(htmlId, "volumeLevelTop")}.onmouseleave = ${mouseUnClickedFunc}
+        `;
+
+        //Add the listener for the mouse position and convert to a percentage
+        var mousePercentListener = `${util.getElement(htmlId, "volumeLevelTop")}.onmousemove = function(event) {
+            if(this.getAttribute("mouseIsHeld") == "true") {
+                var volume = (event.offsetY / event.srcElement.clientHeight) * 100;
+                console.log(volume);
+                ${this.showVolume(htmlId)}
+            }
+        }`;
+
+        return `
+            //Add the actions
+            ${util.getElement(htmlId, "muteButton")}.onclick = function(event) {${muteAction}};
+            ${util.getElement(htmlId, "widget")}.setAttribute("muted", "${this.getValue("muted")}");
+            ${util.getElement(htmlId, "widget")}.setAttribute("volume", ${this.getValue("volume")});
+            ${mouseClickListeners}
+            ${mousePercentListener}
+
+            //Set the default UI
+            ${this.showMute(htmlId, this.getValue("muted") == `${this.config.mutedValue}`)}
+            ${this.showVolume(htmlId, this.getValue("volume"))}
+        `;
     },
 
     //Generate the script that will be called when a message comes from NodeRed on the dashbored

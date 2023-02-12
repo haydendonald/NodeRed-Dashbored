@@ -98,24 +98,22 @@ module.exports = {
             .clickColor {
                 background-color: white !important;
             }
-
-
             #volumeLevelContainer {
                 transform: rotate(180deg);
                 overflow: hidden;
                 background-color: white;
-                width: 20%;
+                width: 100%;
                 height: 90%;
-                margin-top: 5%;
-                margin-left: 10%;
-                margin-right: 5%;
-                float: right;
-                border-radius: 10em;
+                border-radius: 0.5em;
             }
             #volumeLevelTop {
                 background-color: #01e301;
                 width: 100%;
                 height: 100%;
+            }
+            #volumeLevelHandle {
+                background-color: gray;
+                height: 20px
             }
 
 
@@ -193,15 +191,11 @@ module.exports = {
 
     //Generate the HTML for the widget that will be inserted into the dashbored
     generateHTML: function (htmlId) {
-        var volumeLevel = util.generateTag(htmlId, "div", "volumeLevelTop", "", "");
-        var buttons = `
-            ${util.generateTag(htmlId, "button", "plus", "+", `class=${util.generateCSSClass(htmlId, "button")}`)}
-            ${util.generateTag(htmlId, "button", "minus", "-", `class=${util.generateCSSClass(htmlId, "button")}`)}
-            ${util.generateTag(htmlId, "button", "muteButton", "Mute", `class=${util.generateCSSClass(htmlId, "button")}`)}
-        `;
         return `
-            ${util.generateTag(htmlId, "div", "volumeLevelContainer", volumeLevel, `mouseIsHeld="false"`)}
-            ${util.generateTag(htmlId, "div", "buttonContainer", buttons, "")}
+            ${util.generateTag(htmlId, "div", "container", `
+                ${util.generateTag(htmlId, "div", "volumeLevelContainer", `${util.generateTag(htmlId, "div", "volumeLevelTop", "", "")} ${util.generateTag(htmlId, "div", "volumeLevelHandle", "", "")}`, `mouseIsHeld="false"`)}
+                ${util.generateTag(htmlId, "button", "muteButton", "Mute", `class=${util.generateCSSClass(htmlId, "button")}`)}
+            `, `style="height: 80%"`)}
         `;
     },
 
@@ -286,19 +280,28 @@ module.exports = {
         var mouseClickedFunc = `function(event) {this.setAttribute("mouseIsHeld", true);}`;
         var mouseUnClickedFunc = `function(event) {this.setAttribute("mouseIsHeld", false);}`;
         var mouseClickListeners = `
-            ${util.getElement(htmlId, "volumeLevelTop")}.onmousedown = ${mouseClickedFunc}
+            ${util.getElement(htmlId, "volumeLevelHandle")}.onmousedown = ${mouseClickedFunc}
 
-            ${util.getElement(htmlId, "volumeLevelTop")}.onmouseup = ${mouseUnClickedFunc}
-            ${util.getElement(htmlId, "volumeLevelTop")}.onmouseout = ${mouseUnClickedFunc}
-            ${util.getElement(htmlId, "volumeLevelTop")}.onmouseleave = ${mouseUnClickedFunc}
+            ${util.getElement(htmlId, "volumeLevelHandle")}.onmouseup = ${mouseUnClickedFunc}
+            ${util.getElement(htmlId, "volumeLevelHandle")}.onmouseout = ${mouseUnClickedFunc}
+            ${util.getElement(htmlId, "volumeLevelHandle")}.onmouseleave = ${mouseUnClickedFunc}
         `;
 
         //Add the listener for the mouse position and convert to a percentage
-        var mousePercentListener = `${util.getElement(htmlId, "volumeLevelTop")}.onmousemove = function(event) {
+        var mousePercentListener = `${util.getElement(htmlId, "volumeLevelHandle")}.onmousemove = function(event) {
             if(this.getAttribute("mouseIsHeld") == "true") {
-                var volume = (event.offsetY / event.srcElement.clientHeight) * 100;
-                console.log(volume);
-                ${this.showVolume(htmlId)}
+                //console.log(event.offsetY - (event.srcElement.clientHeight / 2))
+
+                //console.log(event.srcElement.offsetParent.clientHeight);
+                //console.log(event.srcElement.offsetParent.offsetHeight);
+
+                //console.log();
+
+
+               var volume = parseInt(${util.getElement(htmlId, "widget")}.getAttribute("volume")) + (event.offsetY - (event.srcElement.clientHeight / 2) > 0 ? 1 : -1);
+               ${this.showVolume(htmlId)}
+              //console.log(event);
+
             }
         }`;
 

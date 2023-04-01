@@ -142,7 +142,7 @@ module.exports = function (RED, dashboredGeneration = undefined) {
 
         //Copy in the default config if it wasn't set
         for (var i in this.defaultConfig) {
-            if (config[this.widgetType + "-" + i] && !this.resetConfig) {
+            if (config[this.widgetType + "-" + i] !== undefined && !this.resetConfig) {
                 this.config[i] = config[this.widgetType + "-" + i];
             }
             else if (config[i] && !this.resetConfig) {

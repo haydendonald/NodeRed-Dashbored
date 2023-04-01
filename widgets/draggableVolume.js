@@ -15,7 +15,6 @@ module.exports = {
     minWeight: undefined,
     maxWidth: undefined,
     maxHeight: undefined,
-    resetConfig: true,
 
     //Insert the HTML into the config on the NodeRed flow
     //The ids MUST be node-config-input-<WIDGETNAME>-<CONFIGNAME> otherwise they may not be set
@@ -30,6 +29,10 @@ module.exports = {
                         <label for="config-input-draggableVolume-unmutedValue">Unmuted Value</label>
                         <input type="text" id="node-config-input-draggableVolume-unmutedValue" placeholder="Unmuted Value">
                     </div>
+                    <div class="form-row">
+                        <label for="node-config-input-draggableVolume-sendOnRelease">Set Value on Release</label>
+                        <input type="checkbox" id="node-config-input-draggableVolume-sendOnRelease">
+                    </div>
                     <!-- CSS Editor -->
                     <div class="form-row">
                         <label for="CSS">CSS</label>
@@ -42,6 +45,7 @@ module.exports = {
         return {
             //When the user opens the config panel get things ready
             oneditprepare: `
+                    $("#node-config-input-draggableVolume-sendOnRelease").prop("checked", element["draggableVolume-sendOnRelease"]);
                     element.cssEditor = RED.editor.createEditor({
                         id: "CSS",
                         mode: "ace/mode/css",
@@ -52,6 +56,7 @@ module.exports = {
             oneditsave: `
                     //Set the CSS value
                     element["draggableVolume-CSS"] = element.cssEditor.getValue();
+                    element["draggableVolume-sendOnRelease"] = $("#node-config-input-draggableVolume-sendOnRelease").val();
 
                     //Delete the CSS editor
                     element.cssEditor.destroy();
@@ -69,6 +74,7 @@ module.exports = {
                     element.cssEditor.clearSelection();
                     $("#node-config-input-draggableVolume-mutedValue").val(settings.mutedValue.value);
                     $("#node-config-input-draggableVolume-unmutedValue").val(settings.unmutedValue.value);
+                    $("#node-config-input-draggableVolume-sendOnRelease").prop("checked", settings.sendOnRelease.value);
                 `
         }
     },
@@ -76,6 +82,7 @@ module.exports = {
     defaultConfig: {
         mutedValue: { value: "on", required: true },
         unmutedValue: { value: "off", required: true },
+        sendOnRelease: { value: true },
         CSS: {
             value: `
             .button {
@@ -187,7 +194,7 @@ module.exports = {
                 ${util.generateTag(htmlId, "div", "volumeLevelContainer", `
                     ${util.generateTag(htmlId, "div", "volumeLevelTop", "", "")}
                     ${util.generateTag(htmlId, "div", "volumeLevelHandle", "", "")}
-                `, `mouseIsHeld="false"`)}
+                `, ``)}
                 ${util.generateTag(htmlId, "div", "touch", "", `
                     style="
                     z-index: 1;
@@ -227,8 +234,8 @@ module.exports = {
      */
     showVolume: function (htmlId, volume) {
         return ` 
-        ${volume != undefined ? "" : "volume = volume + '%';"};
-        ${util.getElement(htmlId, "volumeLevelTop")}.style.height = ${volume != undefined ? '"' + volume + '%"' : "volume"};
+            ${volume != undefined ? "" : "volume = volume + '%';"};
+            ${util.getElement(htmlId, "volumeLevelTop")}.style.height = ${volume != undefined ? '"' + volume + '%"' : "volume"};
         `;
     },
 
@@ -254,16 +261,21 @@ module.exports = {
             ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
         `;
 
+        //Send the volume to the flow
+        var sendVolume = `
+            sendMsg("${htmlId}", "${this.id}", {volume: parseInt(${util.getElement(htmlId, "volumeLevelTop")}.style.height)}, function(id, sessionId, success, msg) {
+                if(id == "${this.id}") {
+                    if(!success) {
+                        failedToSend();
+                    }
+                }
+            });
+        `;
+
         //When the volume has been changed
         var volumeAction = `
             var yesAction = function() {
-                sendMsg("${htmlId}", "${this.id}", {volume: parseInt(${util.getElement(htmlId, "volumeLevelTop")}.style.height)}, function(id, sessionId, success, msg) {
-                    if(id == "${this.id}") {
-                        if(!success) {
-                            failedToSend();
-                        }
-                    }
-                });
+                ${sendVolume}
             }
             var noAction = function() {
                 //Update the UI to the previous value
@@ -277,7 +289,7 @@ module.exports = {
         //Listen if the user has the mouse held or not
         var mouseClickedFunc = `function(event) {this.setAttribute("mouseIsHeld", true);}`;
         var mouseUnClickedFunc = `function(event) {
-            if(this.getAttribute("mouseIsHeld") == "true") {
+            if(this.getAttribute("mouseIsHeld") == "true" && !${this.config.sendOnRelease}) {
                 ${volumeAction}
             }
             this.setAttribute("mouseIsHeld", false);
@@ -296,6 +308,11 @@ module.exports = {
                 var volume = ((${util.getElement(htmlId, "volumeLevelContainer")}.offsetHeight - event.offsetY) / ${util.getElement(htmlId, "volumeLevelContainer")}.offsetHeight) * 100.0;
                 volume = volume < 0.0 ? 0.0 : volume;
                 volume = volume > 100.0 ? 100.0: volume;
+
+                if(${this.config.sendOnRelease}) {
+                    ${sendVolume}
+                }
+
                 ${this.showVolume(htmlId)}
             }
         }`;
@@ -330,7 +347,9 @@ module.exports = {
             if(msg.payload.volume != undefined) {
                 ${util.getElement(htmlId, "widget")}.setAttribute("volume", msg.payload.volume);
                 var volume = msg.payload.volume;
-                ${this.showVolume(htmlId)}
+                if(${util.getElement(htmlId, "touch")}.getAttribute("mouseIsHeld") != "true") {
+                    ${this.showVolume(htmlId)}
+                }
             }
         `;
     },

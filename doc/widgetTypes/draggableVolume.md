@@ -6,7 +6,7 @@ Provides a volume widget that can be interacted with by dragging the volume bar 
 ## Properties
 * `Muted Value (mutedValue)`: The muted state
 * `Unmuted Value (unmutedValue)`: The un-muted state
-* `Increment (increment)`: The value to increment the slider by
+* `Set Value on Release (setValueOnRelease)`: Send the value to NodeRed when the user releases their finger (Note: If this is disabled ask/password functionality will be ignored)
 
 ## Messages
 ### Input

@@ -51,6 +51,8 @@ module.exports = {
                         mode: "ace/mode/css",
                         value: element["draggableVolume-CSS"]
                     });
+
+                    console.log(element);
                 `,
             //When the user clicks save on the editor set our values
             oneditsave: `
@@ -193,7 +195,17 @@ module.exports = {
     generateHTML: function (htmlId) {
         return `
             ${util.generateTag(htmlId, "div", "container", `
-                ${util.generateTag(htmlId, "div", "volumeLevelContainer", `${util.generateTag(htmlId, "div", "volumeLevelTop", "", "")} ${util.generateTag(htmlId, "div", "volumeLevelHandle", "", "")}`, `mouseIsHeld="false"`)}
+                ${util.generateTag(htmlId, "div", "volumeLevelContainer", `
+                    ${util.generateTag(htmlId, "div", "volumeLevelTop", "", "")}
+                    ${util.generateTag(htmlId, "div", "volumeLevelHandle", "", "")}
+                `, `mouseIsHeld="false"`)}
+                ${util.generateTag(htmlId, "div", "touch", "", `
+                    style="
+                    z-index: 1;
+                    position: absolute;
+                    top: 0;
+                    "
+                `)}
                 ${util.generateTag(htmlId, "button", "muteButton", "Mute", `class=${util.generateCSSClass(htmlId, "button")}`)}
             `, `style="height: 80%"`)}
         `;
@@ -280,15 +292,15 @@ module.exports = {
         var mouseClickedFunc = `function(event) {this.setAttribute("mouseIsHeld", true);}`;
         var mouseUnClickedFunc = `function(event) {this.setAttribute("mouseIsHeld", false);}`;
         var mouseClickListeners = `
-            ${util.getElement(htmlId, "volumeLevelHandle")}.onmousedown = ${mouseClickedFunc}
+            ${util.getElement(htmlId, "touch")}.onmousedown = ${mouseClickedFunc}
 
-            ${util.getElement(htmlId, "volumeLevelHandle")}.onmouseup = ${mouseUnClickedFunc}
-            ${util.getElement(htmlId, "volumeLevelHandle")}.onmouseout = ${mouseUnClickedFunc}
-            ${util.getElement(htmlId, "volumeLevelHandle")}.onmouseleave = ${mouseUnClickedFunc}
+            ${util.getElement(htmlId, "touch")}.onmouseup = ${mouseUnClickedFunc}
+            ${util.getElement(htmlId, "touch")}.onmouseout = ${mouseUnClickedFunc}
+            ${util.getElement(htmlId, "touch")}.onmouseleave = ${mouseUnClickedFunc}
         `;
 
         //Add the listener for the mouse position and convert to a percentage
-        var mousePercentListener = `${util.getElement(htmlId, "volumeLevelHandle")}.onmousemove = function(event) {
+        var mousePercentListener = `${util.getElement(htmlId, "touch")}.onmousemove = function(event) {
             if(this.getAttribute("mouseIsHeld") == "true") {
                 //console.log(event.offsetY - (event.srcElement.clientHeight / 2))
 
@@ -306,6 +318,11 @@ module.exports = {
         }`;
 
         return `
+            //Update the volume touch div to be the correct size of the widget
+            ${util.getElement(htmlId, "touch")}.style.width = ${util.getElement(htmlId, "volumeLevelContainer")}.offsetWidth + "px";
+            ${util.getElement(htmlId, "touch")}.style.height = ${util.getElement(htmlId, "volumeLevelContainer")}.offsetHeight + "px";
+
+
             //Add the actions
             ${util.getElement(htmlId, "muteButton")}.onclick = function(event) {${muteAction}};
             ${util.getElement(htmlId, "widget")}.setAttribute("muted", "${this.getValue("muted")}");

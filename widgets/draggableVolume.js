@@ -30,10 +30,6 @@ module.exports = {
                         <label for="config-input-draggableVolume-unmutedValue">Unmuted Value</label>
                         <input type="text" id="node-config-input-draggableVolume-unmutedValue" placeholder="Unmuted Value">
                     </div>
-                    <div class="form-row">
-                        <label for="config-input-draggableVolume-increment">Increment</label>
-                        <input type="number" id="node-config-input-draggableVolume-increment" placeholder="Increment">
-                    </div>
                     <!-- CSS Editor -->
                     <div class="form-row">
                         <label for="CSS">CSS</label>
@@ -51,8 +47,6 @@ module.exports = {
                         mode: "ace/mode/css",
                         value: element["draggableVolume-CSS"]
                     });
-
-                    console.log(element);
                 `,
             //When the user clicks save on the editor set our values
             oneditsave: `
@@ -75,7 +69,6 @@ module.exports = {
                     element.cssEditor.clearSelection();
                     $("#node-config-input-draggableVolume-mutedValue").val(settings.mutedValue.value);
                     $("#node-config-input-draggableVolume-unmutedValue").val(settings.unmutedValue.value);
-                    $("#node-config-input-draggableVolume-increment").val(settings.increment.value);
                 `
         }
     },
@@ -83,7 +76,6 @@ module.exports = {
     defaultConfig: {
         mutedValue: { value: "on", required: true },
         unmutedValue: { value: "off", required: true },
-        increment: { value: 1, required: true },
         CSS: {
             value: `
             .button {
@@ -117,9 +109,6 @@ module.exports = {
                 background-color: gray;
                 height: 20px
             }
-
-
-
                 `.replace(/^\s+|\s+$/gm, ''), required: false
         }
     },
@@ -245,28 +234,6 @@ module.exports = {
 
     //Generate the script that will be executed when the dashbored loads
     generateOnload: function (htmlId, lockedAccess, alwaysPassword, ask, askText) {
-        // //When the user changes the volume level
-        // var volPlusAction = `
-        // var yesAction = function() {
-        //     var waiting = true;
-        //     setTimeout(function(){if(waiting){loadingAnimation(event.target.id, true);}}, 500);
-        //     sendMsg("${htmlId}", "${this.id}", {volume: parseInt(${util.getElement(htmlId, "widget")}.getAttribute("volume")) + ${this.config.increment}}, function(id, sessionId, success, msg) {
-        //         if(id == "${this.id}") {
-        //             waiting = false;
-        //             loadingAnimation(event.target.id, false);
-        //             if(!success) {
-        //                 failedToSend();
-        //             }
-        //         }
-        //     });
-        // }
-        // var noAction = function() {
-        //     //TODO: Update the UI to the previous value
-        // }
-        // ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")} 
-        // `;
-
-
         //When the mute button is pressed
         var muteAction = `
             var yesAction = function() {
@@ -299,7 +266,9 @@ module.exports = {
                 });
             }
             var noAction = function() {
-                //TODO: Update the UI to the previous value
+                //Update the UI to the previous value
+                volume = ${util.getElement(htmlId, "widget")}.getAttribute("volume");
+                ${this.showVolume(htmlId)}
             }
             ${util.generateWidgetAction(lockedAccess, alwaysPassword, ask, askText, "yesAction", "noAction")}
         `;

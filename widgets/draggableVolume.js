@@ -96,9 +96,6 @@ module.exports = {
             .mutedColor {
                 background-color: red !important;
             }
-            .clickColor {
-                background-color: white !important;
-            }
             #volumeLevelContainer {
                 transform: rotate(180deg);
                 overflow: hidden;
@@ -108,13 +105,13 @@ module.exports = {
                 border-radius: 0.5em;
             }
             #volumeLevelTop {
-                background-color: #434343;
+                background-color: #5dd54a;
                 width: 100%;
                 height: 100%;
             }
             #volumeLevelHandle {
-                background-color: gray;
-                height: 20px
+                background-color: #626262;
+                height: 5px
             }
                 `.replace(/^\s+|\s+$/gm, ''), required: false
         }

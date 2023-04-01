@@ -26,6 +26,7 @@ and will show how widgets can be used between the two dashbored instances.
 
 The example above has the following diagram that shows the general flow of the project.
 ![Flow](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/exampleflow.png)
+
 It shows that the project has 2 main parts, widgets and dashboreds (both contained within a server). A `widget` is an element that the user interacts with (for example a button that turns the lights on), and a `dashbored` is the webpage that links to the widgets.
 
 Doing it this way allows you to use widgets between dashboreds, for example one may have a toggle to turn the alarm on/off, this project allows you to have the widget for this implemented once but placed on several dashboreds, say on the bedroom, entry, and kitchen dashboreds.

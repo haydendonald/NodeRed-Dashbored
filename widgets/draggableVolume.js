@@ -302,6 +302,17 @@ module.exports = {
         //Add the listener for the mouse position and convert to a percentage
         var mousePercentListener = `${util.getElement(htmlId, "touch")}.onmousemove = function(event) {
             if(this.getAttribute("mouseIsHeld") == "true") {
+
+
+
+
+                var volume = ((${util.getElement(htmlId, "volumeLevelContainer")}.offsetHeight - event.offsetY) / ${util.getElement(htmlId, "volumeLevelContainer")}.offsetHeight) * 100.0;
+                volume = volume < 0 ? 0 : volume;
+                volume = volume > 1 ? 1: volume;
+
+
+                console.log(volume);
+
                 //console.log(event.offsetY - (event.srcElement.clientHeight / 2))
 
                 //console.log(event.srcElement.offsetParent.clientHeight);
@@ -309,8 +320,10 @@ module.exports = {
 
                 //console.log();
 
+                //var volume = 0;
 
-               var volume = parseInt(${util.getElement(htmlId, "widget")}.getAttribute("volume")) + (event.offsetY - (event.srcElement.clientHeight / 2) > 0 ? 1 : -1);
+
+               //var volume = parseInt(${util.getElement(htmlId, "widget")}.getAttribute("volume")) + (event.offsetY - (event.srcElement.clientHeight / 2) > 0 ? 1 : -1);
                ${this.showVolume(htmlId)}
               //console.log(event);
 

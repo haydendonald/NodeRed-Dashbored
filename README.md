@@ -18,15 +18,14 @@ Simply search for `node-red-contrib-dashbored` in the pallet manager or install 
 ## How it works
 The project serves dashboreds at your node-red ip `http://<your-nodered-ip>:1880/<dashbored-endpoint>`
 
-The following example will create 2 dashboreds at `/kitchen` and `/bedroom` and will show how widgets can be used between the two dashbored instances.
-
-[Example JSON](https://github.com/haydendonald/NodeRed-Dashbored/blob/main/examples/defaultExample.json)
-
-![Kitchen Example](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/kitchenExam[ple].png)
-![Bedroom Example](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/bedroomExample.png)
+The following [Example JSON](https://github.com/haydendonald/NodeRed-Dashbored/blob/main/examples/defaultExample.json) will create 2 dashboreds at `/kitchen`
+![Kitchen Example](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/kitchenExample.png)
+ and `/bedroom`
+ ![Bedroom Example](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/bedroomExample.png)
+and will show how widgets can be used between the two dashbored instances.
 
 The example above has the following diagram that shows the general flow of the project.
-![Flow](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/exampleFlow.png)
+![Flow](https://raw.githubusercontent.com/haydendonald/NodeRed-Dashbored/main/img/exampleflow.png)
 It shows that the project has 2 main parts, widgets and dashboreds (both contained within a server). A `widget` is an element that the user interacts with (for example a button that turns the lights on), and a `dashbored` is the webpage that links to the widgets.
 
 Doing it this way allows you to use widgets between dashboreds, for example one may have a toggle to turn the alarm on/off, this project allows you to have the widget for this implemented once but placed on several dashboreds, say on the bedroom, entry, and kitchen dashboreds.

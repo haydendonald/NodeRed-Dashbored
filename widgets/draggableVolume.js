@@ -277,8 +277,10 @@ module.exports = {
         //Listen if the user has the mouse held or not
         var mouseClickedFunc = `function(event) {this.setAttribute("mouseIsHeld", true);}`;
         var mouseUnClickedFunc = `function(event) {
+            if(this.getAttribute("mouseIsHeld") == "true") {
+                ${volumeAction}
+            }
             this.setAttribute("mouseIsHeld", false);
-            ${volumeAction}
         }`;
         var mouseClickListeners = `
             ${util.getElement(htmlId, "touch")}.onmousedown = ${mouseClickedFunc}

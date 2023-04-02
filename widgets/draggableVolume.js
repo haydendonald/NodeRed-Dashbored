@@ -22,6 +22,10 @@ module.exports = {
         return `
                     <p><a href="https://github.com/haydendonald/NodeRed-Dashbored/blob/main/doc/widgetTypes/draggableVolume.md" target="_blank">See the wiki for more information</a></p>
                     <div class="form-row">
+                        <label for="node-config-input-draggableVolume-muteEnabled">Enable Mute</label>
+                        <input type="checkbox" id="node-config-input-draggableVolume-muteEnabled">
+                    </div>
+                    <div class="form-row">
                         <label for="config-input-draggableVolume-mutedValue">Muted Value</label>
                         <input type="text" id="node-config-input-draggableVolume-mutedValue" placeholder="Muted Value">
                     </div>
@@ -45,6 +49,7 @@ module.exports = {
         return {
             //When the user opens the config panel get things ready
             oneditprepare: `
+                    $("#node-config-input-draggableVolume-muteEnabled").prop("checked", element["draggableVolume-muteEnabled"]);
                     $("#node-config-input-draggableVolume-sendOnRelease").prop("checked", element["draggableVolume-sendOnRelease"]);
                     element.cssEditor = RED.editor.createEditor({
                         id: "CSS",
@@ -56,6 +61,7 @@ module.exports = {
             oneditsave: `
                     //Set the CSS value
                     element["draggableVolume-CSS"] = element.cssEditor.getValue();
+                    element["draggableVolume-muteEnabled"] = $("#node-config-input-draggableVolume-muteEnabled").val();
                     element["draggableVolume-sendOnRelease"] = $("#node-config-input-draggableVolume-sendOnRelease").val();
 
                     //Delete the CSS editor
@@ -75,6 +81,7 @@ module.exports = {
                     $("#node-config-input-draggableVolume-mutedValue").val(settings.mutedValue.value);
                     $("#node-config-input-draggableVolume-unmutedValue").val(settings.unmutedValue.value);
                     $("#node-config-input-draggableVolume-sendOnRelease").prop("checked", settings.sendOnRelease.value);
+                    $("#node-config-input-draggableVolume-muteEnabled").prop("checked", settings.muteEnabled.value);
                 `
         }
     },
@@ -83,6 +90,7 @@ module.exports = {
         mutedValue: { value: "on", required: true },
         unmutedValue: { value: "off", required: true },
         sendOnRelease: { value: true },
+        muteEnabled: {value: true },
         CSS: {
             value: `
             .button {
@@ -196,11 +204,10 @@ module.exports = {
                     style="
                     z-index: 1;
                     position: absolute;
-                    top: 0;
                     "
                 `)}
-                ${util.generateTag(htmlId, "button", "muteButton", "Mute", `class=${util.generateCSSClass(htmlId, "button")}`)}
-            `, `style="height: 80%"`)}
+                ${this.config.muteEnabled ? util.generateTag(htmlId, "button", "muteButton", "Mute", `class=${util.generateCSSClass(htmlId, "button")}`) : ""}
+            `, `style="height: ${this.config.muteEnabled ? "80%" : "100%"}; margin: 5px"`)}
         `;
     },
 
@@ -213,11 +220,11 @@ module.exports = {
     showMute: function (htmlId, muted) {
         return `
         if(${muted != undefined ? muted : "muted"}) {
-            ${util.getElement(htmlId, "muteButton")}.classList.add("${util.generateCSSClass(htmlId, "mutedColor")}");
+            if(${this.config.muteEnabled}){${util.getElement(htmlId, "muteButton")}.classList.add("${util.generateCSSClass(htmlId, "mutedColor")}");}
             ${util.getElement(htmlId, "volumeLevelTop")}.classList.add("${util.generateCSSClass(htmlId, "mutedColor")}");
         }
         else {
-            ${util.getElement(htmlId, "muteButton")}.classList.remove("${util.generateCSSClass(htmlId, "mutedColor")}");
+            if(${this.config.muteEnabled}){${util.getElement(htmlId, "muteButton")}.classList.remove("${util.generateCSSClass(htmlId, "mutedColor")}");}
             ${util.getElement(htmlId, "volumeLevelTop")}.classList.remove("${util.generateCSSClass(htmlId, "mutedColor")}");
         }
         `;
@@ -318,10 +325,10 @@ module.exports = {
             //Update the volume touch div to be the correct size of the widget
             ${util.getElement(htmlId, "touch")}.style.width = ${util.getElement(htmlId, "volumeLevelContainer")}.offsetWidth + "px";
             ${util.getElement(htmlId, "touch")}.style.height = ${util.getElement(htmlId, "volumeLevelContainer")}.offsetHeight + "px";
-
+            ${util.getElement(htmlId, "touch")}.style.top = ${util.getElement(htmlId, "volumeLevelContainer")}.offsetTop + "px";
 
             //Add the actions
-            ${util.getElement(htmlId, "muteButton")}.onclick = function(event) {${muteAction}};
+            if(${this.config.muteEnabled}){${util.getElement(htmlId, "muteButton")}.onclick = function(event) {${muteAction}};}
             ${util.getElement(htmlId, "widget")}.setAttribute("muted", "${this.getValue("muted")}");
             ${util.getElement(htmlId, "widget")}.setAttribute("volume", ${this.getValue("volume")});
             ${mouseClickListeners}

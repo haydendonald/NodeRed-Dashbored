@@ -157,7 +157,7 @@ module.exports = {
             var temp;
             if (msg.payload.muted != undefined) { vals["muted"] = msg.payload.muted; }
             if (msg.payload.volume != undefined) {
-                vals["volume"] = msg.payload.volume;
+                vals["volume"] = (msg.payload.volume * 1.2) - 10;
                 if (vals["volume"] >= 100) { vals["volume"] = 100; }
                 if (vals["volume"] <= 0) { vals["volume"] = 0; }
             }

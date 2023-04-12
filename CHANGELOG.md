@@ -53,3 +53,5 @@
 ## - 1.1.0
 * Added a draggable volume widget
 * Fixed a bug where widgets with boolean config would be set to the default value if false. This was due to an error in the population of configuration to a widget
+## - 1.1.1
+* Bug fix: The draggable volume didn't support touch screens, this has been fixed :)

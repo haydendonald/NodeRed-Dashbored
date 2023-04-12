@@ -204,6 +204,7 @@ module.exports = {
                     style="
                     z-index: 1;
                     position: absolute;
+                    touch-action: none;
                     "
                 `)}
                 ${this.config.muteEnabled ? util.generateTag(htmlId, "button", "muteButton", "Mute", `class=${util.generateCSSClass(htmlId, "button")}`) : ""}
@@ -299,15 +300,16 @@ module.exports = {
             this.setAttribute("mouseIsHeld", false);
         }`;
         var mouseClickListeners = `
-            ${util.getElement(htmlId, "touch")}.onmousedown = ${mouseClickedFunc}
+            ${util.getElement(htmlId, "touch")}.onpointerdown = ${mouseClickedFunc}
 
-            ${util.getElement(htmlId, "touch")}.onmouseup = ${mouseUnClickedFunc}
-            ${util.getElement(htmlId, "touch")}.onmouseout = ${mouseUnClickedFunc}
-            ${util.getElement(htmlId, "touch")}.onmouseleave = ${mouseUnClickedFunc}
+            ${util.getElement(htmlId, "touch")}.onpointerup = ${mouseUnClickedFunc}
+            ${util.getElement(htmlId, "touch")}.onpointerout = ${mouseUnClickedFunc}
+            ${util.getElement(htmlId, "touch")}.onpointerleave = ${mouseUnClickedFunc}
         `;
 
+
         //Add the listener for the mouse position and convert to a percentage
-        var mousePercentListener = `${util.getElement(htmlId, "touch")}.onmousemove = function(event) {
+        var updatePosition = `function(event) {
             if(this.getAttribute("mouseIsHeld") == "true") {
                 var volume = ((${util.getElement(htmlId, "volumeLevelContainer")}.offsetHeight - event.offsetY) / ${util.getElement(htmlId, "volumeLevelContainer")}.offsetHeight) * 100.0;
                 volume = volume < 0.0 ? 0.0 : volume;
@@ -320,6 +322,9 @@ module.exports = {
                 ${this.showVolume(htmlId)}
             }
         }`;
+
+        var mousePercentListener = `${util.getElement(htmlId, "touch")}.onpointermove = ${updatePosition}`;
+        // var touchPercentListener = `${util.getElement(htmlId, "touch")}.ontouchmove = ${updatePosition}`;
 
         return `
             //Update the volume touch div to be the correct size of the widget

@@ -57,3 +57,5 @@
 * Bug fix: The draggable volume didn't support touch screens, this has been fixed :)
 ## - 1.1.2
 * Bug fix: Made the draggable volume easier to reach 0% and 100%
+## - 1.1.3
+* Bug fix: Made the draggable volume easier to reach 0% and 100%, forgot the return

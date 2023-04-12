@@ -178,7 +178,7 @@ module.exports = {
     onFlowMessage: function (msg) {
         if (msg.payload) {
             if (msg.payload.volume != undefined) {
-                this.setValue("volume", msg.payload.volume);
+                this.setValue("volume", (msg.payload.volume / 1.2) + 10);
             }
             if (msg.payload.muted != undefined) {
                 this.setValue("muted", msg.payload.muted);

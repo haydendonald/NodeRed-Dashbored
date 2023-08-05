@@ -13,6 +13,7 @@ var onLoadCompleteFunctions = [];
 var messageCallbacks = {};
 // var waitingFor = {};
 var elementsHiddenWhileLocked = [];
+var onPageChangeFunctions = [];
 var currentPage;
 var socketWasClosed = false;
 var socket;
@@ -25,6 +26,11 @@ function addOnLoadFunction(fn) {
 //Add a function that will be called when a message is received on the websocket
 function addOnMsgFunction(fn) {
     onMsgFunctions.push(fn);
+}
+
+//Add a function that will be called when a new page is shown
+function addOnPageChangeFunction(fn) {
+    onPageChangeFunctions.push(fn);
 }
 
 //Generates a random string
@@ -362,6 +368,9 @@ function showCurrentPage(newPageId) {
         else {
             buttons[i].classList.remove("active");
         }
+    }
+    for(var i in onPageChangeFunctions) {
+        onPageChangeFunctions[i](newPageId);
     }
 }
 

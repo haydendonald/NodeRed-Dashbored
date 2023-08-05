@@ -236,7 +236,18 @@ module.exports = function (RED) {
                             if(msg.id == "${widget.id}") {
                                 ${widget.generateOnMsg(randomId)}
                             }
-                        })
+                        });
+
+                        //When the page changes
+                        ${widget.onPageFocus ?
+                            `
+                            addOnPageChangeFunction(function(pageId) {
+                                if(pageId == "${page.getAttribute("id")}") {
+                                    ${widget.onPageFocus(randomId)}
+                                }
+                            });
+                        ` : ""
+                        }
                     `);
 
                     //Generate and add the CSS

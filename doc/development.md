@@ -47,6 +47,7 @@ _Note: The ids must include the widget name in the format node-config-input-<WID
 * `generateOnload*: function(htmlId, lockedAccess, alwaysPassword, ask, askText): returns string`: Expects a script to be returned that will be executed when the dashbored loads in. Events should be set here.
 * `generateOnMsg*: function(htmlId): returns string`: Expects a script to be returned that will be executed when a message comes in to the dashbored from nodered. You can update UI elements here for example.
 * `generateScript*: function(): string`: Expects a script to be returned here. This will be placed directly on the webpage for any advanced scripts required.
+* `onPageFocus: function(): string`: Expects a script to be returned here. Is called when the page this widget is on is focused
 
 _There are utility functions which makes the generation with unique identifiers easier see utility methods below_
 

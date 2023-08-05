@@ -59,3 +59,5 @@
 * Bug fix: Made the draggable volume easier to reach 0% and 100%
 ## - 1.1.3
 * Bug fix: Made the draggable volume easier to reach 0% and 100%, forgot the return
+## - 1.1.4
+* Bug fix: Fixed an issue with draggable volume not working on all pages

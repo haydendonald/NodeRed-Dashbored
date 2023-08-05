@@ -327,11 +327,6 @@ module.exports = {
         // var touchPercentListener = `${util.getElement(htmlId, "touch")}.ontouchmove = ${updatePosition}`;
 
         return `
-            //Update the volume touch div to be the correct size of the widget
-            ${util.getElement(htmlId, "touch")}.style.width = ${util.getElement(htmlId, "volumeLevelContainer")}.offsetWidth + "px";
-            ${util.getElement(htmlId, "touch")}.style.height = ${util.getElement(htmlId, "volumeLevelContainer")}.offsetHeight + "px";
-            ${util.getElement(htmlId, "touch")}.style.top = ${util.getElement(htmlId, "volumeLevelContainer")}.offsetTop + "px";
-
             //Add the actions
             if(${this.config.muteEnabled}){${util.getElement(htmlId, "muteButton")}.onclick = function(event) {${muteAction}};}
             ${util.getElement(htmlId, "widget")}.setAttribute("muted", "${this.getValue("muted")}");
@@ -360,6 +355,16 @@ module.exports = {
                     ${this.showVolume(htmlId)}
                 }
             }
+        `;
+    },
+
+    //When the page this widget is on is focused
+    onPageFocus: function(htmlId) {
+        return `
+            //Update the volume touch div to be the correct size of the widget
+            ${util.getElement(htmlId, "touch")}.style.width = ${util.getElement(htmlId, "volumeLevelContainer")}.offsetWidth + "px";
+            ${util.getElement(htmlId, "touch")}.style.height = ${util.getElement(htmlId, "volumeLevelContainer")}.offsetHeight + "px";
+            ${util.getElement(htmlId, "touch")}.style.top = ${util.getElement(htmlId, "volumeLevelContainer")}.offsetTop + "px";
         `;
     },
 
